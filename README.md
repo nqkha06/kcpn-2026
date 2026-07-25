@@ -181,8 +181,8 @@ sequenceDiagram
 ### 1. Clone repository
 
 ```bash
-git clone https://github.com/nqkha06/spendify.git
-cd spendify
+git clone https://github.com/nqkha06/kcpn-2026.git
+cd kcpn-2026
 ```
 
 ### 2. Cài đặt backend
