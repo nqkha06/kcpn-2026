@@ -1,0 +1,819 @@
+{
+  "info": {
+    "_postman_id": "afb24918-a75b-4d61-8188-13b52d5e5d12",
+    "name": "Cashback Admin Users Categories Pages API",
+    "description": "Postman Collection kiểm thử 15 endpoint Admin Users, Admin Categories và Admin Pages. Backend dùng prefix /api/v1 và Laravel Sanctum theo session cookie. Collection thêm CSRF Cookie và Login làm hai request hỗ trợ. Chạy các folder theo thứ tự; mỗi chuỗi CRUD chỉ xóa resource do chính collection vừa tạo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.request.headers.upsert({ key: 'Accept', value: 'application/json' });",
+          "pm.request.headers.upsert({ key: 'Origin', value: pm.variables.replaceIn('{{frontend_url}}') });",
+          "pm.request.headers.upsert({ key: 'Referer', value: pm.variables.replaceIn('{{frontend_url}}/') });",
+          "",
+          "const unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];",
+          "const xsrfToken = pm.collectionVariables.get('xsrf_token');",
+          "if (unsafeMethods.includes(pm.request.method) && xsrfToken) {",
+          "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: xsrfToken });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "api_base_url",
+      "value": "{{base_url}}/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "frontend_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@example.com",
+      "type": "string"
+    },
+    {
+      "key": "admin_password",
+      "value": "password123",
+      "type": "string"
+    },
+    {
+      "key": "xsrf_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_user_email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "page_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "page_slug",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Authentication",
+      "description": "Điền admin_password trong collection variables, sau đó chạy hai request theo thứ tự để tạo CSRF/session cookie và đăng nhập admin.",
+      "item": [
+        {
+          "name": "GET /sanctum/csrf-cookie (helper)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/sanctum/csrf-cookie",
+            "description": "Route thực tế là /api/v1/sanctum/csrf-cookie. Response 204 đặt XSRF-TOKEN và session cookie."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CSRF cookie response is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "let encodedToken = pm.cookies.get('XSRF-TOKEN');",
+                  "",
+                  "if (!encodedToken) {",
+                  "    const setCookieHeaders = pm.response.headers.all().filter(h => h.key.toLowerCase() === 'set-cookie');",
+                  "    for (let i = 0; i < setCookieHeaders.length; i++) {",
+                  "        if (setCookieHeaders[i].value.includes('XSRF-TOKEN')) {",
+                  "            const match = setCookieHeaders[i].value.match(/XSRF-TOKEN=([^;]+)/);",
+                  "            if (match) {",
+                  "                encodedToken = match[1];",
+                  "                break;",
+                  "            }",
+                  "        }",
+                  "    }",
+                  "}",
+                  "",
+                  "pm.test('XSRF-TOKEN cookie is present', function () {",
+                  "    pm.expect(encodedToken).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "if (encodedToken) {",
+                  "    pm.collectionVariables.set('xsrf_token', decodeURIComponent(encodedToken));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login (helper)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{admin_email}}\",\n    \"password\": \"{{admin_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/auth/login"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Admin login succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200 && !pm.response.json().data.requires_two_factor) {",
+                  "    pm.test('Authenticated account has admin role', function () {",
+                  "        pm.expect(pm.response.json().data.user.roles).to.include('admin');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Admin Users",
+      "description": "Create dùng email có timestamp và lưu ID vào user_id. Roles là tùy chọn nên payload mặc định tạo user không có role, tránh phụ thuộc role ID của từng database.",
+      "item": [
+        {
+          "name": "GET /admin/users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/admin/users?per_page=15&page=1",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "role",
+                  "value": "user",
+                  "disabled": true,
+                  "description": "Tên role phải tồn tại với guard web."
+                },
+                {
+                  "key": "created_date",
+                  "value": "2026-07-28",
+                  "disabled": true,
+                  "description": "Định dạng Y-m-d"
+                },
+                {
+                  "key": "created_from",
+                  "value": "2026-07-01",
+                  "disabled": true
+                },
+                {
+                  "key": "created_to",
+                  "value": "2026-07-31",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "created_at",
+                  "disabled": true,
+                  "description": "id, name, email hoặc created_at"
+                },
+                {
+                  "key": "direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('User list is paginated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /admin/users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Postman API User\",\n    \"email\": \"postman.admin-user.{{$timestamp}}@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"roles\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/users",
+            "description": "roles là array role ID tùy chọn; để giữ collection độc lập với dữ liệu seed, request mẫu dùng mảng rỗng."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('User is created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data).to.have.property('id');",
+                  "    pm.expect(data.roles).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set('user_id', String(data.id));",
+                  "    pm.collectionVariables.set('created_user_email', data.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/users/{user}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/users/{{user_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Created user is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(String(data.id)).to.eql(pm.collectionVariables.get('user_id'));",
+                  "    pm.expect(data.email).to.eql(pm.collectionVariables.get('created_user_email'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /admin/users/{user}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Postman API User Updated\",\n    \"email\": \"postman.admin-user.updated.{{$timestamp}}@example.com\",\n    \"roles\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/users/{{user_id}}",
+            "description": "name và email là bắt buộc khi PATCH. password, password_confirmation và roles là tùy chọn; request mẫu vẫn để roles rỗng để không phụ thuộc seed data."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('User is updated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.name).to.eql('Postman API User Updated');",
+                  "    pm.expect(data.email).to.include('postman.admin-user.updated.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /admin/users/{user}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{api_base_url}}/admin/users/{{user_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('User is deleted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().message).to.eql('User deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Admin Categories",
+      "description": "Create dùng tên có timestamp để tránh trùng global category. ID được lưu và dùng xuyên suốt Show, Update, Delete.",
+      "item": [
+        {
+          "name": "GET /admin/categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/admin/categories?per_page=15&page=1",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true,
+                  "description": "active hoặc inactive"
+                },
+                {
+                  "key": "sort",
+                  "value": "created_at",
+                  "disabled": true,
+                  "description": "id, name, status hoặc created_at"
+                },
+                {
+                  "key": "direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Category list is paginated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /admin/categories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Postman Category {{$timestamp}}\",\n    \"color\": \"#10B981\",\n    \"description\": \"Category created from Postman collection\",\n    \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/categories",
+            "description": "color phải là mã hex 3 hoặc 6 ký tự; status chỉ nhận active hoặc inactive."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Category is created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.name).to.include('Postman Category ');",
+                  "    pm.expect(data.status).to.eql('active');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('category_id', String(pm.response.json().data.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/categories/{category}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/categories/{{category_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Created category is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('category_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /admin/categories/{category}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Postman Category Updated {{$timestamp}}\",\n    \"color\": \"#3B82F6\",\n    \"description\": \"Updated from Postman collection\",\n    \"status\": \"inactive\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/categories/{{category_id}}",
+            "description": "CategoryRequest yêu cầu name, color và status cả khi dùng PATCH."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Category is updated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.name).to.include('Postman Category Updated ');",
+                  "    pm.expect(data.color).to.eql('#3B82F6');",
+                  "    pm.expect(data.status).to.eql('inactive');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /admin/categories/{category}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{api_base_url}}/admin/categories/{{category_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Category is deleted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().message).to.eql('Category deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Admin Pages",
+      "description": "Page tạo với category_id null để không phụ thuộc category ở folder trước. Slug được tự sinh từ title; page_id được dùng cho toàn bộ chuỗi CRUD.",
+      "item": [
+        {
+          "name": "GET /admin/pages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/admin/pages?per_page=15&page=1",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "pages"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "published",
+                  "disabled": true,
+                  "description": "published, draft hoặc pending"
+                },
+                {
+                  "key": "sort",
+                  "value": "created_at",
+                  "disabled": true,
+                  "description": "id, title, slug, status hoặc created_at"
+                },
+                {
+                  "key": "direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Page list is paginated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /admin/pages",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Postman API Page {{$timestamp}}\",\n    \"image\": null,\n    \"category_id\": null,\n    \"tags\": \"postman, api, postman\",\n    \"content\": \"<p>Page created from Postman collection</p>\",\n    \"meta_title\": \"Postman API Page {{$timestamp}}\",\n    \"meta_description\": \"Page used for API testing\",\n    \"meta_keywords\": \"postman,api,test\",\n    \"status\": \"published\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/pages",
+            "description": "status hỗ trợ published, draft, pending. tags nhận chuỗi phân tách bằng dấu phẩy hoặc array; service tự loại tag trùng."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Page is created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.status).to.eql('published');",
+                  "    pm.expect(data.tags).to.eql(['postman', 'api']);",
+                  "    pm.expect(data.slug).to.include('postman-api-page-');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set('page_id', String(data.id));",
+                  "    pm.collectionVariables.set('page_slug', data.slug);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/pages/{page}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/pages/{{page_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Created page is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(String(data.id)).to.eql(pm.collectionVariables.get('page_id'));",
+                  "    pm.expect(data.slug).to.eql(pm.collectionVariables.get('page_slug'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /admin/pages/{page}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Postman API Page Updated\",\n    \"slug\": \"postman-api-page-updated-{{$timestamp}}\",\n    \"image\": null,\n    \"category_id\": null,\n    \"tags\": [\"postman\", \"updated\"],\n    \"content\": \"<p>Updated from Postman collection</p>\",\n    \"meta_title\": \"Postman API Page Updated\",\n    \"meta_description\": \"Updated page used for API testing\",\n    \"meta_keywords\": \"postman,api,updated\",\n    \"status\": \"draft\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/pages/{{page_id}}",
+            "description": "PageRequest yêu cầu title và status cả khi dùng PATCH; các field còn lại có thể nullable."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Page is updated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.title).to.eql('Postman API Page Updated');",
+                  "    pm.expect(data.slug).to.include('postman-api-page-updated-');",
+                  "    pm.expect(data.status).to.eql('draft');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /admin/pages/{page}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{api_base_url}}/admin/pages/{{page_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Page is deleted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().message).to.eql('Page deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
