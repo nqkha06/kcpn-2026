@@ -1,0 +1,650 @@
+{
+  "info": {
+    "_postman_id": "8c35a8f4-6d9b-449e-b9b5-c0d11f9ae234",
+    "name": "Transactions, Admin Dashboard & Admin Roles",
+    "description": "Bộ sưu tập kiểm thử API cho phân hệ Transactions (User & Admin), Admin Dashboard và Admin Roles trong dự án KCPN 2026. Tích hợp sẵn cơ chế CSRF/Sanctum tự động.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.request.headers.upsert({ key: 'Accept', value: 'application/json' });",
+          "pm.request.headers.upsert({ key: 'Origin', value: pm.variables.replaceIn('{{frontend_url}}') });",
+          "pm.request.headers.upsert({ key: 'Referer', value: pm.variables.replaceIn('{{frontend_url}}/') });",
+          "",
+          "const unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];",
+          "const xsrfToken = pm.collectionVariables.get('xsrf_token');",
+          "if (unsafeMethods.includes(pm.request.method) && xsrfToken) {",
+          "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: xsrfToken });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "api_base_url",
+      "value": "{{base_url}}/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "frontend_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "xsrf_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_transaction_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_transaction_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "role_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - CSRF & Auth Helpers",
+      "item": [
+        {
+          "name": "GET /sanctum/csrf-cookie (Khởi tạo Cookie)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/sanctum/csrf-cookie",
+            "description": "Gọi API này trước tiên để nhận XSRF-TOKEN cookie."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CSRF cookie response is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "const encodedToken = pm.cookies.get('XSRF-TOKEN');",
+                  "if (encodedToken) {",
+                  "    pm.collectionVariables.set('xsrf_token', decodeURIComponent(encodedToken));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login (Đăng nhập Admin/User)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password\",\n    \"remember\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/auth/login",
+            "description": "Đăng nhập tài khoản. Chú ý gán vai trò 'admin' hoặc 'user' cho tài khoản này trước."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - User Transactions",
+      "item": [
+        {
+          "name": "GET /user/transactions (Danh sách giao dịch)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/user/transactions?page=1&per_page=15",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "user",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                }
+              ]
+            },
+            "description": "Lấy danh sách giao dịch chi tiêu/thu nhập của User hiện tại."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Get transactions succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /user/transactions (Tạo giao dịch)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"wallet_id\": 1,\n    \"category_id\": 1,\n    \"type\": \"expense\",\n    \"amount\": 50000,\n    \"transacted_at\": \"2026-07-29\",\n    \"note\": \"Ăn trưa văn phòng\",\n    \"labels\": [\"ăn-uống\", \"demo\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/user/transactions",
+            "description": "Tạo một giao dịch chi tiêu mới. Lưu ý: `wallet_id` và `category_id` phải tồn tại trong DB của user này."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Create transaction succeeds', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.success).to.eql(true);",
+                  "    pm.collectionVariables.set('user_transaction_id', responseJson.data.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Admin Dashboard",
+      "item": [
+        {
+          "name": "GET /admin/dashboard (Dashboard dữ liệu Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/dashboard",
+            "description": "Xem thông tin bảng điều khiển tổng hợp của Admin (yêu cầu quyền Admin)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Admin dashboard succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Admin Roles",
+      "item": [
+        {
+          "name": "GET /admin/roles (Danh sách vai trò)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/admin/roles?page=1&per_page=15",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "roles"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                }
+              ]
+            },
+            "description": "Lấy danh sách phân trang tất cả các vai trò hệ thống."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Get roles succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/roles/options (Options vai trò)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/roles/options",
+            "description": "Lấy danh sách rút gọn các vai trò phục vụ thẻ select option."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Get roles options succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /admin/roles (Tạo vai trò)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Postman Test Role\",\n    \"permissions\": [1, 2]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/roles",
+            "description": "Tạo một vai trò quản trị mới."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Create role succeeds', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.success).to.eql(true);",
+                  "    pm.collectionVariables.set('role_id', responseJson.data.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/roles/{id} (Chi tiết vai trò)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/roles/{{role_id}}",
+            "description": "Xem chi tiết một vai trò quản trị cụ thể theo ID."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Get role detail succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /admin/roles/{id} (Cập nhật vai trò)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Postman Test Role Updated\",\n    \"permissions\": [1]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/roles/{{role_id}}",
+            "description": "Cập nhật tên và phân quyền của một vai trò quản trị."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Update role succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /admin/roles/{id} (Xóa vai trò)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{api_base_url}}/admin/roles/{{role_id}}",
+            "description": "Xóa một vai trò quản trị ra khỏi hệ thống."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Delete role succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Admin Transactions",
+      "item": [
+        {
+          "name": "GET /admin/transactions (Danh sách giao dịch hệ thống)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/admin/transactions?page=1&per_page=15",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                }
+              ]
+            },
+            "description": "Lấy danh sách tất cả các giao dịch của mọi người dùng trong hệ thống (yêu cầu quyền Admin)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Get admin transactions succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/transactions/options (Lấy Options cấu hình giao dịch)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/transactions/options",
+            "description": "Lấy các tùy chọn cho giao dịch phía Admin."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Get admin transactions options succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /admin/transactions (Tạo giao dịch cho User bất kỳ)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user_id\": 1,\n    \"wallet_id\": 1,\n    \"category_id\": 1,\n    \"type\": \"expense\",\n    \"amount\": 150000,\n    \"transacted_at\": \"2026-07-29\",\n    \"status\": \"posted\",\n    \"note\": \"Chi phí mua sắm văn phòng phẩm (Admin tạo)\",\n    \"labels\": [\"office\", \"admin-created\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/transactions",
+            "description": "Admin tạo một giao dịch cho một User bất kỳ. Phải cung cấp `user_id` và ví thuộc về user đó."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Admin create transaction succeeds', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.success).to.eql(true);",
+                  "    pm.collectionVariables.set('admin_transaction_id', responseJson.data.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/transactions/{id} (Chi tiết giao dịch)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
+            "description": "Xem chi tiết một giao dịch cụ thể từ phía Admin."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Get admin transaction detail succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /admin/transactions/{id} (Cập nhật giao dịch)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user_id\": 1,\n    \"wallet_id\": 1,\n    \"category_id\": 1,\n    \"type\": \"expense\",\n    \"amount\": 180000,\n    \"transacted_at\": \"2026-07-29\",\n    \"status\": \"posted\",\n    \"note\": \"Chi phí mua sắm văn phòng phẩm (Admin cập nhật)\",\n    \"labels\": [\"office\", \"admin-updated\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
+            "description": "Cập nhật một giao dịch hiện có."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Update admin transaction succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /admin/transactions/{id} (Xóa giao dịch)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
+            "description": "Xóa giao dịch ra khỏi hệ thống từ phía Admin."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Delete admin transaction succeeds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
