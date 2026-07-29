@@ -1,17 +1,93 @@
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"user_id\": 1,\n    \"wallet_id\": 1,\n    \"category_id\": 1,\n    \"type\": \"expense\",\n    \"amount\": 180000,\n    \"transacted_at\": \"2026-07-29\",\n    \"status\": \"posted\",\n    \"note\": \"Chi phí mua sắm văn phòng phẩm (Admin cập nhật)\",\n    \"labels\": [\"office\", \"admin-updated\"]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
-            "description": "Cập nhật một giao dịch hiện có."
+{
+  "info": {
+    "_postman_id": "d3d68a60-e6c4-4b40-88ce-a69435a53e5e",
+    "name": "CSRF, Appearance, Admin Budgets & Permissions",
+    "description": "CSRF, Appearance, Admin Budgets & Permissions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.request.headers.upsert({ key: 'Accept', value: 'application/json' });",
+          "pm.request.headers.upsert({ key: 'Origin', value: pm.variables.replaceIn('{{frontend_url}}') });",
+          "pm.request.headers.upsert({ key: 'Referer', value: pm.variables.replaceIn('{{frontend_url}}/') });",
+          "",
+          "const unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];",
+          "const xsrfToken = pm.collectionVariables.get('xsrf_token');",
+          "if (unsafeMethods.includes(pm.request.method) && xsrfToken) {",
+          "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: xsrfToken });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "api_base_url",
+      "value": "{{base_url}}/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "frontend_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@example.com",
+      "type": "string"
+    },
+    {
+      "key": "admin_password",
+      "value": "password",
+      "type": "string"
+    },
+    {
+      "key": "xsrf_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "budget_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "budget_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "budget_category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "permission_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Authentication",
+      "description": "Chạy theo thứ tự để Postman lưu XSRF-TOKEN và laravel_session trong cookie jar. Điền admin_password trong collection variables trước khi chạy Login.",
+      "item": [
+        {
+          "name": "GET /sanctum/csrf-cookie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/sanctum/csrf-cookie",
+            "description": "Backend đăng ký route này tại /api/v1/sanctum/csrf-cookie. Response 204 sẽ đặt cookie XSRF-TOKEN và session cookie."
           },
           "response": [],
           "event": [
@@ -20,9 +96,91 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Update admin transaction succeeds', function () {",
+                  "pm.test('CSRF cookie response is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "const encodedToken = pm.cookies.get('XSRF-TOKEN');",
+                  "pm.test('XSRF-TOKEN cookie is present', function () {",
+                  "    pm.expect(encodedToken).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "if (encodedToken) {",
+                  "    pm.collectionVariables.set('xsrf_token', decodeURIComponent(encodedToken));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/login (helper)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{admin_email}}\",\n    \"password\": \"{{admin_password}}\",\n    \"remember\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/auth/login",
+            "description": "Request hỗ trợ xác thực session Sanctum. Điền collection variable admin_password bằng mật khẩu admin cục bộ."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login succeeds', function () {",
                   "    pm.response.to.have.status(200);",
                   "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const roles = pm.response.json().data.user.roles || [];",
+                  "    pm.test('Authenticated account has admin role', function () {",
+                  "        pm.expect(roles).to.include('admin');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Admin Appearance",
+      "item": [
+        {
+          "name": "GET /admin/appearance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/appearance"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Appearance is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "    pm.expect(pm.response.json().data).to.have.property('general');",
                   "});"
                 ]
               }
@@ -30,12 +188,85 @@
           ]
         },
         {
-          "name": "DELETE /admin/transactions/{id} (Xóa giao dịch)",
+          "name": "POST /admin/appearance",
           "request": {
-            "method": "DELETE",
+            "method": "POST",
             "header": [],
-            "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
-            "description": "Xóa giao dịch ra khỏi hệ thống từ phía Admin."
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "general[vi][site_name]",
+                  "value": "Hoàn tiền",
+                  "type": "text"
+                },
+                {
+                  "key": "general[vi][site_title]",
+                  "value": "Quản lý chi tiêu",
+                  "type": "text"
+                },
+                {
+                  "key": "general[vi][tagline]",
+                  "value": "Chi tiêu thông minh",
+                  "type": "text"
+                },
+                {
+                  "key": "general[vi][meta_description]",
+                  "value": "Ứng dụng quản lý chi tiêu và hoàn tiền",
+                  "type": "text"
+                },
+                {
+                  "key": "general[en][site_name]",
+                  "value": "Cashback",
+                  "type": "text"
+                },
+                {
+                  "key": "general[en][site_title]",
+                  "value": "Expense Manager",
+                  "type": "text"
+                },
+                {
+                  "key": "general[en][tagline]",
+                  "value": "Spend smarter",
+                  "type": "text"
+                },
+                {
+                  "key": "general[en][meta_description]",
+                  "value": "Cashback and expense management application",
+                  "type": "text"
+                },
+                {
+                  "key": "logo_light",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true,
+                  "description": "Tùy chọn: jpg, jpeg, png, gif, webp, svg, ico; tối đa 4 MB."
+                },
+                {
+                  "key": "logo_dark",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true,
+                  "description": "Tùy chọn: bật field rồi chọn file."
+                },
+                {
+                  "key": "favicon",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true,
+                  "description": "Tùy chọn: bật field rồi chọn file."
+                },
+                {
+                  "key": "social_image",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true,
+                  "description": "Tùy chọn: bật field rồi chọn file."
+                }
+              ]
+            },
+            "url": "{{api_base_url}}/admin/appearance",
+            "description": "Gửi multipart/form-data để vừa cập nhật nội dung đa ngôn ngữ vừa có thể upload ảnh. Các field file đang tắt mặc định; bật và chọn file khi cần."
           },
           "response": [],
           "event": [
@@ -44,9 +275,482 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Delete admin transaction succeeds', function () {",
+                  "pm.test('Appearance is updated', function () {",
                   "    pm.response.to.have.status(200);",
-                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.message).to.eql('Appearance settings updated successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Admin Budgets",
+      "description": "Chạy cả folder theo thứ tự. Request Options tự chọn user/category đầu tiên nếu collection variables tương ứng đang trống. Create lưu data.id vào budget_id để Show, Update và Delete dùng lại.",
+      "item": [
+        {
+          "name": "GET /admin/budgets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/admin/budgets?per_page=15&page=1",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "budgets"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "period",
+                  "value": "monthly",
+                  "disabled": true,
+                  "description": "monthly hoặc yearly"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true,
+                  "description": "active hoặc inactive"
+                },
+                {
+                  "key": "user_id",
+                  "value": "{{budget_user_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "{{budget_category_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "created_at",
+                  "disabled": true,
+                  "description": "id, amount_limit, period, status hoặc created_at"
+                },
+                {
+                  "key": "direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Budget list is paginated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/budgets/options",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/budgets/options",
+            "description": "Ngoài kiểm thử endpoint, test script sẽ tự điền budget_user_id và budget_category_id nếu các biến đang trống."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Budget options are returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.users).to.be.an('array').and.not.empty;",
+                  "    pm.expect(data.categories).to.be.an('array').and.not.empty;",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json().data;",
+                  "    if (!pm.collectionVariables.get('budget_user_id') && data.users.length > 0) {",
+                  "        pm.collectionVariables.set('budget_user_id', String(data.users[0].id));",
+                  "    }",
+                  "",
+                  "    const userId = Number(pm.collectionVariables.get('budget_user_id'));",
+                  "    const compatibleCategory = data.categories.find(function (category) {",
+                  "        return category.user_id === null || Number(category.user_id) === userId;",
+                  "    });",
+                  "",
+                  "    if (!pm.collectionVariables.get('budget_category_id') && compatibleCategory) {",
+                  "        pm.collectionVariables.set('budget_category_id', String(compatibleCategory.id));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /admin/budgets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user_id\": {{budget_user_id}},\n    \"category_id\": {{budget_category_id}},\n    \"amount_limit\": 1000000,\n    \"period\": \"yearly\",\n    \"status\": \"active\",\n    \"note\": \"Created from Postman collection\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/budgets",
+            "description": "user_id và category_id phải tồn tại; category phải là global hoặc thuộc user. Bộ ba user_id + category_id + period phải là duy nhất."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Budget is created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    pm.expect(pm.response.json().data).to.have.property('id');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('budget_id', String(pm.response.json().data.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/budgets/{budget}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/budgets/{{budget_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Created budget is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('budget_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /admin/budgets/{budget}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user_id\": {{budget_user_id}},\n    \"category_id\": {{budget_category_id}},\n    \"amount_limit\": 1500000,\n    \"period\": \"yearly\",\n    \"status\": \"inactive\",\n    \"note\": \"Updated from Postman collection\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/budgets/{{budget_id}}",
+            "description": "BudgetRequest yêu cầu gửi đầy đủ user_id, category_id, amount_limit, period và status cả khi dùng PATCH."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Budget is updated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.amount_limit).to.eql(1500000);",
+                  "    pm.expect(data.status).to.eql('inactive');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /admin/budgets/{budget}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{api_base_url}}/admin/budgets/{{budget_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Budget is deleted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().message).to.eql('Budget deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Admin Permissions",
+      "description": "Create dùng tên có timestamp để tránh trùng và tự lưu data.id vào permission_id. Chạy cả folder theo thứ tự để chỉ xóa permission do collection vừa tạo.",
+      "item": [
+        {
+          "name": "GET /admin/permissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/admin/permissions?per_page=15&page=1",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "permissions"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "id",
+                  "disabled": true,
+                  "description": "id, name hoặc created_at"
+                },
+                {
+                  "key": "direction",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Permission list is paginated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.meta).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /admin/permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"postman.permission.{{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/permissions"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Permission is created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    pm.expect(pm.response.json().data.guard_name).to.eql('web');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('permission_id', String(pm.response.json().data.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/permissions/options",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/permissions/options"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Permission options are returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /admin/permissions/{permission}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/admin/permissions/{{permission_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Created permission is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('permission_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /admin/permissions/{permission}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"postman.permission.updated.{{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/admin/permissions/{{permission_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Permission is updated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().data.name).to.include('postman.permission.updated.');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /admin/permissions/{permission}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{api_base_url}}/admin/permissions/{{permission_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Permission is deleted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().message).to.eql('Permission deleted successfully');",
                   "});"
                 ]
               }
