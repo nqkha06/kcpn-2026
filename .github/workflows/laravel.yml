@@ -42,4 +42,4 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: ":memory:"
-        run: php artisan test --compact tests/Feature/SmokeTest.php
+        run: php artisan test --compact tests/Feature/
