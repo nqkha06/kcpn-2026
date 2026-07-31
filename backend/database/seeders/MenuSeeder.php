@@ -12,6 +12,12 @@ class MenuSeeder extends Seeder
      */
     public function run(): void
     {
+        Menu::query()
+            ->where('canonical', 'home.footer')
+            ->where('title', 'Bảng xếp hạng')
+            ->where('url', '/leaderboard')
+            ->delete();
+
         $menus = [
             'home.header' => [
                 [
@@ -27,8 +33,14 @@ class MenuSeeder extends Seeder
                     'children' => [],
                 ],
                 [
-                    'title' => 'Câu hỏi thường gặp',
+                    'title' => 'Mẫu ngân sách',
                     'url' => '/#templates',
+                    'target' => '_self',
+                    'children' => [],
+                ],
+                [
+                    'title' => 'Câu hỏi thường gặp',
+                    'url' => '/#faqs',
                     'target' => '_self',
                     'children' => [],
                 ],
@@ -45,8 +57,9 @@ class MenuSeeder extends Seeder
                     'url' => null,
                     'target' => '_self',
                     'children' => [
+                        ['title' => 'Tính năng', 'url' => '/#features', 'target' => '_self'],
                         ['title' => 'Cách hoạt động', 'url' => '/#how-it-works', 'target' => '_self'],
-                        ['title' => 'Bảng xếp hạng', 'url' => '/leaderboard', 'target' => '_self'],
+                        ['title' => 'Mẫu ngân sách', 'url' => '/#templates', 'target' => '_self'],
                     ],
                 ],
                 [
@@ -54,7 +67,7 @@ class MenuSeeder extends Seeder
                     'url' => null,
                     'target' => '_self',
                     'children' => [
-                        ['title' => 'Về chúng tôi', 'url' => '/about', 'target' => '_self'],
+                        ['title' => 'Về chúng tôi', 'url' => '/p/gioi-thieu', 'target' => '_self'],
                         ['title' => 'Liên hệ', 'url' => '/#contact', 'target' => '_self'],
                     ],
                 ],
@@ -63,15 +76,46 @@ class MenuSeeder extends Seeder
                     'url' => null,
                     'target' => '_self',
                     'children' => [
-                        ['title' => 'Trung tâm trợ giúp', 'url' => '#', 'target' => '_self'],
-                        ['title' => 'Chính sách bảo mật', 'url' => '#', 'target' => '_self'],
+                        ['title' => 'Trung tâm trợ giúp', 'url' => '/p/trung-tam-tro-giup', 'target' => '_self'],
+                        ['title' => 'Chính sách bảo mật', 'url' => '/p/chinh-sach-bao-mat', 'target' => '_self'],
+                        ['title' => 'Điều khoản sử dụng', 'url' => '/p/dieu-khoan-su-dung', 'target' => '_self'],
                     ],
                 ],
             ],
             'user.header' => [
                 [
                     'title' => 'Dashboard',
-                    'url' => '/user/dashboard',
+                    'url' => '/dashboard',
+                    'target' => '_self',
+                    'children' => [],
+                ],
+                [
+                    'title' => 'Giao dịch',
+                    'url' => '/transactions',
+                    'target' => '_self',
+                    'children' => [],
+                ],
+                [
+                    'title' => 'Ngân sách',
+                    'url' => '/budgets',
+                    'target' => '_self',
+                    'children' => [],
+                ],
+                [
+                    'title' => 'Ví tiền',
+                    'url' => '/wallets',
+                    'target' => '_self',
+                    'children' => [],
+                ],
+                [
+                    'title' => 'Danh mục',
+                    'url' => '/categories',
+                    'target' => '_self',
+                    'children' => [],
+                ],
+                [
+                    'title' => 'Cài đặt',
+                    'url' => '/settings',
                     'target' => '_self',
                     'children' => [],
                 ],

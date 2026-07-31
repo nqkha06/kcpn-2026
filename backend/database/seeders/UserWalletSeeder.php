@@ -14,6 +14,10 @@ class UserWalletSeeder extends Seeder
     public function run(): void
     {
         User::query()->each(function (User $user): void {
+            if ($user->wallets()->exists()) {
+                return;
+            }
+
             UserWallet::query()->firstOrCreate(
                 [
                     'user_id' => $user->id,

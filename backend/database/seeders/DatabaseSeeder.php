@@ -2,10 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,19 +11,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        $this->call(PermissionSeeder::class);
-
-        $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            PermissionSeeder::class,
+            AdminUserSeeder::class,
+            CategorySeeder::class,
+            PageSeeder::class,
+            SettingSeeder::class,
+            MenuSeeder::class,
+            DemoDataSeeder::class,
+            UserWalletSeeder::class,
         ]);
-        $user->assignRole(Role::findOrCreate('user', 'web'));
-
-        $this->call(CategorySeeder::class);
-        $this->call(UserWalletSeeder::class);
-        $this->call(MenuSeeder::class);
-        $this->call(DemoDataSeeder::class);
     }
 }

@@ -1,0 +1,15 @@
+{
+    "name": "codeceptjs-tests",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "test": "HEADLESS=true codeceptjs run --steps",
+        "test:headed": "codeceptjs run --steps",
+        "codeceptjs": "codeceptjs run --steps",
+        "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"
+    },
+    "devDependencies": {
+        "codeceptjs": "^4.1.0",
+        "playwright": "^1.62.0"
+    }
+}

@@ -28,8 +28,11 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            Category::query()->firstOrCreate(
-                ['name' => $category['name']],
+            Category::query()->updateOrCreate(
+                [
+                    'user_id' => null,
+                    'name' => $category['name'],
+                ],
                 [
                     'color' => $category['color'],
                     'description' => $category['description'],

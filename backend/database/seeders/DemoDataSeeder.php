@@ -22,6 +22,7 @@ class DemoDataSeeder extends Seeder
         $this->call(CategorySeeder::class);
 
         $categories = Category::query()
+            ->whereNull('user_id')
             ->where('status', 'active')
             ->get()
             ->keyBy('name');
@@ -38,8 +39,14 @@ class DemoDataSeeder extends Seeder
                     'password' => Hash::make('password'),
                 ],
             );
-            if ($user->roles()->doesntExist()) {
-                $user->assignRole(Role::findOrCreate('user', 'web'));
+            $user->assignRole(Role::findOrCreate('user', 'web'));
+
+            foreach ([
+                'currency' => 'VND',
+                'locale' => 'vi',
+                'timezone' => 'Asia/Ho_Chi_Minh',
+            ] as $key => $value) {
+                $user->setMeta($key, $value);
             }
 
             $wallets = $this->seedWallets($user, $userData['wallets']);
