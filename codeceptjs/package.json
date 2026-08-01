@@ -3,10 +3,10 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "test": "HEADLESS=true codeceptjs run --steps",
-        "test:headed": "codeceptjs run --steps",
-        "codeceptjs": "codeceptjs run --steps",
-        "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"
+        "test": "HEADLESS=true node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps",
+        "test:headed": "HEADLESS=false node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps",
+        "codeceptjs": "node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps",
+        "codeceptjs:headless": "HEADLESS=true node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps"
     },
     "devDependencies": {
         "codeceptjs": "^4.1.0",
