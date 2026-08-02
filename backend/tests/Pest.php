@@ -43,8 +43,20 @@ expect()->extend('toBeOne', function () {
 
 function adminUser(): App\Models\User
 {
+    app(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
     $user = App\Models\User::factory()->create();
     $user->assignRole(Spatie\Permission\Models\Role::findOrCreate('admin', 'web'));
+
+    return $user;
+}
+
+function regularUser(): App\Models\User
+{
+    app(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+    $user = App\Models\User::factory()->create();
+    $user->assignRole(Spatie\Permission\Models\Role::findOrCreate('user', 'web'));
 
     return $user;
 }
