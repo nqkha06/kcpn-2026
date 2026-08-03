@@ -21,6 +21,8 @@ it('can list permissions', function () {
 });
 
 it('can get permission options', function () {
+    Permission::findOrCreate('option-permission', 'web');
+
     actingAs($this->admin)
         ->getJson(route('api.v1.admin.permissions.options'))
         ->assertOk()

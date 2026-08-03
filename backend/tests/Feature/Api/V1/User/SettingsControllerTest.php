@@ -13,7 +13,7 @@ it('can view user settings', function () {
     actingAs($this->user)
         ->getJson(route('api.v1.user.settings.show'))
         ->assertOk()
-        ->assertJsonStructure(['data' => ['id', 'name', 'email']]);
+        ->assertJsonStructure(['data' => ['profile', 'preferences', 'currency_options']]);
 });
 
 it('can update user profile', function () {
