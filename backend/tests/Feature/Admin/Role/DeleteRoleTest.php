@@ -21,7 +21,7 @@ it('can delete a role', function () {
 });
 
 it('cannot delete system roles', function () {
-    $role = Role::where('name', 'super-admin')->first();
+    $role = Role::where('name', 'admin')->first();
 
     $response = $this->actingAs($this->user, 'sanctum')->deleteJson("/api/v1/admin/roles/{$role->id}");
 

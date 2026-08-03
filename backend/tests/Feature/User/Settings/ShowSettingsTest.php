@@ -4,10 +4,12 @@ use App\Models\User;
 
 it('returns the settings of the current user', function () {
     $user = User::factory()->create([
-        'first_name' => 'John',
-        'last_name' => 'Doe',
+        'name' => 'John Doe',
+        'email' => 'john@example.com',
     ]);
-
+    
+    $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
+    
     $user->setMeta('currency', 'USD');
 
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/v1/user/settings');
@@ -16,8 +18,8 @@ it('returns the settings of the current user', function () {
         ->assertJson([
             'data' => [
                 'profile' => [
-                    'first_name' => 'John',
-                    'last_name' => 'Doe',
+                    'name' => 'John Doe',
+                    'email' => 'john@example.com',
                 ],
                 'preferences' => [
                     'currency' => 'USD',
