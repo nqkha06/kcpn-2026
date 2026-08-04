@@ -29,6 +29,9 @@ class RolePolicy
 
     public function delete(User $user, Role $role): bool
     {
+        if (in_array($role->name, ['admin', 'super-admin'])) {
+            return false;
+        }
         return $user->hasRole('admin');
     }
 
