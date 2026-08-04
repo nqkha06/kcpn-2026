@@ -47,9 +47,4 @@ Scenario('Verify status column', ({ I }) => {
     I.see('Active');
 });
 
-// NOTE: "Target" (_self / _blank) is a field on the Menu form
-// (MenuFormView), not a column rendered in the Menus list table
-// (menus-list-view.tsx columns: title, url, canonical, parent,
-// sort_order, status, created_at). No "Target" column selector
-// exists in the list view to verify without inventing one.
 Scenario.todo('Verify target column (not present in Menus list table - see MenuFormView "Target" field instead)');
