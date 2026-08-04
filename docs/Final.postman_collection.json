@@ -1,0 +1,3435 @@
+{
+  "info": {
+    "_postman_id": "db4fdd0b-8f39-478e-b18d-a441879d60bd",
+    "name": "KCPM API Complete Collection",
+    "description": "Collection hợp nhất và đồng bộ toàn bộ request/test từ 5 Postman collection trong docs. Bao phủ Auth, Public, User Dashboard, Settings, Categories, Wallets, Budgets, Transactions và toàn bộ nhóm Admin Appearance, Dashboard, Users, Categories, Pages, Menus, Budgets, Permissions, Roles, Transactions. Request CSRF được chạy đầu tiên để lưu XSRF-TOKEN; collection tự gắn token này cho các request thay đổi dữ liệu. Thứ tự folder được thiết kế cho Collection Runner: lấy CSRF, đăng nhập admin, chạy Admin, chuyển sang user, chạy User, rồi logout.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.request.headers.upsert({ key: 'Accept', value: 'application/json' });",
+          "pm.request.headers.upsert({ key: 'Origin', value: pm.variables.replaceIn('{{frontend_url}}') });",
+          "pm.request.headers.upsert({ key: 'Referer', value: pm.variables.replaceIn('{{frontend_url}}/') });",
+          "",
+          "const unsafeMethods = ['POST', 'PATCH', 'PUT', 'DELETE'];",
+          "const encodedToken = pm.cookies.get('XSRF-TOKEN');",
+          "const xsrfToken = encodedToken",
+          "    ? decodeURIComponent(encodedToken)",
+          "    : pm.collectionVariables.get('xsrf_token');",
+          "if (unsafeMethods.includes(pm.request.method) && xsrfToken) {",
+          "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: xsrfToken });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "api_base_url",
+      "value": "{{base_url}}/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "frontend_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@example.com",
+      "type": "string"
+    },
+    {
+      "key": "admin_password",
+      "value": "password",
+      "type": "string"
+    },
+    {
+      "key": "xsrf_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "budget_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "budget_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "budget_category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "permission_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registered_email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registered_password",
+      "value": "password123",
+      "type": "string"
+    },
+    {
+      "key": "reset_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reset_new_password",
+      "value": "new-password123",
+      "type": "string"
+    },
+    {
+      "key": "two_factor_code",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "two_factor_recovery_code",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "public_locale",
+      "value": "vi",
+      "type": "string"
+    },
+    {
+      "key": "public_page_slug",
+      "value": "about",
+      "type": "string"
+    },
+    {
+      "key": "menu_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_user_email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "page_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "page_slug",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "transaction_date",
+      "value": "2026-08-04",
+      "type": "string"
+    },
+    {
+      "key": "user_wallet_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "user_category_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "user_transaction_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_wallet_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_transaction_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "role_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_email",
+      "value": "test@example.com",
+      "type": "string"
+    },
+    {
+      "key": "user_password",
+      "value": "password",
+      "type": "string"
+    },
+    {
+      "key": "existing_user_category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_user_category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "available_user_category_ids",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "existing_user_wallet_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_user_wallet_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_user_budget_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "GET /sanctum/csrf-cookie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/sanctum/csrf-cookie",
+            "description": "Lấy XSRF-TOKEN và session cookie trước khi gọi các API POST, PUT, PATCH hoặc DELETE. Postman cần bật Cookie Jar."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CSRF cookie response is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "const encodedToken = pm.cookies.get('XSRF-TOKEN');",
+                  "pm.test('XSRF-TOKEN cookie is present', function () {",
+                  "    pm.expect(encodedToken).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "if (encodedToken) {",
+                  "    pm.collectionVariables.set('xsrf_token', decodeURIComponent(encodedToken));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Account & Recovery",
+          "item": [
+            {
+              "name": "POST /auth/register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Postman Test User\",\n    \"email\": \"postman.user.{{$timestamp}}@example.com\",\n    \"password\": \"{{registered_password}}\",\n    \"password_confirmation\": \"{{registered_password}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/auth/register",
+                "description": "Tạo user mới với role user và đăng nhập user đó vào session hiện tại. Email động tránh lỗi trùng dữ liệu."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('User is registered', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.data.user.roles).to.include('user');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    pm.collectionVariables.set('registered_email', pm.response.json().data.user.email);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /auth/forgot-password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"{{registered_email}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/auth/forgot-password",
+                "description": "Gửi yêu cầu reset cho user thử nghiệm vừa đăng ký. Với MAIL_MAILER=log, lấy token trong storage/logs/laravel.log hoặc URL reset được ghi vào log."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Password reset link is requested', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().success).to.eql(true);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /auth/reset-password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"token\": \"{{reset_token}}\",\n    \"email\": \"{{registered_email}}\",\n    \"password\": \"{{reset_new_password}}\",\n    \"password_confirmation\": \"{{reset_new_password}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/auth/reset-password",
+                "description": "Điền reset_token lấy từ email hoặc storage/logs/laravel.log. Nếu biến đang trống, response 422 là kết quả mong đợi vì token là bắt buộc."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const resetToken = pm.collectionVariables.get('reset_token');",
+                      "if (resetToken) {",
+                      "    pm.test('Password is reset with supplied token', function () {",
+                      "        pm.response.to.have.status(200);",
+                      "        pm.expect(pm.response.json().success).to.eql(true);",
+                      "    });",
+                      "} else {",
+                      "    pm.test('Empty reset token is rejected', function () {",
+                      "        pm.response.to.have.status(422);",
+                      "        pm.expect(pm.response.json().errors).to.have.property('token');",
+                      "    });",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /auth/two-factor-challenge",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"code\": \"{{two_factor_code}}\",\n    \"recovery_code\": \"{{two_factor_recovery_code}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/auth/two-factor-challenge",
+                "description": "Chỉ chạy thành công sau khi Login bằng tài khoản đã bật 2FA và response yêu cầu two-factor. Điền một trong two_factor_code hoặc two_factor_recovery_code. Nếu cả hai trống, response 422 là mong đợi."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const hasChallengeValue = pm.collectionVariables.get('two_factor_code') || pm.collectionVariables.get('two_factor_recovery_code');",
+                      "if (hasChallengeValue) {",
+                      "    pm.test('Two-factor challenge succeeds', function () {",
+                      "        pm.response.to.have.status(200);",
+                      "        pm.expect(pm.response.json().data.requires_two_factor).to.eql(false);",
+                      "    });",
+                      "} else {",
+                      "    pm.test('Missing two-factor code is rejected', function () {",
+                      "        pm.response.to.have.status(422);",
+                      "        pm.expect(pm.response.json().success).to.eql(false);",
+                      "    });",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Admin Session",
+          "item": [
+            {
+              "name": "POST /auth/login — Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"{{admin_email}}\",\n    \"password\": \"{{admin_password}}\",\n    \"remember\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/auth/login",
+                "description": "Điền admin_password trong collection variables. Request này thay session user vừa đăng ký bằng session admin dùng cho Menu CRUD."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Admin login succeeds', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().success).to.eql(true);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200 && !pm.response.json().data.requires_two_factor) {",
+                      "    pm.test('Authenticated account has admin role', function () {",
+                      "        pm.expect(pm.response.json().data.user.roles).to.include('admin');",
+                      "    });",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /auth/me",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/auth/me"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Current admin session is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const user = pm.response.json().data.user;",
+                      "    pm.expect(user.email).to.eql(pm.collectionVariables.get('admin_email').toLowerCase());",
+                      "    pm.expect(user.roles).to.include('admin');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Public API",
+      "item": [
+        {
+          "name": "GET /public/configuration",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/public/configuration?locale={{public_locale}}",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "public",
+                "configuration"
+              ],
+              "query": [
+                {
+                  "key": "locale",
+                  "value": "{{public_locale}}",
+                  "description": "Hỗ trợ vi hoặc en"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Public configuration is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.locale).to.eql(pm.collectionVariables.get('public_locale'));",
+                  "    pm.expect(json.data).to.have.property('menus');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /public/pages/{slug}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/public/pages/{{public_page_slug}}",
+            "description": "public_page_slug phải trỏ tới page có status published. Route hỗ trợ slug lồng nhau như guides/getting-started."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Published page is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const data = pm.response.json().data;",
+                  "    pm.expect(data.slug).to.eql(pm.collectionVariables.get('public_page_slug'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin API",
+      "item": [
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "GET /admin/dashboard",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/dashboard",
+                "description": "Trả về dữ liệu tổng hợp cho admin: stats, dòng tiền 6 tháng, top category chi tiêu và tối đa 8 giao dịch gần nhất. Yêu cầu tài khoản có role admin."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Dashboard structure is complete', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.data).to.include.keys('stats', 'monthlyFlow', 'topExpenseCategories', 'recentTransactions');",
+                      "    pm.expect(json.data.stats).to.include.keys('users', 'wallets', 'activeCategories', 'activeBudgets', 'postedIncomeThisMonth', 'postedExpenseThisMonth', 'netThisMonth', 'pendingTransactions');",
+                      "    pm.expect(json.data.monthlyFlow).to.be.an('array').with.lengthOf(6);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Appearance",
+          "item": [
+            {
+              "name": "GET /admin/appearance",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/appearance"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Appearance is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().success).to.eql(true);",
+                      "    pm.expect(pm.response.json().data).to.have.property('general');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/appearance",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "general[vi][site_name]",
+                      "value": "Hoàn tiền",
+                      "type": "text"
+                    },
+                    {
+                      "key": "general[vi][site_title]",
+                      "value": "Quản lý chi tiêu",
+                      "type": "text"
+                    },
+                    {
+                      "key": "general[vi][tagline]",
+                      "value": "Chi tiêu thông minh",
+                      "type": "text"
+                    },
+                    {
+                      "key": "general[vi][meta_description]",
+                      "value": "Ứng dụng quản lý chi tiêu và hoàn tiền",
+                      "type": "text"
+                    },
+                    {
+                      "key": "general[en][site_name]",
+                      "value": "Cashback",
+                      "type": "text"
+                    },
+                    {
+                      "key": "general[en][site_title]",
+                      "value": "Expense Manager",
+                      "type": "text"
+                    },
+                    {
+                      "key": "general[en][tagline]",
+                      "value": "Spend smarter",
+                      "type": "text"
+                    },
+                    {
+                      "key": "general[en][meta_description]",
+                      "value": "Cashback and expense management application",
+                      "type": "text"
+                    },
+                    {
+                      "key": "logo_light",
+                      "type": "file",
+                      "src": [],
+                      "disabled": true,
+                      "description": "Tùy chọn: jpg, jpeg, png, gif, webp, svg, ico; tối đa 4 MB."
+                    },
+                    {
+                      "key": "logo_dark",
+                      "type": "file",
+                      "src": [],
+                      "disabled": true,
+                      "description": "Tùy chọn: bật field rồi chọn file."
+                    },
+                    {
+                      "key": "favicon",
+                      "type": "file",
+                      "src": [],
+                      "disabled": true,
+                      "description": "Tùy chọn: bật field rồi chọn file."
+                    },
+                    {
+                      "key": "social_image",
+                      "type": "file",
+                      "src": [],
+                      "disabled": true,
+                      "description": "Tùy chọn: bật field rồi chọn file."
+                    }
+                  ]
+                },
+                "url": "{{api_base_url}}/admin/appearance",
+                "description": "Gửi multipart/form-data để vừa cập nhật nội dung đa ngôn ngữ vừa có thể upload ảnh. Các field file đang tắt mặc định; bật và chọn file khi cần."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Appearance is updated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Appearance settings updated successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "GET /admin/users",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/users?per_page=15&page=1",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "email",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "role",
+                      "value": "user",
+                      "disabled": true,
+                      "description": "Tên role phải tồn tại với guard web."
+                    },
+                    {
+                      "key": "created_date",
+                      "value": "2026-07-28",
+                      "disabled": true,
+                      "description": "Định dạng Y-m-d"
+                    },
+                    {
+                      "key": "created_from",
+                      "value": "2026-07-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "created_to",
+                      "value": "2026-07-31",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "created_at",
+                      "disabled": true,
+                      "description": "id, name, email hoặc created_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc",
+                      "disabled": true
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('User list is paginated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.have.property('total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/users",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Postman API User\",\n    \"email\": \"postman.admin-user.{{$timestamp}}@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"roles\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/users",
+                "description": "roles là array role ID tùy chọn; để giữ collection độc lập với dữ liệu seed, request mẫu dùng mảng rỗng."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('User is created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data).to.have.property('id');",
+                      "    pm.expect(data.roles).to.be.an('array');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    const data = pm.response.json().data;",
+                      "    pm.collectionVariables.set('user_id', String(data.id));",
+                      "    pm.collectionVariables.set('created_user_email', data.email);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/users/{user}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/users/{{user_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Created user is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(String(data.id)).to.eql(pm.collectionVariables.get('user_id'));",
+                      "    pm.expect(data.email).to.eql(pm.collectionVariables.get('created_user_email'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/users/{user}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Postman API User Updated\",\n    \"email\": \"postman.admin-user.updated.{{$timestamp}}@example.com\",\n    \"roles\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/users/{{user_id}}",
+                "description": "name và email là bắt buộc khi PATCH. password, password_confirmation và roles là tùy chọn; request mẫu vẫn để roles rỗng để không phụ thuộc seed data."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('User is updated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.name).to.eql('Postman API User Updated');",
+                      "    pm.expect(data.email).to.include('postman.admin-user.updated.');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/users/{user}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/users/{{user_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('User is deleted', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().message).to.eql('User deleted successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "GET /admin/categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/categories?per_page=15&page=1",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "active",
+                      "disabled": true,
+                      "description": "active hoặc inactive"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "created_at",
+                      "disabled": true,
+                      "description": "id, name, status hoặc created_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc",
+                      "disabled": true
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Category list is paginated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.have.property('total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/categories",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Postman Category {{$timestamp}}\",\n    \"color\": \"#10B981\",\n    \"description\": \"Category created from Postman collection\",\n    \"status\": \"active\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/categories",
+                "description": "color phải là mã hex 3 hoặc 6 ký tự; status chỉ nhận active hoặc inactive."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Category is created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.name).to.include('Postman Category ');",
+                      "    pm.expect(data.status).to.eql('active');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    pm.collectionVariables.set('category_id', String(pm.response.json().data.id));",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/categories/{category}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/categories/{{category_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Created category is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('category_id'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/categories/{category}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Postman Category Updated {{$timestamp}}\",\n    \"color\": \"#3B82F6\",\n    \"description\": \"Updated from Postman collection\",\n    \"status\": \"inactive\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/categories/{{category_id}}",
+                "description": "CategoryRequest yêu cầu name, color và status cả khi dùng PATCH."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Category is updated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.name).to.include('Postman Category Updated ');",
+                      "    pm.expect(data.color).to.eql('#3B82F6');",
+                      "    pm.expect(data.status).to.eql('inactive');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/categories/{category}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/categories/{{category_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Category is deleted', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().message).to.eql('Category deleted successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Pages",
+          "item": [
+            {
+              "name": "GET /admin/pages",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/pages?per_page=15&page=1",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "pages"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "published",
+                      "disabled": true,
+                      "description": "published, draft hoặc pending"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "created_at",
+                      "disabled": true,
+                      "description": "id, title, slug, status hoặc created_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc",
+                      "disabled": true
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Page list is paginated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.have.property('total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/pages",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Postman API Page {{$timestamp}}\",\n    \"image\": null,\n    \"category_id\": null,\n    \"tags\": \"postman, api, postman\",\n    \"content\": \"<p>Page created from Postman collection</p>\",\n    \"meta_title\": \"Postman API Page {{$timestamp}}\",\n    \"meta_description\": \"Page used for API testing\",\n    \"meta_keywords\": \"postman,api,test\",\n    \"status\": \"published\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/pages",
+                "description": "status hỗ trợ published, draft, pending. tags nhận chuỗi phân tách bằng dấu phẩy hoặc array; service tự loại tag trùng."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Page is created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.status).to.eql('published');",
+                      "    pm.expect(data.tags).to.eql(['postman', 'api']);",
+                      "    pm.expect(data.slug).to.include('postman-api-page-');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    const data = pm.response.json().data;",
+                      "    pm.collectionVariables.set('page_id', String(data.id));",
+                      "    pm.collectionVariables.set('page_slug', data.slug);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/pages/{page}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/pages/{{page_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Created page is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(String(data.id)).to.eql(pm.collectionVariables.get('page_id'));",
+                      "    pm.expect(data.slug).to.eql(pm.collectionVariables.get('page_slug'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/pages/{page}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Postman API Page Updated\",\n    \"slug\": \"postman-api-page-updated-{{$timestamp}}\",\n    \"image\": null,\n    \"category_id\": null,\n    \"tags\": [\"postman\", \"updated\"],\n    \"content\": \"<p>Updated from Postman collection</p>\",\n    \"meta_title\": \"Postman API Page Updated\",\n    \"meta_description\": \"Updated page used for API testing\",\n    \"meta_keywords\": \"postman,api,updated\",\n    \"status\": \"draft\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/pages/{{page_id}}",
+                "description": "PageRequest yêu cầu title và status cả khi dùng PATCH; các field còn lại có thể nullable."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Page is updated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.title).to.eql('Postman API Page Updated');",
+                      "    pm.expect(data.slug).to.include('postman-api-page-updated-');",
+                      "    pm.expect(data.status).to.eql('draft');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/pages/{page}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/pages/{{page_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Page is deleted', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().message).to.eql('Page deleted successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Menus",
+          "item": [
+            {
+              "name": "GET /admin/menus",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/menus?per_page=15&page=1",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "menus"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "active",
+                      "disabled": true,
+                      "description": "active hoặc inactive"
+                    },
+                    {
+                      "key": "canonical",
+                      "value": "home.header",
+                      "disabled": true
+                    },
+                    {
+                      "key": "parent_id",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "sort_order",
+                      "disabled": true,
+                      "description": "id, title, canonical, sort_order, status hoặc created_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "asc",
+                      "disabled": true
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Menu list is paginated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.have.property('total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/menus/parent-options",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/menus/parent-options?exclude={{menu_id}}",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "menus",
+                    "parent-options"
+                  ],
+                  "query": [
+                    {
+                      "key": "exclude",
+                      "value": "{{menu_id}}",
+                      "description": "Tùy chọn: loại menu hiện tại khỏi danh sách parent để tránh tự tham chiếu."
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Parent menu options are returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data).to.be.an('array');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200) {",
+                      "    const excludedId = pm.collectionVariables.get('menu_id');",
+                      "    const returnedIds = pm.response.json().data.map(function (menu) { return String(menu.id); });",
+                      "    pm.test('Created menu is excluded from parent options', function () {",
+                      "        pm.expect(returnedIds).not.to.include(excludedId);",
+                      "    });",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/menus",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Postman Menu {{$timestamp}}\",\n    \"url\": \"/postman-menu\",\n    \"parent_id\": null,\n    \"canonical\": \"home.header\",\n    \"sort_order\": 999,\n    \"target\": \"_self\",\n    \"status\": \"active\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/menus",
+                "description": "canonical phải có dạng home.header, home.footer hoặc user.header. target chỉ nhận _self hoặc _blank."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Menu is created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.canonical).to.eql('home.header');",
+                      "    pm.expect(data.status).to.eql('active');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    pm.collectionVariables.set('menu_id', String(pm.response.json().data.id));",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/menus/{menu}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/menus/{{menu_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Created menu is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('menu_id'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/menus/{menu}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Postman Menu Updated\",\n    \"url\": \"/postman-menu-updated\",\n    \"parent_id\": null,\n    \"canonical\": \"home.footer\",\n    \"sort_order\": 998,\n    \"target\": \"_blank\",\n    \"status\": \"inactive\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/menus/{{menu_id}}",
+                "description": "MenuRequest yêu cầu title, canonical, target và status cả khi dùng PATCH."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Menu is updated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.title).to.eql('Postman Menu Updated');",
+                      "    pm.expect(data.canonical).to.eql('home.footer');",
+                      "    pm.expect(data.target).to.eql('_blank');",
+                      "    pm.expect(data.status).to.eql('inactive');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/menus/{menu}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/menus/{{menu_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Menu is deleted', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().message).to.eql('Menu deleted successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Budgets",
+          "item": [
+            {
+              "name": "GET /admin/budgets",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/budgets?per_page=15&page=1",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "budgets"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "period",
+                      "value": "monthly",
+                      "disabled": true,
+                      "description": "monthly hoặc yearly"
+                    },
+                    {
+                      "key": "status",
+                      "value": "active",
+                      "disabled": true,
+                      "description": "active hoặc inactive"
+                    },
+                    {
+                      "key": "user_id",
+                      "value": "{{budget_user_id}}",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "{{budget_category_id}}",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "created_at",
+                      "disabled": true,
+                      "description": "id, amount_limit, period, status hoặc created_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc",
+                      "disabled": true
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Budget list is paginated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.have.property('total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/budgets/options",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/budgets/options",
+                "description": "Ngoài kiểm thử endpoint, test script sẽ tự điền budget_user_id và budget_category_id nếu các biến đang trống."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Budget options are returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.users).to.be.an('array').and.not.empty;",
+                      "    pm.expect(data.categories).to.be.an('array').and.not.empty;",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200) {",
+                      "    const data = pm.response.json().data;",
+                      "    if (!pm.collectionVariables.get('budget_user_id') && data.users.length > 0) {",
+                      "        pm.collectionVariables.set('budget_user_id', String(data.users[0].id));",
+                      "    }",
+                      "",
+                      "    const userId = Number(pm.collectionVariables.get('budget_user_id'));",
+                      "    const compatibleCategory = data.categories.find(function (category) {",
+                      "        return category.user_id === null || Number(category.user_id) === userId;",
+                      "    });",
+                      "",
+                      "    if (!pm.collectionVariables.get('budget_category_id') && compatibleCategory) {",
+                      "        pm.collectionVariables.set('budget_category_id', String(compatibleCategory.id));",
+                      "    }",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/budgets",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"user_id\": {{budget_user_id}},\n    \"category_id\": {{budget_category_id}},\n    \"amount_limit\": 1000000,\n    \"period\": \"yearly\",\n    \"status\": \"active\",\n    \"note\": \"Created from Postman collection\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/budgets",
+                "description": "user_id và category_id phải tồn tại; category phải là global hoặc thuộc user. Bộ ba user_id + category_id + period phải là duy nhất."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Budget is created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data).to.have.property('id');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    pm.collectionVariables.set('budget_id', String(pm.response.json().data.id));",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/budgets/{budget}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/budgets/{{budget_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Created budget is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('budget_id'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/budgets/{budget}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"user_id\": {{budget_user_id}},\n    \"category_id\": {{budget_category_id}},\n    \"amount_limit\": 1500000,\n    \"period\": \"yearly\",\n    \"status\": \"inactive\",\n    \"note\": \"Updated from Postman collection\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/budgets/{{budget_id}}",
+                "description": "BudgetRequest yêu cầu gửi đầy đủ user_id, category_id, amount_limit, period và status cả khi dùng PATCH."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Budget is updated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.amount_limit).to.eql(1500000);",
+                      "    pm.expect(data.status).to.eql('inactive');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/budgets/{budget}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/budgets/{{budget_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Budget is deleted', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().message).to.eql('Budget deleted successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Permissions",
+          "item": [
+            {
+              "name": "GET /admin/permissions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/permissions?per_page=15&page=1",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "permissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id",
+                      "disabled": true,
+                      "description": "id, name hoặc created_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc",
+                      "disabled": true
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Permission list is paginated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.have.property('total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/permissions/options",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/permissions/options"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Permission options are returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data).to.be.an('array');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/permissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"postman.permission.{{$timestamp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/permissions"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Permission is created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.guard_name).to.eql('web');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    pm.collectionVariables.set('permission_id', String(pm.response.json().data.id));",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/permissions/{permission}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/permissions/{{permission_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Created permission is returned', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('permission_id'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/permissions/{permission}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"postman.permission.updated.{{$timestamp}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/permissions/{{permission_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Permission is updated', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.name).to.include('postman.permission.updated.');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/permissions/{permission}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/permissions/{{permission_id}}"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Permission is deleted', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().message).to.eql('Permission deleted successfully');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Roles",
+          "item": [
+            {
+              "name": "GET /admin/roles",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/roles?search=&sort=id&direction=desc&page=1&per_page=15",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "roles"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "id"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    }
+                  ]
+                },
+                "description": "Danh sách role phân trang. sort hợp lệ: id, name, created_at; direction: asc|desc; per_page: 1-100."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response is a paginated role list', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.include.keys('current_page', 'last_page', 'per_page', 'total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/roles/options",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/roles/options",
+                "description": "Trả về toàn bộ role guard web theo thứ tự tên, kèm permissions, dùng cho select/options. Route tĩnh này phải đứng trước route /roles/{role}."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Role options are returned', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    if (json.data.length) pm.expect(json.data[0]).to.include.keys('id', 'name', 'guard_name', 'permissions');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/roles",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"postman-final-role-{{$timestamp}}\",\n  \"permissions\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/roles",
+                "description": "Tạo role guard web. name bắt buộc, duy nhất, tối đa 255 ký tự. permissions là mảng ID permission guard web, không trùng nhau."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                      "pm.test('Role is created and role_id is saved', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Role created successfully');",
+                      "    pm.expect(json.data).to.include.keys('id', 'name', 'guard_name', 'permissions');",
+                      "    pm.collectionVariables.set('role_id', String(json.data.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/roles/{role}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/roles/{{role_id}}",
+                "description": "Chi tiết role theo role_id đã lưu từ POST /admin/roles, bao gồm permissions."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Correct role is returned', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(String(json.data.id)).to.eql(pm.collectionVariables.get('role_id'));",
+                      "    pm.expect(json.data.permissions).to.be.an('array');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/roles/{role}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"postman-final-role-updated-{{$timestamp}}\",\n  \"permissions\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/roles/{{role_id}}",
+                "description": "Cập nhật role theo role_id. Dù dùng PATCH, request hiện tại vẫn yêu cầu name; permissions nếu gửi sẽ đồng bộ toàn bộ permission của role."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Role is updated', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Role updated successfully');",
+                      "    pm.expect(String(json.data.id)).to.eql(pm.collectionVariables.get('role_id'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/roles/{role}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/roles/{{role_id}}",
+                "description": "Xóa role vừa tạo. Policy từ chối xóa các system role admin và user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Role is deleted', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Role deleted successfully');",
+                      "    pm.collectionVariables.unset('role_id');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Transactions",
+          "item": [
+            {
+              "name": "GET /admin/transactions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/admin/transactions?search=&type=expense&status=posted&user_id=&wallet_id=&category_id=&from_date=&to_date=&sort=transacted_at&direction=desc&page=1&per_page=15",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "type",
+                      "value": "expense"
+                    },
+                    {
+                      "key": "status",
+                      "value": "posted"
+                    },
+                    {
+                      "key": "user_id",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "wallet_id",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "from_date",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "to_date",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "transacted_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    }
+                  ]
+                },
+                "description": "Danh sách transaction toàn hệ thống. status: posted|pending|cancelled; sort: id|type|amount|status|transacted_at|created_at; per_page: 1-100. Lưu ý Admin dùng from_date/to_date, khác User dùng date_from/date_to."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response is a paginated transaction list', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.include.keys('current_page', 'last_page', 'per_page', 'total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/transactions/options",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/transactions/options",
+                "description": "Trả về users, wallets, categories, types và statuses. Test script tự chọn wallet đầu tiên, user sở hữu wallet đó và một category hợp lệ, rồi lưu vào collection variables cho POST/PATCH."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Transaction options are complete', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.data).to.include.keys('users', 'wallets', 'categories', 'types', 'statuses');",
+                      "    pm.expect(json.data.users).to.be.an('array').that.is.not.empty;",
+                      "    pm.expect(json.data.wallets).to.be.an('array').that.is.not.empty;",
+                      "    const wallet = json.data.wallets[0];",
+                      "    const user = json.data.users.find(item => Number(item.id) === Number(wallet.user_id));",
+                      "    const category = json.data.categories.find(item => item.status === 'active' && (item.user_id === null || Number(item.user_id) === Number(wallet.user_id)));",
+                      "    pm.expect(user, 'wallet owner must exist').to.exist;",
+                      "    pm.expect(category, 'compatible active category must exist').to.exist;",
+                      "    pm.collectionVariables.set('admin_user_id', String(user.id));",
+                      "    pm.collectionVariables.set('admin_wallet_id', String(wallet.id));",
+                      "    pm.collectionVariables.set('admin_category_id', String(category.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /admin/transactions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user_id\": {{admin_user_id}},\n  \"wallet_id\": {{admin_wallet_id}},\n  \"category_id\": {{admin_category_id}},\n  \"type\": \"expense\",\n  \"amount\": 150000,\n  \"transacted_at\": \"{{transaction_date}}\",\n  \"status\": \"posted\",\n  \"note\": \"Admin tạo bằng Postman Final\",\n  \"labels\": [\"office\", \"postman-final\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/transactions",
+                "description": "Admin tạo transaction cho user bất kỳ. user_id, wallet_id, type, amount, transacted_at và status bắt buộc; wallet phải thuộc user; category phải là global hoặc thuộc user. status: posted|pending|cancelled."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                      "pm.test('Admin transaction is created and ID is saved', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Transaction created successfully');",
+                      "    pm.expect(json.data).to.include.keys('id', 'user_id', 'wallet_id', 'type', 'amount', 'status');",
+                      "    pm.collectionVariables.set('admin_transaction_id', String(json.data.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /admin/transactions/{transaction}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
+                "description": "Chi tiết transaction theo admin_transaction_id đã lưu từ POST, kèm user, wallet và category."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Correct transaction is returned', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(String(json.data.id)).to.eql(pm.collectionVariables.get('admin_transaction_id'));",
+                      "    pm.expect(json.data).to.include.keys('user', 'wallet', 'category');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /admin/transactions/{transaction}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user_id\": {{admin_user_id}},\n  \"wallet_id\": {{admin_wallet_id}},\n  \"category_id\": {{admin_category_id}},\n  \"type\": \"expense\",\n  \"amount\": 180000,\n  \"transacted_at\": \"{{transaction_date}}\",\n  \"status\": \"pending\",\n  \"note\": \"Admin cập nhật bằng Postman Final\",\n  \"labels\": [\"office\", \"postman-updated\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
+                "description": "Cập nhật transaction. Dù dùng PATCH, ExpenseTransactionRequest hiện yêu cầu đầy đủ user_id, wallet_id, type, amount, transacted_at và status."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Transaction is updated', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Transaction updated successfully');",
+                      "    pm.expect(json.data.amount).to.eql(180000);",
+                      "    pm.expect(json.data.status).to.eql('pending');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /admin/transactions/{transaction}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
+                "description": "Xóa transaction vừa tạo và dọn admin_transaction_id khỏi collection variables."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Transaction is deleted', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Transaction deleted successfully');",
+                      "    pm.collectionVariables.unset('admin_transaction_id');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User API",
+      "item": [
+        {
+          "name": "Session",
+          "item": [
+            {
+              "name": "POST /auth/login — User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\",\n  \"remember\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/auth/login",
+                "description": "Chuyển session Postman sang tài khoản role user trước khi chạy User Settings và các module cá nhân."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('User login succeeds', function () {",
+                      "    pm.expect(pm.response.json().data.user.email).to.eql(pm.collectionVariables.get('user_email'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "GET /user/dashboard",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/user/dashboard",
+                "description": "Trả về categories, wallets và transactions thuộc tài khoản user hiện tại."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Dashboard structure is complete', function () {",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data).to.include.keys('categories', 'wallets', 'transactions');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Settings",
+          "item": [
+            {
+              "name": "GET /user/settings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/user/settings",
+                "description": "Lấy profile và preferences của user hiện tại. Endpoint yêu cầu role user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Settings structure is complete', function () {",
+                      "    pm.expect(pm.response.json().data).to.include.keys('profile', 'preferences');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /user/settings/profile",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman User\",\n  \"email\": \"{{user_email}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/settings/profile",
+                "description": "Cập nhật name và email của user hiện tại."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Profile is updated', function () {",
+                      "    pm.expect(pm.response.json().message).to.eql('Đã cập nhật thông tin hồ sơ.');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /user/settings/preferences",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currency\": \"VND\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/settings/preferences",
+                "description": "Cập nhật currency bằng mã tiền tệ 3 ký tự."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Currency preference is updated', function () {",
+                      "    pm.expect(pm.response.json().data.preferences.currency).to.eql('VND');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "GET /user/categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/user/categories",
+                "description": "Lấy category active dùng chung và category private của user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Categories are returned and reusable IDs are saved', function () {",
+                      "    const categories = pm.response.json().data;",
+                      "    pm.expect(categories).to.be.an('array');",
+                      "    pm.collectionVariables.set('available_user_category_ids', JSON.stringify(categories.map(item => Number(item.id))));",
+                      "    const existing = categories.find(item => item.is_private === false) || categories[0];",
+                      "    pm.expect(existing, 'at least one active category must exist').to.exist;",
+                      "    pm.collectionVariables.set('existing_user_category_id', String(existing.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /user/categories",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman User Category {{$timestamp}}\",\n  \"color\": \"#10B981\",\n  \"description\": \"Created by Final collection\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/categories",
+                "description": "Tạo category private cho user hiện tại."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Private category is created and ID is saved', function () {",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.is_private).to.eql(true);",
+                      "    pm.collectionVariables.set('created_user_category_id', String(data.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET /user/categories/{category}",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/user/categories/{{created_user_category_id}}",
+                "description": "Lấy category private vừa tạo."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Correct category is returned', function () {",
+                      "    pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('created_user_category_id'));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /user/categories/{category}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman User Category Updated {{$timestamp}}\",\n  \"color\": \"#3B82F6\",\n  \"description\": \"Updated by Final collection\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/categories/{{created_user_category_id}}",
+                "description": "Cập nhật category private của user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Category is updated', function () {",
+                      "    pm.expect(pm.response.json().message).to.eql('Đã cập nhật danh mục riêng.');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /user/categories/{category}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/user/categories/{{created_user_category_id}}",
+                "description": "Xóa category private vừa tạo khi chưa được dùng trong transaction hoặc budget."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Category is deleted', function () {",
+                      "    pm.expect(pm.response.json().message).to.eql('Đã xóa danh mục riêng.');",
+                      "    pm.collectionVariables.unset('created_user_category_id');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Wallets",
+          "item": [
+            {
+              "name": "GET /user/wallets",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/user/wallets",
+                "description": "Lấy toàn bộ wallet của user hiện tại."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Wallets are returned and an existing ID is saved', function () {",
+                      "    const wallets = pm.response.json().data;",
+                      "    pm.expect(wallets).to.be.an('array').that.is.not.empty;",
+                      "    pm.collectionVariables.set('existing_user_wallet_id', String(wallets[0].id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /user/wallets",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Wallet {{$timestamp}}\",\n  \"currency\": \"VND\",\n  \"opening_balance\": 500000,\n  \"is_default\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/wallets",
+                "description": "Tạo wallet mới; name duy nhất trong phạm vi user và currency có đúng 3 ký tự."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Wallet is created and ID is saved', function () {",
+                      "    const data = pm.response.json().data;",
+                      "    pm.expect(data.currency).to.eql('VND');",
+                      "    pm.collectionVariables.set('created_user_wallet_id', String(data.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PATCH /user/wallets/{wallet}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Wallet Updated {{$timestamp}}\",\n  \"currency\": \"USD\",\n  \"opening_balance\": 750000,\n  \"is_default\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/wallets/{{created_user_wallet_id}}",
+                "description": "Cập nhật wallet vừa tạo. Request yêu cầu name và currency."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Wallet is updated', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.message).to.eql('Wallet updated successfully');",
+                      "    pm.expect(json.data.currency).to.eql('USD');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /user/wallets/{wallet}",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{api_base_url}}/user/wallets/{{created_user_wallet_id}}",
+                "description": "Xóa wallet vừa tạo."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Wallet is deleted', function () {",
+                      "    pm.expect(pm.response.json().message).to.eql('Wallet deleted successfully');",
+                      "    pm.collectionVariables.unset('created_user_wallet_id');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Budgets",
+          "item": [
+            {
+              "name": "GET /user/budgets",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{api_base_url}}/user/budgets",
+                "description": "Lấy budget của user và chọn category chưa có budget yearly cho request tạo kế tiếp."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Budgets are returned and a free category is selected', function () {",
+                      "    const budgets = pm.response.json().data;",
+                      "    pm.expect(budgets).to.be.an('array');",
+                      "    const categoryIds = JSON.parse(pm.collectionVariables.get('available_user_category_ids') || '[]');",
+                      "    const categoryId = categoryIds.find(id => !budgets.some(item => Number(item.category_id) === Number(id) && item.period === 'yearly'));",
+                      "    pm.expect(categoryId, 'an active category without a yearly budget must exist').to.exist;",
+                      "    pm.collectionVariables.set('budget_category_id', String(categoryId));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /user/budgets",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category_id\": {{budget_category_id}},\n  \"amount_limit\": 2500000,\n  \"period\": \"yearly\",\n  \"note\": \"Created by Final collection\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/budgets",
+                "description": "Tạo yearly budget cho category active thuộc phạm vi user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                      "pm.test('Response uses the API envelope', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json).to.have.property('data');",
+                      "});",
+                      "pm.test('Budget is created and ID is saved', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.message).to.eql('Budget created successfully');",
+                      "    pm.expect(json.data.status).to.eql('active');",
+                      "    pm.collectionVariables.set('created_user_budget_id', String(json.data.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Transactions",
+          "item": [
+            {
+              "name": "GET /user/transactions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_base_url}}/user/transactions?search=&type=expense&status=posted&wallet_id=&category_id=&date_from=&date_to=&sort=transacted_at&direction=desc&page=1&per_page=15",
+                  "host": [
+                    "{{api_base_url}}"
+                  ],
+                  "path": [
+                    "user",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "type",
+                      "value": "expense"
+                    },
+                    {
+                      "key": "status",
+                      "value": "posted"
+                    },
+                    {
+                      "key": "wallet_id",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_from",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_to",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "transacted_at"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "desc"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    }
+                  ]
+                },
+                "description": "Trả về giao dịch của đúng user hiện tại. Filter hợp lệ: search, type=income|expense, status=posted|pending, wallet_id, category_id, date_from, date_to, sort=transacted_at|amount|created_at, direction=asc|desc, page và per_page (1-100)."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response is a paginated transaction list', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.data).to.be.an('array');",
+                      "    pm.expect(json.meta).to.include.keys('current_page', 'last_page', 'per_page', 'total');",
+                      "    pm.expect(json.links).to.include.keys('first', 'last', 'prev', 'next');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST /user/transactions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"wallet_id\": {{existing_user_wallet_id}},\n  \"category_id\": {{existing_user_category_id}},\n  \"type\": \"expense\",\n  \"amount\": 50000,\n  \"transacted_at\": \"{{transaction_date}}\",\n  \"note\": \"Ăn trưa văn phòng - Postman Final\",\n  \"labels\": [\"ăn-uống\", \"postman-final\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{api_base_url}}/user/transactions",
+                "description": "Tạo giao dịch cho user hiện tại. wallet_id bắt buộc thuộc user; category_id có thể null nhưng nếu có phải là category active dùng chung hoặc private của user. type chỉ nhận income|expense; amount từ 0.01 đến 9,999,999,999.99; status được server tự đặt là posted."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                      "pm.test('Transaction is created as posted', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.eql(true);",
+                      "    pm.expect(json.message).to.eql('Transaction created successfully');",
+                      "    pm.expect(json.data.status).to.eql('posted');",
+                      "    pm.expect(json.data).to.include.keys('id', 'wallet_id', 'type', 'amount', 'transacted_at');",
+                      "    pm.collectionVariables.set('user_transaction_id', String(json.data.id));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session Cleanup",
+      "item": [
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api_base_url}}/auth/logout"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Session is logged out', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().message).to.eql('Logout successful');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
