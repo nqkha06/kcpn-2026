@@ -1,0 +1,62 @@
+name: cashback-sonarqube
+
+services:
+  database:
+    image: postgres:17-alpine
+    container_name: cashback-sonarqube-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${SONAR_DB_NAME:-sonar}
+      POSTGRES_USER: ${SONAR_DB_USER:-sonar}
+      POSTGRES_PASSWORD: ${SONAR_DB_PASSWORD:-sonar_local_password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
+  sonarqube:
+    image: sonarqube:26.6.0.123539-community
+    container_name: cashback-sonarqube-server
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://database:5432/${SONAR_DB_NAME:-sonar}
+      SONAR_JDBC_USERNAME: ${SONAR_DB_USER:-sonar}
+      SONAR_JDBC_PASSWORD: ${SONAR_DB_PASSWORD:-sonar_local_password}
+    ports:
+      - "${SONARQUBE_PORT:-9000}:9000"
+    stop_grace_period: 1h
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+  scanner:
+    image: sonarsource/sonar-scanner-cli:12.1.0.3233_8.0.1
+    platform: linux/amd64
+    profiles: ["scanner"]
+    depends_on:
+      sonarqube:
+        condition: service_started
+    environment:
+      SONAR_HOST_URL: ${SONAR_HOST_URL:-http://sonarqube:9000}
+      SONAR_TOKEN: ${SONAR_TOKEN:-}
+      SONAR_USER_HOME: /opt/sonar-scanner/.sonar
+    working_dir: /usr/src
+    command: ["-Dproject.settings=sonarqube/sonar-project.properties"]
+    volumes:
+      - ../:/usr/src:ro
+      - scanner_cache:/opt/sonar-scanner/.sonar/cache
+
+volumes:
+  database_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  scanner_cache:
