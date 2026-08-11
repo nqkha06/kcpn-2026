@@ -6,8 +6,13 @@ use App\Models\ExpenseTransaction;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -18,7 +23,7 @@ test('guests cannot create a budget', function () {
     $customer = User::factory()->create();
     $category = Category::factory()->create();
 
-    $this->postJson('/api/v1/admin/budgets', [
+    postJson('/api/v1/admin/budgets', [
         'user_id' => $customer->id,
         'category_id' => $category->id,
         'amount_limit' => 1000,
@@ -35,7 +40,7 @@ test('non admin users cannot create a budget', function () {
     $customer = User::factory()->create();
     $category = Category::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/admin/budgets', [
             'user_id' => $customer->id,
             'category_id' => $category->id,
@@ -69,7 +74,7 @@ test('admin can create a budget and it is persisted with spent amount', function
         'note' => ' Monthly food ',
     ];
 
-    $response = $this->actingAs($admin, 'web')
+    $response = actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', $payload)
         ->assertCreated()
         ->assertJsonPath('message', 'Budget created successfully')
@@ -79,7 +84,7 @@ test('admin can create a budget and it is persisted with spent amount', function
         ->assertJsonPath('data.status', 'active')
         ->assertJsonPath('data.note', 'Monthly food');
 
-    $this->assertDatabaseHas('budgets', [
+    assertDatabaseHas('budgets', [
         'id' => $response->json('data.id'),
         'user_id' => $customer->id,
         'category_id' => $category->id,
@@ -97,7 +102,7 @@ test('empty note is stored as null', function () {
     $customer = User::factory()->create();
     $category = Category::factory()->create();
 
-    $response = $this->actingAs($admin, 'web')
+    $response = actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [
             'user_id' => $customer->id,
             'category_id' => $category->id,
@@ -109,7 +114,7 @@ test('empty note is stored as null', function () {
         ->assertCreated()
         ->assertJsonPath('data.note', null);
 
-    $this->assertDatabaseHas('budgets', [
+    assertDatabaseHas('budgets', [
         'id' => $response->json('data.id'),
         'note' => null,
     ]);
@@ -119,7 +124,7 @@ test('budget creation requires user_id category_id amount_limit period and statu
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['user_id', 'category_id', 'amount_limit', 'period', 'status']);
@@ -129,7 +134,7 @@ test('budget creation validates user_id and category_id exist', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [
             'user_id' => 999999,
             'category_id' => 999999,
@@ -148,7 +153,7 @@ test('budget creation validates amount_limit range', function () {
     $customer = User::factory()->create();
     $category = Category::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [
             'user_id' => $customer->id,
             'category_id' => $category->id,
@@ -167,7 +172,7 @@ test('budget creation validates period and status enums', function () {
     $customer = User::factory()->create();
     $category = Category::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [
             'user_id' => $customer->id,
             'category_id' => $category->id,
@@ -187,7 +192,7 @@ test('budget creation prevents duplicate user category and period combination', 
     $category = Category::factory()->create();
     Budget::factory()->for($customer)->for($category)->monthly()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [
             'user_id' => $customer->id,
             'category_id' => $category->id,
@@ -207,7 +212,7 @@ test('budget creation validates category belongs to selected user or is shared',
     $otherUser = User::factory()->create();
     $privateCategory = Category::factory()->create(['user_id' => $otherUser->id]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [
             'user_id' => $customer->id,
             'category_id' => $privateCategory->id,

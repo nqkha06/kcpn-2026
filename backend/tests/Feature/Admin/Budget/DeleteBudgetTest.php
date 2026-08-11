@@ -4,8 +4,14 @@ use App\Models\Budget;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -15,11 +21,11 @@ beforeEach(function (): void {
 test('guests cannot delete a budget', function () {
     $budget = Budget::factory()->create();
 
-    $this->deleteJson('/api/v1/admin/budgets/'.$budget->id)
+    deleteJson('/api/v1/admin/budgets/'.$budget->id)
         ->assertUnauthorized()
         ->assertJsonPath('message', 'Unauthenticated');
 
-    $this->assertDatabaseHas('budgets', ['id' => $budget->id]);
+    assertDatabaseHas('budgets', ['id' => $budget->id]);
 });
 
 test('non admin users cannot delete a budget', function () {
@@ -27,12 +33,12 @@ test('non admin users cannot delete a budget', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $budget = Budget::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->deleteJson('/api/v1/admin/budgets/'.$budget->id)
         ->assertForbidden()
         ->assertJsonPath('message', 'Forbidden');
 
-    $this->assertDatabaseHas('budgets', ['id' => $budget->id]);
+    assertDatabaseHas('budgets', ['id' => $budget->id]);
 });
 
 test('admin can delete a budget', function () {
@@ -41,19 +47,19 @@ test('admin can delete a budget', function () {
 
     $budget = Budget::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->deleteJson('/api/v1/admin/budgets/'.$budget->id)
         ->assertOk()
         ->assertJsonPath('message', 'Budget deleted successfully');
 
-    $this->assertDatabaseMissing('budgets', ['id' => $budget->id]);
+    assertDatabaseMissing('budgets', ['id' => $budget->id]);
 });
 
 test('deleting a non existent budget returns not found', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->deleteJson('/api/v1/admin/budgets/999999')
         ->assertNotFound();
 });

@@ -6,8 +6,12 @@ use App\Models\ExpenseTransaction;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -17,7 +21,7 @@ beforeEach(function (): void {
 test('guests cannot view a budget', function () {
     $budget = Budget::factory()->create();
 
-    $this->getJson('/api/v1/admin/budgets/'.$budget->id)
+    getJson('/api/v1/admin/budgets/'.$budget->id)
         ->assertUnauthorized()
         ->assertJsonPath('message', 'Unauthenticated');
 });
@@ -27,7 +31,7 @@ test('non admin users cannot view a budget', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $budget = Budget::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/admin/budgets/'.$budget->id)
         ->assertForbidden()
         ->assertJsonPath('message', 'Forbidden');
@@ -44,7 +48,7 @@ test('admin can view a single budget with user and category details', function (
         'note' => 'Monthly groceries',
     ]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets/'.$budget->id)
         ->assertOk()
         ->assertJsonPath('data.id', $budget->id)
@@ -70,7 +74,7 @@ test('admin viewing a budget receives the computed spent amount', function () {
             'transacted_at' => now()->toDateString(),
         ]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets/'.$budget->id)
         ->assertOk()
         ->assertJsonPath('data.spent', 75);
@@ -80,7 +84,7 @@ test('viewing a non existent budget returns not found', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets/999999')
         ->assertNotFound();
 });

@@ -5,8 +5,13 @@ use App\Models\Category;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/user/budgets',
@@ -16,7 +21,7 @@ beforeEach(function (): void {
 test('guests cannot create a budget', function () {
     $category = Category::factory()->create();
 
-    $this->postJson('/api/v1/user/budgets', [
+    postJson('/api/v1/user/budgets', [
         'category_id' => $category->id,
         'amount_limit' => 1000,
         'period' => 'monthly',
@@ -37,7 +42,7 @@ test('user can create a budget for their own account', function () {
         'note' => '  Annual target  ',
     ];
 
-    $response = $this->actingAs($user, 'web')
+    $response = actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', $payload)
         ->assertCreated()
         ->assertJsonPath('message', 'Budget created successfully')
@@ -48,7 +53,7 @@ test('user can create a budget for their own account', function () {
         ->assertJsonPath('data.spent', 0)
         ->assertJsonPath('data.category.id', $category->id);
 
-    $this->assertDatabaseHas('budgets', [
+    assertDatabaseHas('budgets', [
         'id' => $response->json('data.id'),
         'user_id' => $user->id,
         'category_id' => $category->id,
@@ -64,7 +69,7 @@ test('created budget always starts as active regardless of input', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $category = Category::factory()->create();
 
-    $response = $this->actingAs($user, 'web')
+    $response = actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $category->id,
             'amount_limit' => 100,
@@ -74,7 +79,7 @@ test('created budget always starts as active regardless of input', function () {
         ->assertCreated()
         ->assertJsonPath('data.status', 'active');
 
-    $this->assertDatabaseHas('budgets', [
+    assertDatabaseHas('budgets', [
         'id' => $response->json('data.id'),
         'status' => 'active',
     ]);
@@ -85,7 +90,7 @@ test('empty note is stored as null', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $category = Category::factory()->create();
 
-    $response = $this->actingAs($user, 'web')
+    $response = actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $category->id,
             'amount_limit' => 100,
@@ -95,7 +100,7 @@ test('empty note is stored as null', function () {
         ->assertCreated()
         ->assertJsonPath('data.note', null);
 
-    $this->assertDatabaseHas('budgets', [
+    assertDatabaseHas('budgets', [
         'id' => $response->json('data.id'),
         'note' => null,
     ]);
@@ -112,11 +117,11 @@ test('user can create one budget per category and period', function () {
         'period' => 'yearly',
     ];
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', $payload)
         ->assertCreated();
 
-    $this->postJson('/api/v1/user/budgets', $payload)
+    postJson('/api/v1/user/budgets', $payload)
         ->assertUnprocessable()
         ->assertJsonValidationErrors('category_id');
 });
@@ -128,7 +133,7 @@ test('user can create the same category with a different period', function () {
 
     Budget::factory()->for($user)->for($category)->monthly()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $category->id,
             'amount_limit' => 100,
@@ -141,7 +146,7 @@ test('budget creation requires category_id amount_limit and period', function ()
     $user = User::factory()->create();
     $user->assignRole(Role::findOrCreate('user', 'web'));
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['category_id', 'amount_limit', 'period']);
@@ -152,7 +157,7 @@ test('budget creation validates amount_limit range', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $category = Category::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $category->id,
             'amount_limit' => 0,
@@ -167,7 +172,7 @@ test('budget creation validates period enum', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $category = Category::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $category->id,
             'amount_limit' => 100,
@@ -182,7 +187,7 @@ test('budget creation rejects inactive categories', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $category = Category::factory()->inactive()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $category->id,
             'amount_limit' => 100,
@@ -198,7 +203,7 @@ test('budget creation rejects categories owned by another user', function () {
     $otherUser = User::factory()->create();
     $privateCategory = Category::factory()->create(['user_id' => $otherUser->id]);
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $privateCategory->id,
             'amount_limit' => 100,
@@ -213,7 +218,7 @@ test('budget creation accepts shared categories with no owner', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $sharedCategory = Category::factory()->create(['user_id' => null]);
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/user/budgets', [
             'category_id' => $sharedCategory->id,
             'amount_limit' => 100,
