@@ -8,10 +8,14 @@ use App\Models\UserWallet;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
     Carbon::setTestNow('2026-07-22 10:00:00');
 
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/user/budgets',
@@ -23,7 +27,7 @@ afterEach(function (): void {
 });
 
 test('guests cannot list budgets', function () {
-    $this->getJson('/api/v1/user/budgets')
+    getJson('/api/v1/user/budgets')
         ->assertUnauthorized()
         ->assertJsonPath('message', 'Unauthenticated');
 });
@@ -40,7 +44,7 @@ test('user can list only their own active budgets', function () {
     Budget::factory()->for($user)->for($inactiveCategory)->create(['status' => 'inactive']);
     Budget::factory()->for($otherUser)->for($category)->active()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/user/budgets')
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -54,7 +58,7 @@ test('admin can also list their own active budgets', function () {
     $category = Category::factory()->create();
     $budget = Budget::factory()->for($admin)->for($category)->active()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/user/budgets')
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -100,7 +104,7 @@ test('budget list calculates posted spending for the current period and user', f
         'transacted_at' => '2026-07-12',
     ]);
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/user/budgets')
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -132,7 +136,7 @@ test('yearly budgets are calculated against the full year window', function () {
         'transacted_at' => '2025-12-31',
     ]);
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/user/budgets')
         ->assertOk()
         ->assertJsonPath('data.0.id', $budget->id)
@@ -148,7 +152,7 @@ test('budgets ordered by period then newest id', function () {
     $monthly = Budget::factory()->for($user)->for($category1)->active()->monthly()->create();
     $yearly = Budget::factory()->for($user)->for($category2)->active()->create(['period' => 'yearly']);
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/user/budgets')
         ->assertOk()
         ->assertJsonPath('data.0.id', $monthly->id)
