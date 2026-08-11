@@ -4,8 +4,12 @@ use App\Models\Menu;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -13,7 +17,7 @@ beforeEach(function (): void {
 });
 
 test('guests cannot fetch parent menu options', function () {
-    $this->getJson('/api/v1/admin/menus/parent-options')
+    getJson('/api/v1/admin/menus/parent-options')
         ->assertUnauthorized()
         ->assertJsonPath('message', 'Unauthenticated');
 });
@@ -22,7 +26,7 @@ test('non admin users cannot fetch parent menu options', function () {
     $user = User::factory()->create();
     $user->assignRole(Role::findOrCreate('user', 'web'));
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/admin/menus/parent-options')
         ->assertForbidden()
         ->assertJsonPath('message', 'Forbidden');
@@ -36,7 +40,7 @@ test('parent options only include root level menus ordered by title', function (
     $root2 = Menu::factory()->create(['title' => 'Alpha', 'parent_id' => null]);
     $child = Menu::factory()->create(['title' => 'Child Menu', 'parent_id' => $root1->id]);
 
-    $response = $this->actingAs($admin, 'web')
+    $response = actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/parent-options')
         ->assertOk();
 
@@ -54,7 +58,7 @@ test('parent options exclude the given menu id', function () {
     $menu = Menu::factory()->create(['parent_id' => null]);
     $other = Menu::factory()->create(['parent_id' => null]);
 
-    $response = $this->actingAs($admin, 'web')
+    $response = actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/parent-options?exclude='.$menu->id)
         ->assertOk();
 
@@ -68,7 +72,7 @@ test('parent options exclude filter validates the menu exists', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/parent-options?exclude=999999')
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['exclude']);

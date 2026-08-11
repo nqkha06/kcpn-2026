@@ -4,8 +4,12 @@ use App\Models\Menu;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -15,7 +19,7 @@ beforeEach(function (): void {
 test('guests cannot view a menu', function () {
     $menu = Menu::factory()->create();
 
-    $this->getJson('/api/v1/admin/menus/'.$menu->id)
+    getJson('/api/v1/admin/menus/'.$menu->id)
         ->assertUnauthorized()
         ->assertJsonPath('message', 'Unauthenticated');
 });
@@ -25,7 +29,7 @@ test('non admin users cannot view a menu', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $menu = Menu::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/admin/menus/'.$menu->id)
         ->assertForbidden()
         ->assertJsonPath('message', 'Forbidden');
@@ -41,7 +45,7 @@ test('admin can view a single menu', function () {
         'canonical' => 'home.footer',
     ]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/'.$menu->id)
         ->assertOk()
         ->assertJsonPath('data.id', $menu->id)
@@ -60,7 +64,7 @@ test('admin viewing a menu with a parent receives parent details', function () {
         'title' => 'Sub Menu',
     ]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/'.$child->id)
         ->assertOk()
         ->assertJsonPath('data.parent.id', $parent->id)
@@ -71,7 +75,7 @@ test('viewing a non existent menu returns not found', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/999999')
         ->assertNotFound();
 });

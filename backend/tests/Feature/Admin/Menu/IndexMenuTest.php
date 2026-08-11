@@ -4,8 +4,12 @@ use App\Models\Menu;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -13,7 +17,7 @@ beforeEach(function (): void {
 });
 
 test('guests cannot list menus', function () {
-    $this->getJson('/api/v1/admin/menus')
+    getJson('/api/v1/admin/menus')
         ->assertUnauthorized()
         ->assertJsonPath('message', 'Unauthenticated');
 });
@@ -22,7 +26,7 @@ test('non admin users cannot list menus', function () {
     $user = User::factory()->create();
     $user->assignRole(Role::findOrCreate('user', 'web'));
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/admin/menus')
         ->assertForbidden()
         ->assertJsonPath('message', 'Forbidden');
@@ -34,7 +38,7 @@ test('admin can list menus with default pagination', function () {
 
     Menu::factory()->count(3)->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus')
         ->assertOk()
         ->assertJsonStructure([
@@ -56,7 +60,7 @@ test('admin can search menus by title or url', function () {
     Menu::factory()->create(['title' => 'Pricing Plans', 'url' => '/pricing']);
     Menu::factory()->create(['title' => 'About Us', 'url' => '/about']);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus?search=Pricing')
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
@@ -71,7 +75,7 @@ test('admin can filter menus by status canonical and parent_id', function () {
     Menu::factory()->header()->create(['parent_id' => $parent->id, 'status' => 'active']);
     Menu::factory()->footer()->inactive()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus?status=active&canonical=home.header&parent_id='.$parent->id)
         ->assertOk()
         ->assertJsonPath('meta.total', 1);
@@ -85,7 +89,7 @@ test('admin can sort and paginate menus', function () {
     Menu::factory()->create(['title' => 'Bravo', 'sort_order' => 1]);
     Menu::factory()->create(['title' => 'Charlie', 'sort_order' => 2]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus?sort=title&direction=asc&per_page=2&page=1')
         ->assertOk()
         ->assertJsonPath('data.0.title', 'Alpha')
@@ -99,7 +103,7 @@ test('menu index query parameters are validated', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus?status=archived&sort=invalid_field&direction=up&per_page=500&parent_id=999999')
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['status', 'sort', 'direction', 'per_page', 'parent_id']);

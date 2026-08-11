@@ -4,8 +4,13 @@ use App\Models\Menu;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -13,7 +18,7 @@ beforeEach(function (): void {
 });
 
 test('guests cannot create a menu', function () {
-    $this->postJson('/api/v1/admin/menus', [
+    postJson('/api/v1/admin/menus', [
         'title' => 'Pricing',
         'canonical' => 'home.header',
         'target' => '_self',
@@ -27,7 +32,7 @@ test('non admin users cannot create a menu', function () {
     $user = User::factory()->create();
     $user->assignRole(Role::findOrCreate('user', 'web'));
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->postJson('/api/v1/admin/menus', [
             'title' => 'Pricing',
             'canonical' => 'home.header',
@@ -52,7 +57,7 @@ test('admin can create a top level menu and it is persisted', function () {
         'status' => 'active',
     ];
 
-    $response = $this->actingAs($admin, 'web')
+    $response = actingAs($admin, 'web')
         ->postJson('/api/v1/admin/menus', $payload)
         ->assertCreated()
         ->assertJsonPath('message', 'Menu created successfully')
@@ -63,7 +68,7 @@ test('admin can create a top level menu and it is persisted', function () {
         ->assertJsonPath('data.target', '_self')
         ->assertJsonPath('data.status', 'active');
 
-    $this->assertDatabaseHas('menus', [
+    assertDatabaseHas('menus', [
         'id' => $response->json('data.id'),
         'title' => 'Pricing',
         'url' => '/pricing',
@@ -91,14 +96,14 @@ test('admin creating a child menu inherits the parent canonical', function () {
         'status' => 'active',
     ];
 
-    $response = $this->actingAs($admin, 'web')
+    $response = actingAs($admin, 'web')
         ->postJson('/api/v1/admin/menus', $payload)
         ->assertCreated()
         ->assertJsonPath('data.url', '/p/about')
         ->assertJsonPath('data.canonical', 'home.header')
         ->assertJsonPath('data.parent.id', $parent->id);
 
-    $this->assertDatabaseHas('menus', [
+    assertDatabaseHas('menus', [
         'id' => $response->json('data.id'),
         'parent_id' => $parent->id,
         'canonical' => 'home.header',
@@ -110,7 +115,7 @@ test('menu creation requires title canonical target and status', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/menus', [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['title', 'canonical', 'target', 'status']);
@@ -120,7 +125,7 @@ test('menu creation validates canonical format target and status values', functi
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/menus', [
             'title' => 'Broken',
             'canonical' => 'Not A Valid Canonical!',
@@ -135,7 +140,7 @@ test('menu creation validates parent_id exists', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->postJson('/api/v1/admin/menus', [
             'title' => 'Broken Parent',
             'canonical' => 'home.header',
@@ -146,3 +151,16 @@ test('menu creation validates parent_id exists', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['parent_id']);
 });
+
+test('menu creation rejects executable javascript urls', function () {
+    actingAs(adminUser())
+        ->postJson('/api/v1/admin/menus', [
+            'title' => 'Unsafe Link',
+            'url' => 'javascript:alert(document.domain)',
+            'canonical' => 'home.header',
+            'target' => '_self',
+            'status' => 'active',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('url');
+})->todo('MenuRequest accepts executable URL schemes that may be rendered as public links');

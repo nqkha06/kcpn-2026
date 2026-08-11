@@ -4,8 +4,13 @@ use App\Models\Menu;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\patchJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -15,7 +20,7 @@ beforeEach(function (): void {
 test('guests cannot update a menu', function () {
     $menu = Menu::factory()->create();
 
-    $this->patchJson('/api/v1/admin/menus/'.$menu->id, [
+    patchJson('/api/v1/admin/menus/'.$menu->id, [
         'title' => 'Updated',
         'canonical' => 'home.header',
         'target' => '_self',
@@ -30,7 +35,7 @@ test('non admin users cannot update a menu', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $menu = Menu::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->patchJson('/api/v1/admin/menus/'.$menu->id, [
             'title' => 'Updated',
             'canonical' => 'home.header',
@@ -57,7 +62,7 @@ test('admin can update a menu item', function () {
         'status' => 'inactive',
     ];
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/menus/'.$menu->id, $payload)
         ->assertOk()
         ->assertJsonPath('message', 'Menu updated successfully')
@@ -67,7 +72,7 @@ test('admin can update a menu item', function () {
         ->assertJsonPath('data.target', '_blank')
         ->assertJsonPath('data.status', 'inactive');
 
-    $this->assertDatabaseHas('menus', [
+    assertDatabaseHas('menus', [
         'id' => $menu->id,
         'title' => 'About Us',
         'url' => null,
@@ -83,7 +88,7 @@ test('updating a menu to be its own parent is rejected', function () {
 
     $menu = Menu::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/menus/'.$menu->id, [
             'title' => $menu->title,
             'canonical' => $menu->canonical,
@@ -94,7 +99,7 @@ test('updating a menu to be its own parent is rejected', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['parent_id']);
 
-    $this->assertDatabaseHas('menus', [
+    assertDatabaseHas('menus', [
         'id' => $menu->id,
         'parent_id' => null,
     ]);
@@ -107,7 +112,7 @@ test('admin updating a menu with a new parent inherits the parent canonical', fu
     $parent = Menu::factory()->footer()->create();
     $menu = Menu::factory()->header()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/menus/'.$menu->id, [
             'title' => $menu->title,
             'canonical' => 'home.header',
@@ -119,7 +124,7 @@ test('admin updating a menu with a new parent inherits the parent canonical', fu
         ->assertJsonPath('data.canonical', 'home.footer')
         ->assertJsonPath('data.parent.id', $parent->id);
 
-    $this->assertDatabaseHas('menus', [
+    assertDatabaseHas('menus', [
         'id' => $menu->id,
         'parent_id' => $parent->id,
         'canonical' => 'home.footer',
@@ -132,7 +137,7 @@ test('menu update validates required fields', function () {
 
     $menu = Menu::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/menus/'.$menu->id, [
             'title' => '',
             'canonical' => '',
@@ -142,3 +147,19 @@ test('menu update validates required fields', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['title', 'canonical', 'target', 'status']);
 });
+
+test('updating a menu cannot create an indirect parent cycle', function () {
+    $parent = Menu::factory()->create();
+    $child = Menu::factory()->create(['parent_id' => $parent->id]);
+
+    actingAs(adminUser())
+        ->patchJson('/api/v1/admin/menus/'.$parent->id, [
+            'title' => $parent->title,
+            'canonical' => $parent->canonical,
+            'parent_id' => $child->id,
+            'target' => '_self',
+            'status' => 'active',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('parent_id');
+})->todo('MenuRequest prevents self-parenting but does not detect descendant cycles');
