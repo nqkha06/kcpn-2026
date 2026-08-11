@@ -3,12 +3,17 @@
 use App\Models\Category;
 use App\Models\UserWallet;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\postJson;
+
 test('an admin can create a transaction', function () {
     $user = regularUser();
     $wallet = UserWallet::factory()->for($user)->create();
     $category = Category::factory()->create();
 
-    $this->actingAs(adminUser())
+    actingAs(adminUser())
         ->postJson('/api/v1/admin/transactions', [
             'user_id' => $user->id,
             'wallet_id' => $wallet->id,
@@ -23,5 +28,133 @@ test('an admin can create a transaction', function () {
         ->assertCreated()
         ->assertJsonPath('data.user_id', $user->id);
 
-    $this->assertDatabaseHas('expense_transactions', ['user_id' => $user->id, 'amount' => 150000]);
+    assertDatabaseHas('expense_transactions', ['user_id' => $user->id, 'amount' => 150000]);
+});
+
+test('a guest cannot create an admin transaction', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create();
+
+    postJson('/api/v1/admin/transactions', [
+        'user_id' => $user->id,
+        'wallet_id' => $wallet->id,
+        'type' => 'expense',
+        'amount' => 100,
+        'transacted_at' => '2026-08-01',
+        'status' => 'posted',
+    ])->assertUnauthorized();
+
+    assertDatabaseMissing('expense_transactions', ['wallet_id' => $wallet->id]);
+});
+
+test('a regular user cannot create an admin transaction', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create();
+
+    actingAs($user)
+        ->postJson('/api/v1/admin/transactions', [
+            'user_id' => $user->id,
+            'wallet_id' => $wallet->id,
+            'type' => 'expense',
+            'amount' => 100,
+            'transacted_at' => '2026-08-01',
+            'status' => 'posted',
+        ])
+        ->assertForbidden();
+});
+
+test('admin transaction creation validates required fields', function () {
+    actingAs(adminUser())
+        ->postJson('/api/v1/admin/transactions', [])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors([
+            'user_id',
+            'wallet_id',
+            'type',
+            'amount',
+            'transacted_at',
+            'status',
+        ]);
+});
+
+test('admin transaction creation rejects invalid values', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create();
+
+    actingAs(adminUser())
+        ->postJson('/api/v1/admin/transactions', [
+            'user_id' => $user->id,
+            'wallet_id' => $wallet->id,
+            'type' => 'transfer',
+            'amount' => 0,
+            'transacted_at' => 'not-a-date',
+            'status' => 'approved',
+            'labels' => ['a-label-that-is-longer-than-thirty-characters'],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['type', 'amount', 'transacted_at', 'status', 'labels.0']);
+});
+
+test('an admin cannot assign a wallet owned by another user', function () {
+    $selectedUser = regularUser();
+    $otherWallet = UserWallet::factory()->for(regularUser())->create();
+
+    actingAs(adminUser())
+        ->postJson('/api/v1/admin/transactions', [
+            'user_id' => $selectedUser->id,
+            'wallet_id' => $otherWallet->id,
+            'type' => 'expense',
+            'amount' => 100,
+            'transacted_at' => '2026-08-01',
+            'status' => 'posted',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('wallet_id');
+});
+
+test('an admin cannot assign another users private category', function () {
+    $selectedUser = regularUser();
+    $wallet = UserWallet::factory()->for($selectedUser)->create();
+    $privateCategory = Category::factory()->create(['user_id' => regularUser()->id]);
+
+    actingAs(adminUser())
+        ->postJson('/api/v1/admin/transactions', [
+            'user_id' => $selectedUser->id,
+            'wallet_id' => $wallet->id,
+            'category_id' => $privateCategory->id,
+            'type' => 'expense',
+            'amount' => 100,
+            'transacted_at' => '2026-08-01',
+            'status' => 'posted',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('category_id');
+});
+
+test('admin transaction creation normalizes optional fields', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create();
+
+    actingAs(adminUser())
+        ->postJson('/api/v1/admin/transactions', [
+            'user_id' => $user->id,
+            'wallet_id' => $wallet->id,
+            'category_id' => 'none',
+            'type' => 'income',
+            'amount' => 125.5,
+            'transacted_at' => '2026-08-01',
+            'status' => 'pending',
+            'note' => '   ',
+            'labels' => ' work, recurring, work ',
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.category_id', null)
+        ->assertJsonPath('data.note', null)
+        ->assertJsonPath('data.labels', ['work', 'recurring']);
+
+    assertDatabaseHas('expense_transactions', [
+        'wallet_id' => $wallet->id,
+        'category_id' => null,
+        'note' => null,
+    ]);
 });
