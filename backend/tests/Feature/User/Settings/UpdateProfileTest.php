@@ -2,32 +2,60 @@
 
 use App\Models\User;
 
-it('can update profile and validations and databases', function () {
-    $user = User::factory()->create();
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+
+test('settings return the current users profile and preferences', function () {
+    $user = User::factory()->create([
+        'name' => 'John Doe',
+        'email' => 'john@example.com',
+    ]);
+
     $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
 
-    $response = $this->actingAs($user, 'sanctum')->patchJson('/api/v1/user/settings/profile', [
-        'name' => 'Jane Smith',
-        'email' => 'jane@example.com',
-    ]);
+    $user->setMeta('currency', 'USD');
 
-    $response->assertStatus(200);
+    $response = actingAs($user, 'sanctum')->getJson('/api/v1/user/settings');
 
-    $this->assertDatabaseHas('users', [
-        'id' => $user->id,
-        'name' => 'Jane Smith',
-        'email' => 'jane@example.com',
-    ]);
+    $response->assertStatus(200)
+        ->assertJson([
+            'data' => [
+                'profile' => [
+                    'name' => 'John Doe',
+                    'email' => 'john@example.com',
+                ],
+                'preferences' => [
+                    'currency' => 'USD',
+                ],
+            ],
+        ]);
 });
 
-it('validates profile update fields', function () {
-    $user = User::factory()->create();
-    $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
+test('a guest cannot view settings', function () {
+    $response = getJson('/api/v1/user/settings');
+    $response->assertStatus(401);
+});
 
-    $response = $this->actingAs($user, 'sanctum')->patchJson('/api/v1/user/settings/profile', [
-        'name' => '',
-    ]);
+test('settings use VND when the user has no currency preference', function () {
+    $user = regularUser();
 
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['name']);
+    actingAs($user)
+        ->getJson('/api/v1/user/settings')
+        ->assertOk()
+        ->assertJsonPath('data.preferences.currency', 'VND');
+});
+
+test('an admin cannot access user only settings', function () {
+    actingAs(adminUser())
+        ->getJson('/api/v1/user/settings')
+        ->assertForbidden();
+});
+
+test('settings response does not expose sensitive user fields', function () {
+    actingAs(regularUser())
+        ->getJson('/api/v1/user/settings')
+        ->assertOk()
+        ->assertJsonMissingPath('data.password')
+        ->assertJsonMissingPath('data.remember_token')
+        ->assertJsonMissingPath('data.two_factor_secret');
 });

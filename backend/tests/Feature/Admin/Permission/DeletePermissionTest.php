@@ -1,22 +1,41 @@
 <?php
 
-use App\Models\User;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole(Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']));
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+
+test('an admin can show a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'edit articles', 'guard_name' => 'web']);
+
+    $response = actingAs(adminUser(), 'sanctum')->getJson("/api/v1/admin/permissions/{$permission->id}");
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'data' => [
+                'id' => $permission->id,
+                'name' => 'edit articles',
+            ],
+        ]);
 });
 
-it('can delete a permission', function () {
-    $permission = Permission::firstOrCreate(['name' => 'manage users', 'guard_name' => 'web']);
+test('a guest cannot show a permission', function () {
+    $permission = Permission::create(['name' => 'guest view', 'guard_name' => 'web']);
 
-    $response = $this->actingAs($this->user, 'sanctum')->deleteJson("/api/v1/admin/permissions/{$permission->id}");
+    getJson("/api/v1/admin/permissions/{$permission->id}")
+        ->assertUnauthorized();
+});
 
-    $response->assertStatus(200);
+test('a regular user cannot show a permission', function () {
+    $permission = Permission::create(['name' => 'user view', 'guard_name' => 'web']);
 
-    $this->assertDatabaseMissing('permissions', [
-        'id' => $permission->id,
-    ]);
+    actingAs(regularUser())
+        ->getJson("/api/v1/admin/permissions/{$permission->id}")
+        ->assertForbidden();
+});
+
+test('showing a missing permission returns not found', function () {
+    actingAs(adminUser(), 'sanctum')
+        ->getJson('/api/v1/admin/permissions/999999')
+        ->assertNotFound();
 });

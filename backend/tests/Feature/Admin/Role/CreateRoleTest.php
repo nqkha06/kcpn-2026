@@ -1,29 +1,30 @@
 <?php
 
-use App\Models\User;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole(Role::create(['name' => 'admin', 'guard_name' => 'web']));
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+
+test('an admin can get role options', function () {
+    Role::create(['name' => 'manager', 'guard_name' => 'web']);
+    Role::create(['name' => 'editor', 'guard_name' => 'web']);
+
+    $response = actingAs(adminUser(), 'sanctum')->getJson('/api/v1/admin/roles/options');
+
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'name'],
+            ],
+        ]);
 });
 
-it('can create a role and assign permissions', function () {
-    $permission = Permission::create(['name' => 'publish articles', 'guard_name' => 'web']);
+test('a guest cannot get role options', function () {
+    getJson('/api/v1/admin/roles/options')->assertUnauthorized();
+});
 
-    $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/admin/roles', [
-        'name' => 'writer',
-        'permissions' => [$permission->id],
-    ]);
-
-    $response->assertStatus(201);
-
-    $this->assertDatabaseHas('roles', [
-        'name' => 'writer',
-        'guard_name' => 'web',
-    ]);
-
-    $role = Role::where('name', 'writer')->first();
-    expect($role->hasPermissionTo('publish articles'))->toBeTrue();
+test('a regular user cannot get role options', function () {
+    actingAs(regularUser())
+        ->getJson('/api/v1/admin/roles/options')
+        ->assertForbidden();
 });

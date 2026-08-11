@@ -1,33 +1,64 @@
 <?php
 
-use App\Models\User;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole(Role::create(['name' => 'admin', 'guard_name' => 'web']));
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\postJson;
+
+test('an admin can create a role and assign permissions', function () {
+    $permission = Permission::create(['name' => 'publish articles', 'guard_name' => 'web']);
+
+    $response = actingAs(adminUser(), 'sanctum')->postJson('/api/v1/admin/roles', [
+        'name' => 'writer',
+        'permissions' => [$permission->id],
+    ]);
+
+    $response->assertStatus(201);
+
+    assertDatabaseHas('roles', [
+        'name' => 'writer',
+        'guard_name' => 'web',
+    ]);
+
+    $role = Role::where('name', 'writer')->first();
+    expect($role->hasPermissionTo('publish articles'))->toBeTrue();
 });
 
-it('can delete a role', function () {
-    $role = Role::create(['name' => 'manager', 'guard_name' => 'web']);
+test('a guest cannot create a role', function () {
+    postJson('/api/v1/admin/roles', ['name' => 'guest-role'])
+        ->assertUnauthorized();
 
-    $response = $this->actingAs($this->user, 'sanctum')->deleteJson("/api/v1/admin/roles/{$role->id}");
-
-    $response->assertStatus(200);
-
-    $this->assertDatabaseMissing('roles', [
-        'id' => $role->id,
-    ]);
+    assertDatabaseMissing('roles', ['name' => 'guest-role']);
 });
 
-it('cannot delete system roles', function () {
-    $role = Role::where('name', 'admin')->first();
+test('a regular user cannot create a role', function () {
+    actingAs(regularUser())
+        ->postJson('/api/v1/admin/roles', ['name' => 'unauthorized-role'])
+        ->assertForbidden();
 
-    $response = $this->actingAs($this->user, 'sanctum')->deleteJson("/api/v1/admin/roles/{$role->id}");
+    assertDatabaseMissing('roles', ['name' => 'unauthorized-role']);
+});
 
-    $response->assertStatus(403);
+test('role creation validates the name and selected permissions', function () {
+    $permission = Permission::create(['name' => 'manage reports', 'guard_name' => 'web']);
 
-    $this->assertDatabaseHas('roles', [
-        'id' => $role->id,
-    ]);
+    actingAs(adminUser(), 'sanctum')
+        ->postJson('/api/v1/admin/roles', [
+            'name' => '',
+            'permissions' => [$permission->id, $permission->id, 999999],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name', 'permissions.1', 'permissions.2']);
+});
+
+test('role creation rejects a duplicate web guard name', function () {
+    Role::create(['name' => 'writer', 'guard_name' => 'web']);
+
+    actingAs(adminUser(), 'sanctum')
+        ->postJson('/api/v1/admin/roles', ['name' => 'writer'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
 });

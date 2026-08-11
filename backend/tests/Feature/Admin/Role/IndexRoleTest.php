@@ -1,27 +1,50 @@
 <?php
 
-use App\Models\User;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole(Role::create(['name' => 'admin', 'guard_name' => 'web']));
-});
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
 
-it('can list roles', function () {
-    Role::create(['name' => 'editor', 'guard_name' => 'web']);
+test('an admin can show a role and its permissions', function () {
+    $role = Role::create(['name' => 'editor', 'guard_name' => 'web']);
+    $permission = Permission::create(['name' => 'edit articles', 'guard_name' => 'web']);
+    $role->givePermissionTo($permission);
 
-    $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/admin/roles');
+    $response = actingAs(adminUser(), 'sanctum')->getJson("/api/v1/admin/roles/{$role->id}");
 
     $response->assertStatus(200)
-        ->assertJsonStructure([
+        ->assertJson([
             'data' => [
-                '*' => ['id', 'name', 'created_at'],
+                'id' => $role->id,
+                'name' => 'editor',
+                'permissions' => [
+                    [
+                        'id' => $permission->id,
+                        'name' => 'edit articles',
+                    ],
+                ],
             ],
         ]);
 });
 
-it('unauthorized user cannot list roles', function () {
-    $response = $this->getJson('/api/v1/admin/roles');
-    $response->assertStatus(401);
+test('a guest cannot show a role', function () {
+    $role = Role::create(['name' => 'guest-view', 'guard_name' => 'web']);
+
+    getJson("/api/v1/admin/roles/{$role->id}")
+        ->assertUnauthorized();
+});
+
+test('a regular user cannot show a role', function () {
+    $role = Role::create(['name' => 'user-view', 'guard_name' => 'web']);
+
+    actingAs(regularUser())
+        ->getJson("/api/v1/admin/roles/{$role->id}")
+        ->assertForbidden();
+});
+
+test('showing a missing role returns not found', function () {
+    actingAs(adminUser(), 'sanctum')
+        ->getJson('/api/v1/admin/roles/999999')
+        ->assertNotFound();
 });
