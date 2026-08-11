@@ -6,8 +6,12 @@ use App\Models\ExpenseTransaction;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -15,7 +19,7 @@ beforeEach(function (): void {
 });
 
 test('guests cannot list budgets', function () {
-    $this->getJson('/api/v1/admin/budgets')
+    getJson('/api/v1/admin/budgets')
         ->assertUnauthorized()
         ->assertJsonPath('message', 'Unauthenticated');
 });
@@ -24,7 +28,7 @@ test('non admin users cannot list budgets', function () {
     $user = User::factory()->create();
     $user->assignRole(Role::findOrCreate('user', 'web'));
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->getJson('/api/v1/admin/budgets')
         ->assertForbidden()
         ->assertJsonPath('message', 'Forbidden');
@@ -36,7 +40,7 @@ test('admin can list budgets with default pagination', function () {
 
     Budget::factory()->count(3)->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets')
         ->assertOk()
         ->assertJsonStructure([
@@ -59,12 +63,22 @@ test('admin can search budgets by user name email category name note or id', fun
     $budget = Budget::factory()->for($customer)->for($category)->create();
     Budget::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets?search=Budget%20Customer')
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
         ->assertJsonPath('data.0.id', $budget->id);
 });
+
+test('admin can search budgets by id', function () {
+    $budget = Budget::factory()->create();
+
+    actingAs(adminUser())
+        ->getJson('/api/v1/admin/budgets?search='.$budget->id)
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.id', $budget->id);
+})->todo('AdminBudgetService calls the undefined Eloquent Builder method orWhereKey');
 
 test('admin can filter budgets by period status user and category', function () {
     $admin = User::factory()->create();
@@ -75,7 +89,7 @@ test('admin can filter budgets by period status user and category', function () 
     $budget = Budget::factory()->for($customer)->for($category)->monthly()->active()->create();
     Budget::factory()->create(['period' => 'yearly', 'status' => 'inactive']);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets?period=monthly&status=active&user_id='.$customer->id.'&category_id='.$category->id)
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
@@ -96,10 +110,38 @@ test('admin budget index computes spent amount for the current period', function
             'transacted_at' => now()->toDateString(),
         ]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets')
         ->assertOk()
         ->assertJsonPath('data.0.spent', 125.5);
+});
+
+test('budget spent only includes posted expenses in its current period', function () {
+    $customer = User::factory()->create();
+    $category = Category::factory()->create();
+    $budget = Budget::factory()->for($customer)->for($category)->monthly()->active()->create();
+
+    ExpenseTransaction::factory()->forUser($customer)->for($category)->expense()->posted()->create([
+        'amount' => 100,
+        'transacted_at' => now()->toDateString(),
+    ]);
+    ExpenseTransaction::factory()->forUser($customer)->for($category)->income()->posted()->create([
+        'amount' => 500,
+        'transacted_at' => now()->toDateString(),
+    ]);
+    ExpenseTransaction::factory()->forUser($customer)->for($category)->expense()->pending()->create([
+        'amount' => 300,
+        'transacted_at' => now()->toDateString(),
+    ]);
+    ExpenseTransaction::factory()->forUser($customer)->for($category)->expense()->posted()->create([
+        'amount' => 200,
+        'transacted_at' => now()->subMonth()->endOfMonth()->toDateString(),
+    ]);
+
+    actingAs(adminUser())
+        ->getJson('/api/v1/admin/budgets/'.$budget->id)
+        ->assertOk()
+        ->assertJsonPath('data.spent', 100);
 });
 
 test('admin can sort and paginate budgets', function () {
@@ -110,7 +152,7 @@ test('admin can sort and paginate budgets', function () {
     Budget::factory()->create(['amount_limit' => 100]);
     Budget::factory()->create(['amount_limit' => 300]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets?sort=amount_limit&direction=asc&per_page=2')
         ->assertOk()
         ->assertJsonPath('data.0.amount_limit', 100)
@@ -123,7 +165,7 @@ test('budget index query parameters are validated', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::findOrCreate('admin', 'web'));
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets?period=weekly&status=archived&user_id=999999&category_id=999999&sort=invalid&direction=up&per_page=200')
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['period', 'status', 'user_id', 'category_id', 'sort', 'direction', 'per_page']);

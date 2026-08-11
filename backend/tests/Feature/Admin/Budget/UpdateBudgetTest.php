@@ -5,8 +5,13 @@ use App\Models\Category;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\patchJson;
+use function Pest\Laravel\withHeaders;
+
 beforeEach(function (): void {
-    $this->withHeaders([
+    withHeaders([
         'Accept' => 'application/json',
         'Origin' => 'http://localhost:3000',
         'Referer' => 'http://localhost:3000/admin',
@@ -16,7 +21,7 @@ beforeEach(function (): void {
 test('guests cannot update a budget', function () {
     $budget = Budget::factory()->create();
 
-    $this->patchJson('/api/v1/admin/budgets/'.$budget->id, [
+    patchJson('/api/v1/admin/budgets/'.$budget->id, [
         'user_id' => $budget->user_id,
         'category_id' => $budget->category_id,
         'amount_limit' => 1500,
@@ -32,7 +37,7 @@ test('non admin users cannot update a budget', function () {
     $user->assignRole(Role::findOrCreate('user', 'web'));
     $budget = Budget::factory()->create();
 
-    $this->actingAs($user, 'web')
+    actingAs($user, 'web')
         ->patchJson('/api/v1/admin/budgets/'.$budget->id, [
             'user_id' => $budget->user_id,
             'category_id' => $budget->category_id,
@@ -63,7 +68,7 @@ test('admin can update a budget', function () {
         'note' => '',
     ];
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/budgets/'.$budget->id, $payload)
         ->assertOk()
         ->assertJsonPath('message', 'Budget updated successfully')
@@ -72,7 +77,7 @@ test('admin can update a budget', function () {
         ->assertJsonPath('data.status', 'inactive')
         ->assertJsonPath('data.note', null);
 
-    $this->assertDatabaseHas('budgets', [
+    assertDatabaseHas('budgets', [
         'id' => $budget->id,
         'amount_limit' => 1500,
         'period' => 'yearly',
@@ -91,7 +96,7 @@ test('updating a budget to duplicate an existing user category period combinatio
     Budget::factory()->for($customer)->for($category)->monthly()->create();
     $otherBudget = Budget::factory()->for($customer)->for($otherCategory)->create(['period' => 'yearly']);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/budgets/'.$otherBudget->id, [
             'user_id' => $customer->id,
             'category_id' => $category->id,
@@ -113,7 +118,7 @@ test('a budget can keep its own combination when updated', function () {
         'amount_limit' => 800,
     ]);
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/budgets/'.$budget->id, [
             'user_id' => $customer->id,
             'category_id' => $category->id,
@@ -131,7 +136,7 @@ test('budget update validates required fields', function () {
 
     $budget = Budget::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/budgets/'.$budget->id, [])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['user_id', 'category_id', 'amount_limit', 'period', 'status']);
@@ -144,7 +149,7 @@ test('updating a non existent budget returns not found', function () {
     $customer = User::factory()->create();
     $category = Category::factory()->create();
 
-    $this->actingAs($admin, 'web')
+    actingAs($admin, 'web')
         ->patchJson('/api/v1/admin/budgets/999999', [
             'user_id' => $customer->id,
             'category_id' => $category->id,
