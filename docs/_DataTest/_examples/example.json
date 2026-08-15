@@ -1,0 +1,84 @@
+[
+  {
+    "case_id": "SHARED-DATA-BVA-001",
+    "description": "Valid boundary value resolved by every test runner",
+    "actor": "admin",
+    "preconditions": [
+      "customer_exists",
+      "active_visible_category_exists"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {},
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0.01,
+        "period": "monthly",
+        "status": "active",
+        "note": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 255
+        }
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "success": true,
+        "data.amount_limit": 0.01
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": "budget_created"
+    },
+    "capture": {
+      "budget_id": "data.id"
+    }
+  },
+  {
+    "case_id": "SHARED-DATA-BVA-002",
+    "description": "Invalid boundary value resolved by every test runner",
+    "actor": "admin",
+    "preconditions": [
+      "customer_exists",
+      "active_visible_category_exists"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {},
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0,
+        "period": "monthly",
+        "status": "active",
+        "note": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 256
+        }
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {
+        "success": false
+      },
+      "json_absent": [],
+      "validation_errors": [
+        "amount_limit",
+        "note"
+      ],
+      "database_change": "budget_not_created"
+    },
+    "capture": {}
+  }
+]

@@ -5,6 +5,7 @@
     "scripts": {
         "test": "HEADLESS=true node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps",
         "test:headed": "HEADLESS=false node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps",
+        "test:data": "node --test support/*.test.js",
         "codeceptjs": "node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps",
         "codeceptjs:headless": "HEADLESS=true node --env-file-if-exists=.env ./node_modules/codeceptjs/bin/codecept.js run --steps"
     },
