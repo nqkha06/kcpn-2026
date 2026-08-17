@@ -1,0 +1,121 @@
+[
+    {
+        "case_id": "PUB-CONFIG-SHOW-EP-001",
+        "description": "Configuration uses the default locale when omitted",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/configuration",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.locale": "@app.locale",
+                "data.default_locale": "@app.locale"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "PUB-CONFIG-SHOW-EP-002",
+        "description": "Configuration accepts Vietnamese locale",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/configuration",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": { "locale": "vi" },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.locale": "vi" },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "PUB-CONFIG-SHOW-EP-003",
+        "description": "Configuration accepts English locale",
+        "actor": "guest",
+        "preconditions": ["localized_appearance_exists"],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/configuration",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": { "locale": "en" },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.locale": "en",
+                "data.appearance.site_name": "Cashback"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "PUB-CONFIG-SHOW-EP-004",
+        "description": "Configuration rejects an unsupported locale",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/configuration",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": { "locale": "fr" },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.locale"],
+            "validation_errors": ["locale"],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "PUB-CONFIG-SHOW-BUS-005",
+        "description": "Configuration only includes active menu trees in display order",
+        "actor": "guest",
+        "preconditions": ["active_and_inactive_menus_exist"],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/configuration",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": { "locale": "vi" },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.locale": "vi",
+                "data.menus.home_header.0.title": "First",
+                "data.menus.home_header.0.children.0.title": "Active Child",
+                "data.menus.home_header.1.title": "Later"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": { "table": "menus", "operation": "none" }
+        }
+    }
+]

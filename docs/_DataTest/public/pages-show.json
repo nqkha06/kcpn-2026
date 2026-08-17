@@ -1,0 +1,112 @@
+[
+    {
+        "case_id": "PUB-PAGE-SHOW-EP-001",
+        "description": "A published page is public",
+        "actor": "guest",
+        "preconditions": ["published_page_exists"],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/pages/{slug}",
+            "headers": { "Accept": "application/json" },
+            "path": { "slug": "@published_page.slug" },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.slug": "@published_page.slug"
+            },
+            "json_absent": ["data.user_id", "data.author", "data.category_id"],
+            "validation_errors": [],
+            "database_change": { "table": "pages", "operation": "none" }
+        },
+        "capture": { "public_page_id": "data.id" }
+    },
+    {
+        "case_id": "PUB-PAGE-SHOW-RBAC-002",
+        "description": "A draft page is not public",
+        "actor": "guest",
+        "preconditions": ["draft_page_exists"],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/pages/{slug}",
+            "headers": { "Accept": "application/json" },
+            "path": { "slug": "@draft_page.slug" },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": { "success": false },
+            "json_absent": ["data.id"],
+            "validation_errors": [],
+            "database_change": { "table": "pages", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "PUB-PAGE-SHOW-RBAC-003",
+        "description": "A pending page is not public",
+        "actor": "guest",
+        "preconditions": ["pending_page_exists"],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/pages/{slug}",
+            "headers": { "Accept": "application/json" },
+            "path": { "slug": "@pending_page.slug" },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": { "success": false },
+            "json_absent": ["data.id"],
+            "validation_errors": [],
+            "database_change": { "table": "pages", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "PUB-PAGE-SHOW-EP-004",
+        "description": "An unknown slug returns not found",
+        "actor": "guest",
+        "preconditions": ["page_does_not_exist"],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/pages/{slug}",
+            "headers": { "Accept": "application/json" },
+            "path": { "slug": "missing-page" },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": { "success": false },
+            "json_absent": ["data.id"],
+            "validation_errors": [],
+            "database_change": { "table": "pages", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "PUB-PAGE-SHOW-EP-005",
+        "description": "A published page supports a nested slug",
+        "actor": "guest",
+        "preconditions": ["published_nested_page_exists"],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/public/pages/{slug}",
+            "headers": { "Accept": "application/json" },
+            "path": { "slug": "@nested_page.slug" },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.slug": "@nested_page.slug" },
+            "json_absent": ["data.user_id", "data.author", "data.category_id"],
+            "validation_errors": [],
+            "database_change": { "table": "pages", "operation": "none" }
+        },
+        "capture": { "public_page_id": "data.id" }
+    }
+]

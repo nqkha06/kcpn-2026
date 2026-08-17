@@ -38,7 +38,7 @@
           "                throw new Error(`Missing test fixture alias [${value}].`);",
           "            }",
           "",
-          "            return resolvedAlias;",
+          "            return typeof resolvedAlias === 'string' ? pm.variables.replaceIn(resolvedAlias) : resolvedAlias;",
           "        }",
           "",
           "        return value;",
@@ -65,7 +65,7 @@
           "    let endpoint = requestData.endpoint;",
           "",
           "    Object.entries(requestData.path || {}).forEach(([key, value]) => {",
-          "        endpoint = endpoint.replace(`{${key}}`, encodeURIComponent(String(value)));",
+          "        endpoint = endpoint.replace(`{${key}}`, String(value).split('/').map(encodeURIComponent).join('/'));",
           "    });",
           "",
           "    const query = Object.entries(requestData.query || {})",
@@ -78,13 +78,19 @@
           "",
           "const iterationRow = pm.iterationData.toObject();",
           "const hasIterationRow = Object.keys(iterationRow).length > 0;",
-          "const dataDriven = String(pm.variables.get('data_driven') || '').toLowerCase() === 'true';",
+          "const dataDrivenHeader = pm.request.headers.get('X-Data-Driven');",
+          "const dataDriven = String(dataDrivenHeader || pm.variables.get('data_driven') || '').toLowerCase() === 'true';",
+          "pm.request.headers.remove('X-Data-Driven');",
+          "",
+          "if (!dataDriven) {",
+          "    pm.variables.unset('resolved_test_case');",
+          "}",
           "",
           "if (dataDriven && !hasIterationRow) {",
           "    throw new Error('This data-driven folder requires a JSON data file.');",
           "}",
           "",
-          "if (hasIterationRow) {",
+          "if (dataDriven && hasIterationRow) {",
           "    if (typeof iterationRow.case_id !== 'string' || iterationRow.case_id.trim() === '') {",
           "        throw new Error('Every iteration row requires a case_id.');",
           "    }",
@@ -455,6 +461,96 @@
       "key": "created_user_budget_id",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "user.email",
+      "value": "{{user_email}}",
+      "type": "string"
+    },
+    {
+      "key": "user.password",
+      "value": "{{user_password}}",
+      "type": "string"
+    },
+    {
+      "key": "two_factor_user.email",
+      "value": "{{user_email}}",
+      "type": "string"
+    },
+    {
+      "key": "two_factor_user.password",
+      "value": "{{user_password}}",
+      "type": "string"
+    },
+    {
+      "key": "two_factor.code",
+      "value": "{{two_factor_code}}",
+      "type": "string"
+    },
+    {
+      "key": "two_factor.recovery_code",
+      "value": "{{two_factor_recovery_code}}",
+      "type": "string"
+    },
+    {
+      "key": "two_factor.used_recovery_code",
+      "value": "{{two_factor_recovery_code}}",
+      "type": "string"
+    },
+    {
+      "key": "reset.token",
+      "value": "{{reset_token}}",
+      "type": "string"
+    },
+    {
+      "key": "reset.used_token",
+      "value": "{{reset_token}}",
+      "type": "string"
+    },
+    {
+      "key": "app.locale",
+      "value": "en",
+      "type": "string"
+    },
+    {
+      "key": "published_page.slug",
+      "value": "{{public_page_slug}}",
+      "type": "string"
+    },
+    {
+      "key": "draft_page.slug",
+      "value": "{{draft_page_slug}}",
+      "type": "string"
+    },
+    {
+      "key": "pending_page.slug",
+      "value": "{{pending_page_slug}}",
+      "type": "string"
+    },
+    {
+      "key": "nested_page.slug",
+      "value": "{{nested_page_slug}}",
+      "type": "string"
+    },
+    {
+      "key": "existing_user.email",
+      "value": "{{registered_email}}",
+      "type": "string"
+    },
+    {
+      "key": "register.email254",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd.eeeeee",
+      "type": "string"
+    },
+    {
+      "key": "register.email255",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd.eeeeeee",
+      "type": "string"
+    },
+    {
+      "key": "register.email256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd.eeeeeeee",
+      "type": "string"
     }
   ],
   "item": [
@@ -498,175 +594,209 @@
           "item": [
             {
               "name": "POST /auth/register",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"name\": \"Postman Test User\",\n    \"email\": \"postman.user.{{$timestamp}}@example.com\",\n    \"password\": \"{{registered_password}}\",\n    \"password_confirmation\": \"{{registered_password}}\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/auth/register",
-                "description": "Tạo user mới với role user và đăng nhập user đó vào session hiện tại. Email động tránh lỗi trùng dữ liệu."
-              },
-              "response": [],
-              "event": [
+              "description": "Run with docs/_DataTest/auth/register.json in Collection Runner or Newman -d.",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('User is registered', function () {",
-                      "    pm.response.to.have.status(201);",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json.data.user.roles).to.include('user');",
-                      "});",
-                      "",
-                      "if (pm.response.code === 201) {",
-                      "    pm.collectionVariables.set('registered_email', pm.response.json().data.user.email);",
-                      "}"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "auth/register.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "Execute shared case",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data source: docs/_DataTest/auth/register.json"
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
               "name": "POST /auth/forgot-password",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"email\": \"{{registered_email}}\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/auth/forgot-password",
-                "description": "Gửi yêu cầu reset cho user thử nghiệm vừa đăng ký. Với MAIL_MAILER=log, lấy token trong storage/logs/laravel.log hoặc URL reset được ghi vào log."
-              },
-              "response": [],
-              "event": [
+              "description": "Run with docs/_DataTest/auth/forgot-password.json in Collection Runner or Newman -d.",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Password reset link is requested', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    pm.expect(pm.response.json().success).to.eql(true);",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "auth/forgot-password.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "Execute shared case",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data source: docs/_DataTest/auth/forgot-password.json"
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
               "name": "POST /auth/reset-password",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"token\": \"{{reset_token}}\",\n    \"email\": \"{{registered_email}}\",\n    \"password\": \"{{reset_new_password}}\",\n    \"password_confirmation\": \"{{reset_new_password}}\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/auth/reset-password",
-                "description": "Điền reset_token lấy từ email hoặc storage/logs/laravel.log. Nếu biến đang trống, response 422 là kết quả mong đợi vì token là bắt buộc."
-              },
-              "response": [],
-              "event": [
+              "description": "Run with docs/_DataTest/auth/reset-password.json in Collection Runner or Newman -d.",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "const resetToken = pm.collectionVariables.get('reset_token');",
-                      "if (resetToken) {",
-                      "    pm.test('Password is reset with supplied token', function () {",
-                      "        pm.response.to.have.status(200);",
-                      "        pm.expect(pm.response.json().success).to.eql(true);",
-                      "    });",
-                      "} else {",
-                      "    pm.test('Empty reset token is rejected', function () {",
-                      "        pm.response.to.have.status(422);",
-                      "        pm.expect(pm.response.json().errors).to.have.property('token');",
-                      "    });",
-                      "}"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "auth/reset-password.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "Execute shared case",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data source: docs/_DataTest/auth/reset-password.json"
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
               "name": "POST /auth/two-factor-challenge",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"code\": \"{{two_factor_code}}\",\n    \"recovery_code\": \"{{two_factor_recovery_code}}\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/auth/two-factor-challenge",
-                "description": "Chỉ chạy thành công sau khi Login bằng tài khoản đã bật 2FA và response yêu cầu two-factor. Điền một trong two_factor_code hoặc two_factor_recovery_code. Nếu cả hai trống, response 422 là mong đợi."
-              },
-              "response": [],
-              "event": [
+              "description": "Run with docs/_DataTest/auth/two-factor-challenge.json in Collection Runner or Newman -d.",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "const hasChallengeValue = pm.collectionVariables.get('two_factor_code') || pm.collectionVariables.get('two_factor_recovery_code');",
-                      "if (hasChallengeValue) {",
-                      "    pm.test('Two-factor challenge succeeds', function () {",
-                      "        pm.response.to.have.status(200);",
-                      "        pm.expect(pm.response.json().data.requires_two_factor).to.eql(false);",
-                      "    });",
-                      "} else {",
-                      "    pm.test('Missing two-factor code is rejected', function () {",
-                      "        pm.response.to.have.status(422);",
-                      "        pm.expect(pm.response.json().success).to.eql(false);",
-                      "    });",
-                      "}"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "auth/two-factor-challenge.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "Execute shared case",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data source: docs/_DataTest/auth/two-factor-challenge.json"
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }
@@ -676,46 +806,54 @@
           "name": "Admin Session",
           "item": [
             {
-              "name": "POST /auth/login — Admin",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"email\": \"{{admin_email}}\",\n    \"password\": \"{{admin_password}}\",\n    \"remember\": true\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/auth/login",
-                "description": "Điền admin_password trong collection variables. Request này thay session user vừa đăng ký bằng session admin dùng cho Menu CRUD."
-              },
-              "response": [],
-              "event": [
+              "name": "POST /auth/login",
+              "description": "Run with docs/_DataTest/auth/login.json in Collection Runner or Newman -d.",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Admin login succeeds', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    pm.expect(pm.response.json().success).to.eql(true);",
-                      "});",
-                      "",
-                      "if (pm.response.code === 200 && !pm.response.json().data.requires_two_factor) {",
-                      "    pm.test('Authenticated account has admin role', function () {",
-                      "        pm.expect(pm.response.json().data.user.roles).to.include('admin');",
-                      "    });",
-                      "}"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "auth/login.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "Execute shared case",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data source: docs/_DataTest/auth/login.json"
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -753,68 +891,105 @@
       "item": [
         {
           "name": "GET /public/configuration",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{api_base_url}}/public/configuration?locale={{public_locale}}",
-              "host": [
-                "{{api_base_url}}"
-              ],
-              "path": [
-                "public",
-                "configuration"
-              ],
-              "query": [
-                {
-                  "key": "locale",
-                  "value": "{{public_locale}}",
-                  "description": "Hỗ trợ vi hoặc en"
-                }
-              ]
-            }
-          },
-          "response": [],
-          "event": [
+          "description": "Run with docs/_DataTest/public/configuration.json in Collection Runner or Newman -d.",
+          "variable": [
             {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Public configuration is returned', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json.success).to.eql(true);",
-                  "    pm.expect(json.data.locale).to.eql(pm.collectionVariables.get('public_locale'));",
-                  "    pm.expect(json.data).to.have.property('menus');",
-                  "});"
-                ]
-              }
+              "key": "data_driven",
+              "value": "true",
+              "type": "string"
+            },
+            {
+              "key": "test_data_file",
+              "value": "public/configuration.json",
+              "type": "string"
+            }
+          ],
+          "item": [
+            {
+              "name": "Execute shared case",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Data-Driven",
+                    "value": "true",
+                    "type": "text"
+                  }
+                ],
+                "url": "{{base_url}}{{case_endpoint}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{{case_body}}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Data source: docs/_DataTest/public/configuration.json"
+              },
+              "response": [],
+              "event": []
             }
           ]
         },
         {
           "name": "GET /public/pages/{slug}",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{api_base_url}}/public/pages/{{public_page_slug}}",
-            "description": "public_page_slug phải trỏ tới page có status published. Route hỗ trợ slug lồng nhau như guides/getting-started."
-          },
-          "response": [],
-          "event": [
+          "description": "Run with docs/_DataTest/public/pages-show.json in Collection Runner or Newman -d.",
+          "variable": [
             {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Published page is returned', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "    const data = pm.response.json().data;",
-                  "    pm.expect(data.slug).to.eql(pm.collectionVariables.get('public_page_slug'));",
-                  "});"
-                ]
-              }
+              "key": "data_driven",
+              "value": "true",
+              "type": "string"
+            },
+            {
+              "key": "test_data_file",
+              "value": "public/pages-show.json",
+              "type": "string"
+            }
+          ],
+          "item": [
+            {
+              "name": "Execute shared case",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Data-Driven",
+                    "value": "true",
+                    "type": "text"
+                  }
+                ],
+                "url": "{{base_url}}{{case_endpoint}}",
+                "description": "Data source: docs/_DataTest/public/pages-show.json",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{{case_body}}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": []
             }
           ]
         }
@@ -885,100 +1060,53 @@
             },
             {
               "name": "POST /admin/appearance",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "formdata",
-                  "formdata": [
-                    {
-                      "key": "general[vi][site_name]",
-                      "value": "Hoàn tiền",
-                      "type": "text"
-                    },
-                    {
-                      "key": "general[vi][site_title]",
-                      "value": "Quản lý chi tiêu",
-                      "type": "text"
-                    },
-                    {
-                      "key": "general[vi][tagline]",
-                      "value": "Chi tiêu thông minh",
-                      "type": "text"
-                    },
-                    {
-                      "key": "general[vi][meta_description]",
-                      "value": "Ứng dụng quản lý chi tiêu và hoàn tiền",
-                      "type": "text"
-                    },
-                    {
-                      "key": "general[en][site_name]",
-                      "value": "Cashback",
-                      "type": "text"
-                    },
-                    {
-                      "key": "general[en][site_title]",
-                      "value": "Expense Manager",
-                      "type": "text"
-                    },
-                    {
-                      "key": "general[en][tagline]",
-                      "value": "Spend smarter",
-                      "type": "text"
-                    },
-                    {
-                      "key": "general[en][meta_description]",
-                      "value": "Cashback and expense management application",
-                      "type": "text"
-                    },
-                    {
-                      "key": "logo_light",
-                      "type": "file",
-                      "src": [],
-                      "disabled": true,
-                      "description": "Tùy chọn: jpg, jpeg, png, gif, webp, svg, ico; tối đa 4 MB."
-                    },
-                    {
-                      "key": "logo_dark",
-                      "type": "file",
-                      "src": [],
-                      "disabled": true,
-                      "description": "Tùy chọn: bật field rồi chọn file."
-                    },
-                    {
-                      "key": "favicon",
-                      "type": "file",
-                      "src": [],
-                      "disabled": true,
-                      "description": "Tùy chọn: bật field rồi chọn file."
-                    },
-                    {
-                      "key": "social_image",
-                      "type": "file",
-                      "src": [],
-                      "disabled": true,
-                      "description": "Tùy chọn: bật field rồi chọn file."
-                    }
-                  ]
-                },
-                "url": "{{api_base_url}}/admin/appearance",
-                "description": "Gửi multipart/form-data để vừa cập nhật nội dung đa ngôn ngữ vừa có thể upload ảnh. Các field file đang tắt mặc định; bật và chọn file khi cần."
-              },
-              "response": [],
-              "event": [
+              "description": "Run with docs/_DataTest/admin/appearance/update.json in Collection Runner or Newman -d.",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Appearance is updated', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json.message).to.eql('Appearance settings updated successfully');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/appearance/update.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "Execute shared case",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data source: docs/_DataTest/admin/appearance/update.json"
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }

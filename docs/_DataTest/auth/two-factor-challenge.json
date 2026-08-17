@@ -1,0 +1,168 @@
+[
+    {
+        "case_id": "AUTH-2FA-VERIFY-EP-001",
+        "description": "A valid authenticator code completes login",
+        "actor": "two_factor_user",
+        "preconditions": [
+            "two_factor_challenge_session",
+            "valid_authenticator_code"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/two-factor-challenge",
+            "headers": {
+                "Accept": "application/json",
+                "Origin": "http://localhost"
+            },
+            "path": {},
+            "query": {},
+            "body": { "code": "@two_factor.code" }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.requires_two_factor": false
+            },
+            "json_absent": [
+                "data.user.password",
+                "data.user.two_factor_secret",
+                "data.user.two_factor_recovery_codes"
+            ],
+            "validation_errors": [],
+            "database_change": { "table": "users", "operation": "none" }
+        },
+        "capture": { "authenticated_user_id": "data.user.id" }
+    },
+    {
+        "case_id": "AUTH-2FA-VERIFY-EP-002",
+        "description": "An invalid authenticator code is rejected",
+        "actor": "two_factor_user",
+        "preconditions": ["two_factor_challenge_session"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/two-factor-challenge",
+            "headers": {
+                "Accept": "application/json",
+                "Origin": "http://localhost"
+            },
+            "path": {},
+            "query": {},
+            "body": { "code": "000000" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["code"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-2FA-VERIFY-EP-003",
+        "description": "A valid recovery code completes login and is consumed",
+        "actor": "two_factor_user",
+        "preconditions": [
+            "two_factor_challenge_session",
+            "unused_recovery_code"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/two-factor-challenge",
+            "headers": {
+                "Accept": "application/json",
+                "Origin": "http://localhost"
+            },
+            "path": {},
+            "query": {},
+            "body": { "recovery_code": "@two_factor.recovery_code" }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.requires_two_factor": false
+            },
+            "json_absent": ["data.user.two_factor_recovery_codes"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "update",
+                "field": "two_factor_recovery_codes"
+            }
+        },
+        "capture": { "authenticated_user_id": "data.user.id" }
+    },
+    {
+        "case_id": "AUTH-2FA-VERIFY-EP-004",
+        "description": "A previously used recovery code cannot be reused",
+        "actor": "two_factor_user",
+        "preconditions": ["two_factor_challenge_session", "used_recovery_code"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/two-factor-challenge",
+            "headers": {
+                "Accept": "application/json",
+                "Origin": "http://localhost"
+            },
+            "path": {},
+            "query": {},
+            "body": { "recovery_code": "@two_factor.used_recovery_code" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["recovery_code"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-2FA-VERIFY-EP-005",
+        "description": "A challenge without a login session is rejected",
+        "actor": "guest",
+        "preconditions": ["no_two_factor_challenge_session"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/two-factor-challenge",
+            "headers": {
+                "Accept": "application/json",
+                "Origin": "http://localhost"
+            },
+            "path": {},
+            "query": {},
+            "body": { "code": "123456" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["code"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-2FA-VERIFY-EP-006",
+        "description": "A code or recovery code is required",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/two-factor-challenge",
+            "headers": {
+                "Accept": "application/json",
+                "Origin": "http://localhost"
+            },
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["code", "recovery_code"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    }
+]

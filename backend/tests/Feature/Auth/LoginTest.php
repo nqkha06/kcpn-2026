@@ -1,85 +1,46 @@
 <?php
 
 use App\Models\User;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\assertAuthenticatedAs;
 use function Pest\Laravel\assertGuest;
-use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
 
-test('a user can login through the API', function () {
-    $user = User::factory()->create(['email' => 'login@example.com', 'password' => 'password']);
+test('login follows the shared test data contract', function (array $case) {
+    $aliases = [];
+    $user = null;
 
-    postJson('/api/v1/auth/login', [
-        'email' => 'login@example.com',
-        'password' => 'password',
-    ])
-        ->assertOk()
-        ->assertJsonPath('data.requires_two_factor', false)
-        ->assertJsonPath('data.user.id', $user->id);
+    if (in_array('user_exists', $case['preconditions'], true)) {
+        $user = User::factory()->create([
+            'email' => 'login@example.com',
+            'password' => 'password',
+        ]);
+        $aliases['user'] = ['email' => $user->email, 'password' => 'password'];
+    }
 
-    assertAuthenticatedAs($user);
+    if (in_array('two_factor_user_exists', $case['preconditions'], true)) {
+        $user = User::factory()->withTwoFactor()->create([
+            'email' => 'two-factor@example.com',
+            'password' => 'password',
+        ]);
+        $aliases['two_factor_user'] = ['email' => $user->email, 'password' => 'password'];
+        $this->withSession([]);
+    }
 
-    getJson('/api/v1/auth/me')
-        ->assertOk()
-        ->assertJsonPath('data.user.id', $user->id);
-});
+    $case = TestData::resolveAliases($case, $aliases);
+    $request = $case['request'];
+    $response = $this->postJson($request['endpoint'], $request['body'], $request['headers']);
 
-test('login rejects invalid credentials', function () {
-    User::factory()->create(['email' => 'login@example.com', 'password' => 'password']);
+    TestResponseAssertions::assertForCase($response, $case);
 
-    postJson('/api/v1/auth/login', [
-        'email' => 'login@example.com',
-        'password' => 'incorrect-password',
-    ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('email');
-});
-
-test('login rejects an unknown email without authenticating a user', function () {
-    postJson('/api/v1/auth/login', [
-        'email' => 'missing@example.com',
-        'password' => 'password',
-    ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('email');
-
-    assertGuest();
-});
-
-test('login validates the required credentials', function () {
-    postJson('/api/v1/auth/login', [])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['email', 'password']);
-});
-
-test('login validates the email and remember formats', function () {
-    postJson('/api/v1/auth/login', [
-        'email' => 'not-an-email',
-        'password' => 'password',
-        'remember' => 'sometimes',
-    ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['email', 'remember']);
-});
-
-test('login response does not expose authentication secrets', function () {
-    User::factory()->withTwoFactor()->create([
-        'email' => 'secure@example.com',
-        'password' => 'password',
-        'two_factor_confirmed_at' => null,
-    ]);
-
-    postJson('/api/v1/auth/login', [
-        'email' => 'secure@example.com',
-        'password' => 'password',
-    ])
-        ->assertOk()
-        ->assertJsonMissingPath('data.user.password')
-        ->assertJsonMissingPath('data.user.remember_token')
-        ->assertJsonMissingPath('data.user.two_factor_secret')
-        ->assertJsonMissingPath('data.user.two_factor_recovery_codes');
-});
+    if ($case['case_id'] === 'AUTH-LOGIN-SUBMIT-EP-001') {
+        assertAuthenticatedAs($user);
+        $response->assertJsonPath('data.user.id', $user?->id);
+    } else {
+        assertGuest();
+    }
+})->with(TestData::load('auth/login.json'));
 
 test('login is rate limited after repeated failed attempts', function () {
     User::factory()->create([
@@ -88,13 +49,13 @@ test('login is rate limited after repeated failed attempts', function () {
     ]);
 
     foreach (range(1, 5) as $attempt) {
-        postJson('/api/v1/auth/login', [
+        $this->postJson('/api/v1/auth/login', [
             'email' => 'limited@example.com',
             'password' => 'incorrect-password',
         ])->assertUnprocessable();
     }
 
-    postJson('/api/v1/auth/login', [
+    $this->postJson('/api/v1/auth/login', [
         'email' => 'limited@example.com',
         'password' => 'incorrect-password',
     ])

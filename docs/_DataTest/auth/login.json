@@ -1,0 +1,175 @@
+[
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-001",
+        "description": "Login succeeds with valid credentials",
+        "actor": "guest",
+        "preconditions": ["user_exists"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "email": "@user.email",
+                "password": "@user.password",
+                "remember": true
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.requires_two_factor": false
+            },
+            "json_absent": [
+                "data.user.password",
+                "data.user.remember_token",
+                "data.user.two_factor_secret",
+                "data.user.two_factor_recovery_codes"
+            ],
+            "validation_errors": [],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-002",
+        "description": "Login rejects an incorrect password",
+        "actor": "guest",
+        "preconditions": ["user_exists"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "email": "@user.email", "password": "incorrect-password" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-003",
+        "description": "Login rejects an email that does not exist",
+        "actor": "guest",
+        "preconditions": ["user_does_not_exist"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "email": "missing-login@example.com",
+                "password": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-004",
+        "description": "Login requires an email",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "password": "password" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-005",
+        "description": "Login requires a password",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "email": "login@example.com" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["password"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-006",
+        "description": "Login rejects a malformed email",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "email": "not-an-email", "password": "password" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-007",
+        "description": "Login starts a two-factor challenge for a confirmed 2FA user",
+        "actor": "guest",
+        "preconditions": ["two_factor_user_exists"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": {
+                "Accept": "application/json",
+                "Origin": "http://localhost"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "email": "@two_factor_user.email",
+                "password": "@two_factor_user.password"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.requires_two_factor": true,
+                "data.user": null
+            },
+            "json_absent": ["data.user.password"],
+            "validation_errors": [],
+            "database_change": { "table": "users", "operation": "none" }
+        },
+        "capture": { "two_factor_session": "data.requires_two_factor" }
+    }
+]

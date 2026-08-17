@@ -3,103 +3,77 @@
 use App\Models\Setting;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
-use function Pest\Laravel\postJson;
 
-test('an admin can update appearance settings', function () {
-    actingAs(adminUser())
-        ->postJson('/api/v1/admin/appearance', [
-            'general' => [
-                'vi' => ['site_name' => 'Cashback API', 'site_title' => 'Quản lý chi tiêu'],
-                'en' => ['site_name' => 'Cashback API', 'site_title' => 'Expense manager'],
-            ],
-        ])
-        ->assertOk()
-        ->assertJsonPath('data.general.vi.site_name', 'Cashback API');
+test('appearance update follows shared authorization and boundary data', function (array $case) {
+    if ($case['actor'] === 'admin') {
+        actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        actingAs(regularUser());
+    }
 
-    $general = json_decode(Setting::query()->where('key', 'appearance.general')->value('value'), true);
-
-    expect($general['vi']['site_name'])->toBe('Cashback API');
-});
-
-test('a guest cannot update appearance settings', function () {
-    postJson('/api/v1/admin/appearance', [
-        'general' => ['vi' => ['site_name' => 'Guest Site']],
-    ])->assertUnauthorized();
-
-    assertDatabaseMissing('settings', ['key' => 'appearance.general']);
-});
-
-test('a regular user cannot update appearance settings', function () {
-    actingAs(regularUser())
-        ->postJson('/api/v1/admin/appearance', [
-            'general' => ['vi' => ['site_name' => 'Unauthorized Site']],
-        ])
-        ->assertForbidden();
-});
-
-test('appearance update validates translated text lengths', function () {
-    actingAs(adminUser())
-        ->postJson('/api/v1/admin/appearance', [
-            'general' => [
-                'vi' => [
-                    'site_name' => str_repeat('a', 256),
-                    'meta_description' => str_repeat('a', 501),
-                ],
-            ],
-        ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors([
-            'general.vi.site_name',
-            'general.vi.meta_description',
+    if (in_array('existing_logo', $case['preconditions'], true)) {
+        Setting::query()->create([
+            'key' => 'appearance.logo_light',
+            'value' => 'settings/existing-logo.png',
         ]);
-});
+    }
 
-test('appearance update rejects unsupported uploads', function () {
-    actingAs(adminUser())
-        ->post('/api/v1/admin/appearance', [
-            'logo_light' => UploadedFile::fake()->create('logo.txt', 10, 'text/plain'),
-        ], ['Accept' => 'application/json'])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('logo_light');
-});
+    $request = $case['request'];
+    $body = $request['body'];
+    $isUploadCase = in_array('png_upload', $case['preconditions'], true)
+        || in_array('text_upload', $case['preconditions'], true);
 
-test('an admin can upload a logo and its path is persisted', function () {
-    $response = actingAs(adminUser())
-        ->post('/api/v1/admin/appearance', [
-            'logo_light' => UploadedFile::fake()->image('brand-logo.png', 120, 40),
-        ], ['Accept' => 'application/json'])
-        ->assertOk();
+    if ($isUploadCase) {
+        $sizeInKilobytes = strlen($body['logo_light']);
+        $isTextUpload = in_array('text_upload', $case['preconditions'], true);
+        $body['logo_light'] = UploadedFile::fake()->create(
+            $isTextUpload ? 'logo.txt' : 'logo.png',
+            $sizeInKilobytes,
+            $isTextUpload ? 'text/plain' : 'image/png',
+        );
+    }
 
-    $path = $response->json('data.logos.logo_light.path');
+    $response = $isUploadCase
+        ? $this->post($request['endpoint'], $body, $request['headers'])
+        : $this->postJson($request['endpoint'], $body, $request['headers']);
+
+    $storedPath = $response->json('data.logos.logo_light.path');
 
     try {
-        expect($path)->toStartWith('settings/brand-logo-');
-        expect(File::exists(public_path($path)))->toBeTrue();
-        expect(Setting::query()->where('key', 'appearance.logo_light')->value('value'))->toBe($path);
+        TestResponseAssertions::assertForCase($response, $case);
+
+        if ($case['expected']['status'] === 200) {
+            assertDatabaseHas('settings', ['key' => 'appearance.general']);
+        } else {
+            assertDatabaseMissing('settings', ['key' => 'appearance.general']);
+        }
+
+        if ($isUploadCase && $case['expected']['status'] === 200) {
+            expect($storedPath)
+                ->toBeString()
+                ->toStartWith('settings/logo-');
+            expect(File::exists(public_path($storedPath)))->toBeTrue();
+            assertDatabaseHas('settings', [
+                'key' => 'appearance.logo_light',
+                'value' => $storedPath,
+            ]);
+        }
+
+        if (in_array('existing_logo', $case['preconditions'], true)) {
+            assertDatabaseHas('settings', [
+                'key' => 'appearance.logo_light',
+                'value' => 'settings/existing-logo.png',
+            ]);
+        }
     } finally {
-        File::delete(public_path($path));
+        if ($isUploadCase && is_string($storedPath)) {
+            File::delete(public_path($storedPath));
+        }
     }
-});
-
-test('updating general appearance preserves existing logo paths', function () {
-    Setting::query()->create([
-        'key' => 'appearance.logo_light',
-        'value' => 'settings/existing-logo.png',
-    ]);
-
-    actingAs(adminUser())
-        ->postJson('/api/v1/admin/appearance', [
-            'general' => ['en' => ['site_name' => 'Cashback']],
-        ])
-        ->assertOk()
-        ->assertJsonPath('data.logos.logo_light.path', 'settings/existing-logo.png');
-
-    assertDatabaseHas('settings', [
-        'key' => 'appearance.logo_light',
-        'value' => 'settings/existing-logo.png',
-    ]);
-});
+})->with(TestData::load('admin/appearance/update.json'));

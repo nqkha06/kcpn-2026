@@ -1,0 +1,1320 @@
+[
+    {
+        "case_id": "ADM-APP-UPDATE-RBAC-001",
+        "description": "A guest cannot update appearance",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "site_name": "Guest Site" } } }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": { "success": false },
+            "json_absent": ["data.general"],
+            "validation_errors": [],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-RBAC-002",
+        "description": "A regular user cannot update appearance",
+        "actor": "user",
+        "preconditions": ["user_exists_without_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": { "vi": { "site_name": "Unauthorized Site" } }
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": { "success": false },
+            "json_absent": ["data.general"],
+            "validation_errors": [],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-EP-003",
+        "description": "An admin can update appearance",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "site_name": "Cashback API" } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_name": "Cashback API"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-004",
+        "description": "Site name accepts null",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "site_name": null } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.general.vi.site_name": "" },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-005",
+        "description": "Site name accepts empty text",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "site_name": "" } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.general.vi.site_name": "" },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-006",
+        "description": "Site name accepts length 1",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_name": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 1
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-007",
+        "description": "Site name accepts nominal length 128",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_name": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 128
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 128
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-008",
+        "description": "Site name accepts maximum minus one length 254",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_name": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 254
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 254
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-009",
+        "description": "Site name accepts maximum length 255",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_name": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 255
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 255
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-010",
+        "description": "Site name rejects maximum plus one length 256",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_name": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 256
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.general"],
+            "validation_errors": ["general.vi.site_name"],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-011",
+        "description": "Site title accepts null",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "site_title": null } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.general.vi.site_title": "" },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-012",
+        "description": "Site title accepts empty text",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "site_title": "" } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.general.vi.site_title": "" },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-013",
+        "description": "Site title accepts length 1",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_title": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 1
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_title": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-014",
+        "description": "Site title accepts nominal length 128",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_title": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 128
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_title": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 128
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-015",
+        "description": "Site title accepts maximum minus one length 254",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_title": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 254
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_title": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 254
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-016",
+        "description": "Site title accepts maximum length 255",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_title": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 255
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.site_title": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 255
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-017",
+        "description": "Site title rejects maximum plus one length 256",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "site_title": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 256
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.general"],
+            "validation_errors": ["general.vi.site_title"],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-018",
+        "description": "Tagline accepts null",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "tagline": null } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.general.vi.tagline": "" },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-019",
+        "description": "Tagline accepts empty text",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "tagline": "" } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.general.vi.tagline": "" },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-020",
+        "description": "Tagline accepts length 1",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "tagline": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 1
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.tagline": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-021",
+        "description": "Tagline accepts nominal length 128",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "tagline": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 128
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.tagline": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 128
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-022",
+        "description": "Tagline accepts maximum minus one length 254",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "tagline": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 254
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.tagline": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 254
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-023",
+        "description": "Tagline accepts maximum length 255",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "tagline": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 255
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.tagline": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 255
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-024",
+        "description": "Tagline rejects maximum plus one length 256",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "tagline": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 256
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.general"],
+            "validation_errors": ["general.vi.tagline"],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-025",
+        "description": "Meta description accepts null",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "meta_description": null } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.meta_description": ""
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-026",
+        "description": "Meta description accepts empty text",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "vi": { "meta_description": "" } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.meta_description": ""
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-027",
+        "description": "Meta description accepts length 1",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "meta_description": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 1
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.meta_description": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-028",
+        "description": "Meta description accepts nominal length 250",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "meta_description": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 250
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.meta_description": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 250
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-029",
+        "description": "Meta description accepts maximum minus one length 499",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "meta_description": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 499
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.meta_description": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 499
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-030",
+        "description": "Meta description accepts maximum length 500",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "meta_description": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 500
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.vi.meta_description": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 500
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.general" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-031",
+        "description": "Meta description rejects maximum plus one length 501",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "general": {
+                    "vi": {
+                        "meta_description": {
+                            "generator": "repeat",
+                            "character": "a",
+                            "length": 501
+                        }
+                    }
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.general"],
+            "validation_errors": ["general.vi.meta_description"],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-032",
+        "description": "Logo upload is nullable",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "logo_light": null }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.logos.logo_light.path": "",
+                "data.logos.logo_light.url": null
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.logo_light" }
+            }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-033",
+        "description": "Logo upload accepts 1 KB",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission", "png_upload"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "logo_light": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.logo_light" }
+            }
+        },
+        "capture": { "appearance_logo_path": "data.logos.logo_light.path" }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-034",
+        "description": "Logo upload accepts nominal 100 KB",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission", "png_upload"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "logo_light": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 100
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.logo_light" }
+            }
+        },
+        "capture": { "appearance_logo_path": "data.logos.logo_light.path" }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-035",
+        "description": "Logo upload accepts maximum minus one 4095 KB",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission", "png_upload"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "logo_light": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 4095
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.logo_light" }
+            }
+        },
+        "capture": { "appearance_logo_path": "data.logos.logo_light.path" }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-036",
+        "description": "Logo upload accepts maximum 4096 KB",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission", "png_upload"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "logo_light": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 4096
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "upsert",
+                "where": { "key": "appearance.logo_light" }
+            }
+        },
+        "capture": { "appearance_logo_path": "data.logos.logo_light.path" }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BVA-037",
+        "description": "Logo upload rejects maximum plus one 4097 KB",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission", "png_upload"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "logo_light": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 4097
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.logos"],
+            "validation_errors": ["logo_light"],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-EP-038",
+        "description": "Logo upload rejects an unsupported MIME type",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission", "text_upload"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "logo_light": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 10
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.logos"],
+            "validation_errors": ["logo_light"],
+            "database_change": { "table": "settings", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "ADM-APP-UPDATE-BUS-039",
+        "description": "Updating text without a new upload preserves the existing logo",
+        "actor": "admin",
+        "preconditions": ["admin_has_appearance_permission", "existing_logo"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/appearance",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "general": { "en": { "site_name": "Cashback" } } }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.general.en.site_name": "Cashback",
+                "data.logos.logo_light.path": "settings/existing-logo.png"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "settings",
+                "operation": "update",
+                "where": { "key": "appearance.general" },
+                "preserves": {
+                    "key": "appearance.logo_light",
+                    "value": "settings/existing-logo.png"
+                }
+            }
+        }
+    }
+]

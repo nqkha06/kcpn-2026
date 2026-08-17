@@ -3,50 +3,47 @@
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
-use function Pest\Laravel\postJson;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 
-test('the forgot password API sends a reset notification', function () {
+test('forgot password follows the shared test data contract', function (array $case) {
     Notification::fake();
-    $user = User::factory()->create(['email' => 'forgot@example.com']);
+    $user = null;
 
-    postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
-        ->assertOk()
-        ->assertJsonPath('success', true);
+    if (in_array('user_exists', $case['preconditions'], true)
+        || in_array('reset_link_already_requested', $case['preconditions'], true)) {
+        $user = User::factory()->create(['email' => 'forgot@example.com']);
+    }
 
-    Notification::assertSentTo($user, ResetPassword::class);
-});
+    $case = TestData::resolveAliases($case, [
+        'user' => ['email' => $user?->email],
+    ]);
+    $request = $case['request'];
 
-test('forgot password validates the email field', function () {
-    Notification::fake();
+    if (in_array('reset_link_already_requested', $case['preconditions'], true)) {
+        $this->postJson($request['endpoint'], $request['body'], $request['headers'])
+            ->assertOk();
+    }
 
-    postJson('/api/v1/auth/forgot-password', ['email' => 'invalid-email'])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('email');
+    $response = $this->postJson($request['endpoint'], $request['body'], $request['headers']);
 
-    Notification::assertNothingSent();
-});
+    TestResponseAssertions::assertForCase($response, $case);
 
-test('forgot password rejects an unknown email without sending a notification', function () {
-    Notification::fake();
+    if ($case['case_id'] === 'AUTH-FORGOT-SEND-EP-001') {
+        Notification::assertSentTo($user, ResetPassword::class);
+        assertDatabaseHas('password_reset_tokens', ['email' => $user?->email]);
+    } elseif ($case['case_id'] === 'AUTH-FORGOT-SEND-BUS-005') {
+        Notification::assertSentToTimes($user, ResetPassword::class, 1);
+    } else {
+        Notification::assertNothingSent();
 
-    postJson('/api/v1/auth/forgot-password', ['email' => 'missing@example.com'])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('email');
-
-    Notification::assertNothingSent();
-});
-
-test('forgot password throttles repeated reset requests', function () {
-    Notification::fake();
-    $user = User::factory()->create(['email' => 'throttled@example.com']);
-
-    postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
-        ->assertOk();
-
-    postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('email');
-
-    Notification::assertSentToTimes($user, ResetPassword::class, 1);
-});
+        if (is_string($request['body']['email'] ?? null)) {
+            assertDatabaseMissing('password_reset_tokens', [
+                'email' => $request['body']['email'],
+            ]);
+        }
+    }
+})->with(TestData::load('auth/forgot-password.json'));

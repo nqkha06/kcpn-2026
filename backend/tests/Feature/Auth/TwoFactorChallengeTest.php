@@ -5,110 +5,78 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Laravel\Fortify\Events\TwoFactorAuthenticationFailed;
 use Laravel\Fortify\Events\ValidTwoFactorAuthenticationCodeProvided;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\assertAuthenticatedAs;
 use function Pest\Laravel\assertGuest;
-use function Pest\Laravel\postJson;
-use function Pest\Laravel\withHeader;
-use function Pest\Laravel\withSession;
 
-test('a valid two factor code completes the login', function () {
+test('two-factor challenge follows the shared test data contract', function (array $case) {
     Event::fake([
         Login::class,
+        TwoFactorAuthenticationFailed::class,
         ValidTwoFactorAuthenticationCodeProvided::class,
     ]);
 
-    $user = regularUser();
-    $user->forceFill([
-        'two_factor_secret' => encrypt('two-factor-secret'),
-        'two_factor_confirmed_at' => now(),
-    ])->save();
-
-    $provider = mock(TwoFactorAuthenticationProvider::class);
-    $provider->shouldReceive('verify')
-        ->once()
-        ->with('two-factor-secret', '123456')
-        ->andReturnTrue();
-
-    app()->instance(TwoFactorAuthenticationProvider::class, $provider);
-
-    withHeader('Origin', 'http://localhost');
-
-    withSession(['login.id' => $user->id])
-        ->postJson('/api/v1/auth/two-factor-challenge', ['code' => '123456'])
-        ->assertOk()
-        ->assertJsonPath('data.requires_two_factor', false)
-        ->assertJsonPath('data.user.id', $user->id)
-        ->assertSessionMissing('login.id');
-
-    assertAuthenticatedAs($user);
-    Event::assertDispatched(ValidTwoFactorAuthenticationCodeProvided::class);
-});
-
-test('an invalid two factor code is rejected', function () {
-    Event::fake([TwoFactorAuthenticationFailed::class]);
-
-    $user = regularUser();
-    $user->forceFill([
-        'two_factor_secret' => encrypt('two-factor-secret'),
-        'two_factor_confirmed_at' => now(),
-    ])->save();
-
-    $provider = mock(TwoFactorAuthenticationProvider::class);
-    $provider->shouldReceive('verify')->once()->andReturnFalse();
-    app()->instance(TwoFactorAuthenticationProvider::class, $provider);
-
-    withHeader('Origin', 'http://localhost');
-
-    withSession(['login.id' => $user->id])
-        ->postJson('/api/v1/auth/two-factor-challenge', ['code' => '000000'])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('code');
-
-    assertGuest();
-    Event::assertDispatched(TwoFactorAuthenticationFailed::class);
-});
-
-test('a recovery code completes the login and cannot be reused', function () {
-    $user = regularUser();
-    $user->forceFill([
-        'two_factor_secret' => encrypt('two-factor-secret'),
-        'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code'])),
-        'two_factor_confirmed_at' => now(),
-    ])->save();
-
-    withHeader('Origin', 'http://localhost');
-
-    withSession(['login.id' => $user->id])
-        ->postJson('/api/v1/auth/two-factor-challenge', [
+    $user = null;
+    $aliases = [
+        'two_factor' => [
+            'code' => '123456',
             'recovery_code' => 'recovery-code',
-        ])
-        ->assertOk();
+            'used_recovery_code' => 'used-recovery-code',
+        ],
+    ];
 
-    expect($user->fresh()->recoveryCodes())->not->toContain('recovery-code');
+    if ($case['actor'] === 'two_factor_user') {
+        $recoveryCodes = in_array('used_recovery_code', $case['preconditions'], true)
+            ? ['unused-recovery-code']
+            : ['recovery-code'];
 
-    auth()->logout();
+        $user = regularUser();
+        $user->forceFill([
+            'two_factor_secret' => encrypt('two-factor-secret'),
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes, JSON_THROW_ON_ERROR)),
+            'two_factor_confirmed_at' => now(),
+        ])->save();
 
-    withSession(['login.id' => $user->id])
-        ->postJson('/api/v1/auth/two-factor-challenge', [
-            'recovery_code' => 'recovery-code',
-        ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('recovery_code');
-});
+        $this->withSession(['login.id' => $user->id]);
+    }
 
-test('an expired two factor session is rejected', function () {
-    withHeader('Origin', 'http://localhost');
+    if (in_array($case['case_id'], [
+        'AUTH-2FA-VERIFY-EP-001',
+        'AUTH-2FA-VERIFY-EP-002',
+    ], true)) {
+        $provider = mock(TwoFactorAuthenticationProvider::class);
+        $provider->shouldReceive('verify')
+            ->once()
+            ->with('two-factor-secret', $case['case_id'] === 'AUTH-2FA-VERIFY-EP-001' ? '123456' : '000000')
+            ->andReturn($case['case_id'] === 'AUTH-2FA-VERIFY-EP-001');
+        app()->instance(TwoFactorAuthenticationProvider::class, $provider);
+    }
 
-    postJson('/api/v1/auth/two-factor-challenge', ['code' => '123456'])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('code');
+    $case = TestData::resolveAliases($case, $aliases);
+    $request = $case['request'];
+    $response = $this->withHeaders($request['headers'])
+        ->postJson($request['endpoint'], $request['body']);
 
-    assertGuest();
-});
+    TestResponseAssertions::assertForCase($response, $case);
 
-test('a two factor code or recovery code is required', function () {
-    postJson('/api/v1/auth/two-factor-challenge', [])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['code', 'recovery_code']);
-});
+    if ($case['expected']['status'] === 200) {
+        assertAuthenticatedAs($user);
+        $response->assertJsonPath('data.user.id', $user?->id);
+        Event::assertDispatched(ValidTwoFactorAuthenticationCodeProvided::class);
+    } else {
+        assertGuest();
+    }
+
+    if ($case['case_id'] === 'AUTH-2FA-VERIFY-EP-003') {
+        expect($user?->fresh()->recoveryCodes())->not->toContain('recovery-code');
+    }
+
+    if (in_array($case['case_id'], [
+        'AUTH-2FA-VERIFY-EP-002',
+        'AUTH-2FA-VERIFY-EP-004',
+    ], true)) {
+        Event::assertDispatched(TwoFactorAuthenticationFailed::class);
+    }
+})->with(TestData::load('auth/two-factor-challenge.json'));

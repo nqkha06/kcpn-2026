@@ -1,0 +1,582 @@
+[
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-001",
+        "description": "Name accepts minimum length 1",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                },
+                "email": "register-name-1@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "register-name-1@example.com"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "register-name-1@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-002",
+        "description": "Name accepts minimum plus one length 2",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 2
+                },
+                "email": "register-name-2@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "register-name-2@example.com"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "register-name-2@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-003",
+        "description": "Name accepts nominal length 128",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 128
+                },
+                "email": "register-name-128@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "register-name-128@example.com"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "register-name-128@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-004",
+        "description": "Name accepts maximum minus one length 254",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 254
+                },
+                "email": "register-name-254@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "register-name-254@example.com"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "register-name-254@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-005",
+        "description": "Name accepts maximum length 255",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 255
+                },
+                "email": "register-name-255@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "register-name-255@example.com"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "register-name-255@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-006",
+        "description": "Name is required when missing",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "email": "register-name-missing@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["name"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": { "email": "register-name-missing@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-007",
+        "description": "Name is required when empty",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "",
+                "email": "register-name-empty@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["name"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": { "email": "register-name-empty@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-008",
+        "description": "Name rejects maximum plus one length 256",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 256
+                },
+                "email": "register-name-256@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["name"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": { "email": "register-name-256@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-009",
+        "description": "Email accepts a nominal address",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "register-nominal@example.com",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "register-nominal@example.com"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "register-nominal@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-010",
+        "description": "Email accepts total length 254",
+        "actor": "guest",
+        "preconditions": ["email_254_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Email Boundary User",
+                "email": "@register.email254",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "@register.email254"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "@register.email254" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-011",
+        "description": "Email accepts maximum total length 255",
+        "actor": "guest",
+        "preconditions": ["email_255_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Email Boundary User",
+                "email": "@register.email255",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.user.email": "@register.email255"
+            },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": { "email": "@register.email255" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-012",
+        "description": "Email is required when missing",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Missing Email",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-013",
+        "description": "Email rejects malformed format",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Bad Email",
+                "email": "not-an-email",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": { "email": "not-an-email" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-014",
+        "description": "Email rejects maximum plus one total length 256",
+        "actor": "guest",
+        "preconditions": ["email_256_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Email Boundary User",
+                "email": "@register.email256",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": { "email": "@register.email256" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-015",
+        "description": "Registration rejects a duplicate email",
+        "actor": "guest",
+        "preconditions": ["email_already_registered"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Duplicate Email",
+                "email": "@existing_user.email",
+                "password": "password",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["email"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-016",
+        "description": "Password is required",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Missing Password",
+                "email": "register-password-missing@example.com",
+                "password_confirmation": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["password"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": { "email": "register-password-missing@example.com" }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-017",
+        "description": "Password confirmation is required",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Missing Confirmation",
+                "email": "register-confirmation-missing@example.com",
+                "password": "password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["password", "password_confirmation"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": {
+                    "email": "register-confirmation-missing@example.com"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-EP-018",
+        "description": "Password confirmation must match",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Mismatch Confirmation",
+                "email": "register-confirmation-mismatch@example.com",
+                "password": "password",
+                "password_confirmation": "different-password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["password"],
+            "database_change": {
+                "table": "users",
+                "operation": "none",
+                "where": {
+                    "email": "register-confirmation-mismatch@example.com"
+                }
+            }
+        }
+    }
+]

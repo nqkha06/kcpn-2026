@@ -1,58 +1,62 @@
 <?php
 
 use App\Models\Page;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
-use function Pest\Laravel\getJson;
+test('public page show follows the shared test data contract', function (array $case) {
+    $aliases = [];
 
-test('the public page API returns a published page', function () {
-    $page = Page::query()->create([
-        'title' => 'Điều khoản',
-        'slug' => 'dieu-khoan',
-        'content' => '<p>Nội dung</p>',
-        'status' => 'published',
-    ]);
+    if (in_array('published_page_exists', $case['preconditions'], true)) {
+        $page = Page::query()->create([
+            'user_id' => adminUser()->id,
+            'title' => 'Published Page',
+            'slug' => 'published-page',
+            'status' => 'published',
+        ]);
+        $aliases['published_page'] = ['slug' => $page->slug];
+    }
 
-    getJson('/api/v1/public/pages/dieu-khoan')
-        ->assertOk()
-        ->assertHeader('Cache-Control', 'max-age=60, public')
-        ->assertJsonPath('data.id', $page->id);
-});
+    if (in_array('draft_page_exists', $case['preconditions'], true)) {
+        $page = Page::query()->create([
+            'title' => 'Draft Page',
+            'slug' => 'draft-page',
+            'status' => 'draft',
+        ]);
+        $aliases['draft_page'] = ['slug' => $page->slug];
+    }
 
-test('the public page API rejects a draft page', function () {
-    Page::query()->create(['title' => 'Bản nháp', 'slug' => 'ban-nhap', 'status' => 'draft']);
+    if (in_array('pending_page_exists', $case['preconditions'], true)) {
+        $page = Page::query()->create([
+            'title' => 'Pending Page',
+            'slug' => 'pending-page',
+            'status' => 'pending',
+        ]);
+        $aliases['pending_page'] = ['slug' => $page->slug];
+    }
 
-    getJson('/api/v1/public/pages/ban-nhap')->assertNotFound();
-});
+    if (in_array('published_nested_page_exists', $case['preconditions'], true)) {
+        $page = Page::query()->create([
+            'title' => 'Nested Page',
+            'slug' => 'legal/privacy',
+            'status' => 'published',
+        ]);
+        $aliases['nested_page'] = ['slug' => $page->slug];
+    }
 
-test('the public page API returns not found for an unknown slug', function () {
-    getJson('/api/v1/public/pages/missing-page')->assertNotFound();
-});
+    $case = TestData::resolveAliases($case, $aliases);
+    $request = $case['request'];
+    $url = $request['endpoint'];
 
-test('the public page API supports nested slugs', function () {
-    $page = Page::query()->create([
-        'title' => 'Privacy Policy',
-        'slug' => 'legal/privacy',
-        'content' => '<p>Privacy</p>',
-        'status' => 'published',
-    ]);
+    foreach ($request['path'] as $name => $value) {
+        $url = str_replace('{'.$name.'}', (string) $value, $url);
+    }
 
-    getJson('/api/v1/public/pages/legal/privacy')
-        ->assertOk()
-        ->assertJsonPath('data.id', $page->id)
-        ->assertJsonPath('data.slug', 'legal/privacy');
-});
+    $response = $this->getJson($url, $request['headers']);
 
-test('public page responses do not expose author or internal category data', function () {
-    $page = Page::query()->create([
-        'user_id' => adminUser()->id,
-        'title' => 'Public Page',
-        'slug' => 'public-page',
-        'status' => 'published',
-    ]);
+    TestResponseAssertions::assertForCase($response, $case);
 
-    getJson('/api/v1/public/pages/public-page')
-        ->assertOk()
-        ->assertJsonMissingPath('data.user_id')
-        ->assertJsonMissingPath('data.author')
-        ->assertJsonMissingPath('data.category_id');
-});
+    if ($case['expected']['status'] === 200) {
+        $response->assertHeader('Cache-Control', 'max-age=60, public');
+    }
+})->with(TestData::load('public/pages-show.json'));

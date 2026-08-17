@@ -5,6 +5,17 @@ use Illuminate\Testing\TestResponse;
 use Tests\Support\TestData;
 use Tests\Support\TestResponseAssertions;
 
+$assignedDataFiles = [
+    'auth/login.json',
+    'auth/register.json',
+    'auth/two-factor-challenge.json',
+    'auth/forgot-password.json',
+    'auth/reset-password.json',
+    'public/configuration.json',
+    'public/pages-show.json',
+    'admin/appearance/update.json',
+];
+
 test('it loads a keyed Pest dataset and resolves generators', function () {
     $dataset = TestData::load('_examples/example.json');
 
@@ -81,4 +92,33 @@ test('it applies shared validation error assertions', function () {
             'validation_errors' => ['amount'],
         ],
     ]);
+});
+
+test('assigned operation files have a complete contract and globally unique case IDs', function () use ($assignedDataFiles) {
+    $caseIds = collect();
+
+    foreach ($assignedDataFiles as $dataFile) {
+        $rows = TestData::rows($dataFile);
+
+        expect($rows)->not->toBeEmpty();
+
+        foreach ($rows as $row) {
+            expect($row)
+                ->toHaveKeys(['case_id', 'description', 'actor', 'preconditions', 'request', 'expected'])
+                ->and($row['request'])
+                ->toHaveKeys(['method', 'endpoint', 'headers', 'path', 'query', 'body'])
+                ->and($row['expected'])
+                ->toHaveKeys([
+                    'status',
+                    'json_paths',
+                    'json_absent',
+                    'validation_errors',
+                    'database_change',
+                ]);
+
+            $caseIds->push($row['case_id']);
+        }
+    }
+
+    expect($caseIds->duplicates())->toBeEmpty();
 });
