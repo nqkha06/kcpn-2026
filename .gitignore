@@ -28,3 +28,4 @@ yarn-error.log
 /.zed
 /ui-ux-pro-max-skill
 /backend/.junie
+/scripts/node_modules

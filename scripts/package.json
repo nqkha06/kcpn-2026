@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "export": "node export-testdata-excel.js",
+    "test": "node --test export-testdata-excel.test.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
