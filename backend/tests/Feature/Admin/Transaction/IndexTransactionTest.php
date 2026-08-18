@@ -2,6 +2,8 @@
 
 use App\Models\ExpenseTransaction;
 use App\Models\UserWallet;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -93,3 +95,23 @@ test('admin transaction list query parameters are validated', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['type', 'status', 'to_date', 'sort', 'direction', 'per_page']);
 });
+
+test('admin transaction index follows shared execution data', function (array $case) {
+    $owner = regularUser();
+    ExpenseTransaction::factory()->forUser($owner)->income()->posted()->create();
+    ExpenseTransaction::factory()->forUser(regularUser())->expense()->posted()->create();
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs($owner);
+    }
+
+    $query = http_build_query($case['request']['query']);
+    $endpoint = $case['request']['endpoint'].($query === '' ? '' : '?'.$query);
+    $beforeCount = ExpenseTransaction::query()->count();
+    $response = $this->json('GET', $endpoint, [], $case['request']['headers']);
+
+    TestResponseAssertions::assertForCase($response, $case);
+    expect(ExpenseTransaction::query()->count())->toBe($beforeCount);
+})->with(TestData::load('admin/transactions/index.json'));

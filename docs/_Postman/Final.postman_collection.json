@@ -2709,94 +2709,47 @@
           "name": "Transactions",
           "item": [
             {
-              "name": "GET /admin/transactions",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_base_url}}/admin/transactions?search=&type=expense&status=posted&user_id=&wallet_id=&category_id=&from_date=&to_date=&sort=transacted_at&direction=desc&page=1&per_page=15",
-                  "host": [
-                    "{{api_base_url}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "transactions"
-                  ],
-                  "query": [
-                    {
-                      "key": "search",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "type",
-                      "value": "expense"
-                    },
-                    {
-                      "key": "status",
-                      "value": "posted"
-                    },
-                    {
-                      "key": "user_id",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "wallet_id",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "category_id",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "from_date",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "to_date",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "sort",
-                      "value": "transacted_at"
-                    },
-                    {
-                      "key": "direction",
-                      "value": "desc"
-                    },
-                    {
-                      "key": "page",
-                      "value": "1"
-                    },
-                    {
-                      "key": "per_page",
-                      "value": "15"
-                    }
-                  ]
-                },
-                "description": "Danh sách transaction toàn hệ thống. status: posted|pending|cancelled; sort: id|type|amount|status|transacted_at|created_at; per_page: 1-100. Lưu ý Admin dùng from_date/to_date, khác User dùng date_from/date_to."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Transactions / Index",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Response is a paginated transaction list', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json.data).to.be.an('array');",
-                      "    pm.expect(json.meta).to.include.keys('current_page', 'last_page', 'per_page', 'total');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/transactions/index.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] GET shared execution row",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/transactions/index.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -2837,44 +2790,47 @@
               ]
             },
             {
-              "name": "POST /admin/transactions",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"user_id\": {{admin_user_id}},\n  \"wallet_id\": {{admin_wallet_id}},\n  \"category_id\": {{admin_category_id}},\n  \"type\": \"expense\",\n  \"amount\": 150000,\n  \"transacted_at\": \"{{transaction_date}}\",\n  \"status\": \"posted\",\n  \"note\": \"Admin tạo bằng Postman Final\",\n  \"labels\": [\"office\", \"postman-final\"]\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/transactions",
-                "description": "Admin tạo transaction cho user bất kỳ. user_id, wallet_id, type, amount, transacted_at và status bắt buộc; wallet phải thuộc user; category phải là global hoặc thuộc user. status: posted|pending|cancelled."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Transactions / Create",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                      "pm.test('Admin transaction is created and ID is saved', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json.message).to.eql('Transaction created successfully');",
-                      "    pm.expect(json.data).to.include.keys('id', 'user_id', 'wallet_id', 'type', 'amount', 'status');",
-                      "    pm.collectionVariables.set('admin_transaction_id', String(json.data.id));",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/transactions/create.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] POST shared execution row",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/transactions/create.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -2906,44 +2862,47 @@
               ]
             },
             {
-              "name": "PATCH /admin/transactions/{transaction}",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"user_id\": {{admin_user_id}},\n  \"wallet_id\": {{admin_wallet_id}},\n  \"category_id\": {{admin_category_id}},\n  \"type\": \"expense\",\n  \"amount\": 180000,\n  \"transacted_at\": \"{{transaction_date}}\",\n  \"status\": \"pending\",\n  \"note\": \"Admin cập nhật bằng Postman Final\",\n  \"labels\": [\"office\", \"postman-updated\"]\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/transactions/{{admin_transaction_id}}",
-                "description": "Cập nhật transaction. Dù dùng PATCH, ExpenseTransactionRequest hiện yêu cầu đầy đủ user_id, wallet_id, type, amount, transacted_at và status."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Transactions / Update",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Transaction is updated', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json.message).to.eql('Transaction updated successfully');",
-                      "    pm.expect(json.data.amount).to.eql(180000);",
-                      "    pm.expect(json.data.status).to.eql('pending');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/transactions/update.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] PUT shared execution row",
+                  "request": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/transactions/update.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -3222,47 +3181,47 @@
               ]
             },
             {
-              "name": "POST /user/categories",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Postman User Category {{$timestamp}}\",\n  \"color\": \"#10B981\",\n  \"description\": \"Created by Final collection\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/user/categories",
-                "description": "Tạo category private cho user hiện tại."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / User Categories / Create",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                      "pm.test('Response uses the API envelope', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json).to.have.property('data');",
-                      "});",
-                      "pm.test('Private category is created and ID is saved', function () {",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data.is_private).to.eql(true);",
-                      "    pm.collectionVariables.set('created_user_category_id', String(data.id));",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/categories/create.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] POST shared execution row",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/user/categories/create.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -3296,75 +3255,92 @@
               ]
             },
             {
-              "name": "PATCH /user/categories/{category}",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Postman User Category Updated {{$timestamp}}\",\n  \"color\": \"#3B82F6\",\n  \"description\": \"Updated by Final collection\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/user/categories/{{created_user_category_id}}",
-                "description": "Cập nhật category private của user."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / User Categories / Update",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Response uses the API envelope', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json).to.have.property('data');",
-                      "});",
-                      "pm.test('Category is updated', function () {",
-                      "    pm.expect(pm.response.json().message).to.eql('Đã cập nhật danh mục riêng.');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/categories/update.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] PUT shared execution row",
+                  "request": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/user/categories/update.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
-              "name": "DELETE /user/categories/{category}",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": "{{api_base_url}}/user/categories/{{created_user_category_id}}",
-                "description": "Xóa category private vừa tạo khi chưa được dùng trong transaction hoặc budget."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / User Categories / Delete",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Response uses the API envelope', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json).to.have.property('data');",
-                      "});",
-                      "pm.test('Category is deleted', function () {",
-                      "    pm.expect(pm.response.json().message).to.eql('Đã xóa danh mục riêng.');",
-                      "    pm.collectionVariables.unset('created_user_category_id');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/categories/delete.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] DELETE shared execution row",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/user/categories/delete.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }
@@ -3405,92 +3381,92 @@
               ]
             },
             {
-              "name": "POST /user/wallets",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Postman Wallet {{$timestamp}}\",\n  \"currency\": \"VND\",\n  \"opening_balance\": 500000,\n  \"is_default\": false\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/user/wallets",
-                "description": "Tạo wallet mới; name duy nhất trong phạm vi user và currency có đúng 3 ký tự."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / User Wallets / Create",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                      "pm.test('Response uses the API envelope', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json).to.have.property('data');",
-                      "});",
-                      "pm.test('Wallet is created and ID is saved', function () {",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data.currency).to.eql('VND');",
-                      "    pm.collectionVariables.set('created_user_wallet_id', String(data.id));",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/wallets/create.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] POST shared execution row",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/user/wallets/create.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
-              "name": "PATCH /user/wallets/{wallet}",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Postman Wallet Updated {{$timestamp}}\",\n  \"currency\": \"USD\",\n  \"opening_balance\": 750000,\n  \"is_default\": false\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/user/wallets/{{created_user_wallet_id}}",
-                "description": "Cập nhật wallet vừa tạo. Request yêu cầu name và currency."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / User Wallets / Update",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Response uses the API envelope', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json).to.have.property('data');",
-                      "});",
-                      "pm.test('Wallet is updated', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.message).to.eql('Wallet updated successfully');",
-                      "    pm.expect(json.data.currency).to.eql('USD');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/wallets/update.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] PUT shared execution row",
+                  "request": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/user/wallets/update.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -3615,133 +3591,92 @@
           "name": "Transactions",
           "item": [
             {
-              "name": "GET /user/transactions",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_base_url}}/user/transactions?search=&type=expense&status=posted&wallet_id=&category_id=&date_from=&date_to=&sort=transacted_at&direction=desc&page=1&per_page=15",
-                  "host": [
-                    "{{api_base_url}}"
-                  ],
-                  "path": [
-                    "user",
-                    "transactions"
-                  ],
-                  "query": [
-                    {
-                      "key": "search",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "type",
-                      "value": "expense"
-                    },
-                    {
-                      "key": "status",
-                      "value": "posted"
-                    },
-                    {
-                      "key": "wallet_id",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "category_id",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "date_from",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "date_to",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "sort",
-                      "value": "transacted_at"
-                    },
-                    {
-                      "key": "direction",
-                      "value": "desc"
-                    },
-                    {
-                      "key": "page",
-                      "value": "1"
-                    },
-                    {
-                      "key": "per_page",
-                      "value": "15"
-                    }
-                  ]
-                },
-                "description": "Trả về giao dịch của đúng user hiện tại. Filter hợp lệ: search, type=income|expense, status=posted|pending, wallet_id, category_id, date_from, date_to, sort=transacted_at|amount|created_at, direction=asc|desc, page và per_page (1-100)."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / User Transactions / Index",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Response is a paginated transaction list', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json.data).to.be.an('array');",
-                      "    pm.expect(json.meta).to.include.keys('current_page', 'last_page', 'per_page', 'total');",
-                      "    pm.expect(json.links).to.include.keys('first', 'last', 'prev', 'next');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/transactions/index.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] GET shared execution row",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/user/transactions/index.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
-              "name": "POST /user/transactions",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"wallet_id\": {{existing_user_wallet_id}},\n  \"category_id\": {{existing_user_category_id}},\n  \"type\": \"expense\",\n  \"amount\": 50000,\n  \"transacted_at\": \"{{transaction_date}}\",\n  \"note\": \"Ăn trưa văn phòng - Postman Final\",\n  \"labels\": [\"ăn-uống\", \"postman-final\"]\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/user/transactions",
-                "description": "Tạo giao dịch cho user hiện tại. wallet_id bắt buộc thuộc user; category_id có thể null nhưng nếu có phải là category active dùng chung hoặc private của user. type chỉ nhận income|expense; amount từ 0.01 đến 9,999,999,999.99; status được server tự đặt là posted."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / User Transactions / Create",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                      "pm.test('Transaction is created as posted', function () {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.success).to.eql(true);",
-                      "    pm.expect(json.message).to.eql('Transaction created successfully');",
-                      "    pm.expect(json.data.status).to.eql('posted');",
-                      "    pm.expect(json.data).to.include.keys('id', 'wallet_id', 'type', 'amount', 'transacted_at');",
-                      "    pm.collectionVariables.set('user_transaction_id', String(json.data.id));",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/transactions/create.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] POST shared execution row",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/user/transactions/create.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }

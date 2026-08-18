@@ -1,0 +1,261 @@
+[
+    {
+        "case_id": "USR-CAT-DELETE-BUS-001",
+        "description": "deletes an unreferenced owned category",
+        "actor": "user",
+        "preconditions": [
+            "user_with_unreferenced_own_category_exists"
+        ],
+        "request": {
+            "method": "DELETE",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "delete",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-DELETE-BUS-002",
+        "description": "rejects deleting a category referenced by a transaction",
+        "actor": "user",
+        "preconditions": [
+            "user_category_referenced_by_transaction_exists"
+        ],
+        "request": {
+            "method": "DELETE",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 409,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-DELETE-BUS-003",
+        "description": "rejects deleting a category referenced by a budget",
+        "actor": "user",
+        "preconditions": [
+            "user_category_referenced_by_budget_exists"
+        ],
+        "request": {
+            "method": "DELETE",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 409,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-DELETE-RBAC-004",
+        "description": "rejects deleting another users category",
+        "actor": "user",
+        "preconditions": [
+            "user_and_other_category_exists"
+        ],
+        "request": {
+            "method": "DELETE",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-DELETE-RBAC-005",
+        "description": "rejects deleting a global category",
+        "actor": "user",
+        "preconditions": [
+            "user_and_global_category_exist"
+        ],
+        "request": {
+            "method": "DELETE",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-DELETE-RBAC-006",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [
+            "category_exists"
+        ],
+        "request": {
+            "method": "DELETE",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-DELETE-EP-007",
+        "description": "returns not found for a nonexistent category",
+        "actor": "user",
+        "preconditions": [
+            "user_exists",
+            "missing_category_alias"
+        ],
+        "request": {
+            "method": "DELETE",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    }
+]

@@ -97,6 +97,46 @@ test("assigned Postman operations are data-driven by their matching JSON files",
             ["Admin API", "Appearance", "POST /admin/appearance"],
             "admin/appearance/update.json",
         ],
+        [
+            ["Admin API", "Transactions", "Data / Admin Transactions / Create"],
+            "admin/transactions/create.json",
+        ],
+        [
+            ["Admin API", "Transactions", "Data / Admin Transactions / Index"],
+            "admin/transactions/index.json",
+        ],
+        [
+            ["Admin API", "Transactions", "Data / Admin Transactions / Update"],
+            "admin/transactions/update.json",
+        ],
+        [
+            ["User API", "Transactions", "Data / User Transactions / Create"],
+            "user/transactions/create.json",
+        ],
+        [
+            ["User API", "Transactions", "Data / User Transactions / Index"],
+            "user/transactions/index.json",
+        ],
+        [
+            ["User API", "Wallets", "Data / User Wallets / Create"],
+            "user/wallets/create.json",
+        ],
+        [
+            ["User API", "Wallets", "Data / User Wallets / Update"],
+            "user/wallets/update.json",
+        ],
+        [
+            ["User API", "Categories", "Data / User Categories / Create"],
+            "user/categories/create.json",
+        ],
+        [
+            ["User API", "Categories", "Data / User Categories / Update"],
+            "user/categories/update.json",
+        ],
+        [
+            ["User API", "Categories", "Data / User Categories / Delete"],
+            "user/categories/delete.json",
+        ],
     ];
 
     for (const [folderPath, dataFile] of operations) {

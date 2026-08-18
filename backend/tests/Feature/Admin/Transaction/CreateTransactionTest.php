@@ -1,7 +1,10 @@
 <?php
 
 use App\Models\Category;
+use App\Models\ExpenseTransaction;
 use App\Models\UserWallet;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -158,3 +161,62 @@ test('admin transaction creation normalizes optional fields', function () {
         'note' => null,
     ]);
 });
+
+test('admin transaction create follows shared execution data', function (array $case) {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create([
+        'opening_balance' => 100,
+        'is_default' => true,
+    ]);
+    $category = Category::factory()->create(['status' => 'active']);
+    $otherUser = regularUser();
+    $otherWallet = UserWallet::factory()->for($otherUser)->create();
+    $otherCategory = Category::factory()->create(['user_id' => $otherUser->id]);
+
+    $case = TestData::resolveAliases($case, [
+        'user' => ['id' => $user->id],
+        'wallet' => ['id' => $wallet->id],
+        'category' => ['id' => $category->id],
+        'other_wallet' => ['id' => $otherWallet->id],
+        'other_category' => ['id' => $otherCategory->id],
+        'missing' => ['id' => 999_999_999],
+    ]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs($user);
+    }
+
+    $beforeCount = ExpenseTransaction::query()->count();
+    $response = $this->json(
+        $case['request']['method'],
+        $case['request']['endpoint'],
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    $expectedDelta = $case['expected']['database_change']['operation'] === 'insert' ? 1 : 0;
+    expect(ExpenseTransaction::query()->count())->toBe($beforeCount + $expectedDelta);
+
+    if ($expectedDelta === 1) {
+        $transaction = ExpenseTransaction::query()
+            ->with(['user', 'wallet', 'category'])
+            ->findOrFail($response->json('data.id'));
+
+        expect($transaction->user->is($user))->toBeTrue()
+            ->and($transaction->wallet->is($wallet))->toBeTrue();
+
+        if ($transaction->category_id !== null) {
+            expect($transaction->category)->not->toBeNull();
+        }
+
+        $balanceChange = $transaction->status === 'posted'
+            ? (float) $transaction->amount * ($transaction->type === 'income' ? 1 : -1)
+            : 0.0;
+
+        $this->assertEqualsWithDelta(100 + $balanceChange, $wallet->fresh()->currentBalance(), 0.001);
+    }
+})->with(TestData::load('admin/transactions/create.json'));

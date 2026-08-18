@@ -1,0 +1,436 @@
+[
+    {
+        "case_id": "USR-TXN-INDEX-BVA-001",
+        "description": "accepts per_page 1",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 1
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 1
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-BVA-002",
+        "description": "accepts per_page 2",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 2
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 2
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-BVA-003",
+        "description": "accepts per_page 50",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 50
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 50
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-BVA-004",
+        "description": "accepts per_page 99",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 99
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 99
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-BVA-005",
+        "description": "accepts per_page 100",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 100
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 100
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-RBVA-006",
+        "description": "rejects per_page 0",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 0
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "per_page"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-RBVA-007",
+        "description": "rejects per_page 101",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 101
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "per_page"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-EP-008",
+        "description": "filters income transactions",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "type": "income"
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-EP-009",
+        "description": "filters expense transactions",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "type": "expense"
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-EP-010",
+        "description": "rejects invalid type enum",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "type": "transfer"
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "type"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-EP-011",
+        "description": "rejects invalid status enum",
+        "actor": "user",
+        "preconditions": [
+            "transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "status": "approved"
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "status"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-RBAC-012",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-INDEX-RBAC-013",
+        "description": "returns only transactions owned by the authenticated user",
+        "actor": "user",
+        "preconditions": [
+            "own_and_other_transactions_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.total": 1
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    }
+]

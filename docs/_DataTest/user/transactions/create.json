@@ -1,0 +1,1715 @@
+[
+    {
+        "case_id": "USR-TXN-CREATE-BVA-001",
+        "description": "accepts minimum amount 0.01",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 0.01,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.amount": 0.01
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-002",
+        "description": "accepts minimum plus 0.01 amount",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 0.02,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.amount": 0.02
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-003",
+        "description": "accepts nominal amount",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.amount": 5000000000
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-004",
+        "description": "accepts maximum minus 0.01 amount",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 9999999999.98,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.amount": 9999999999.98
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-005",
+        "description": "accepts maximum amount",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 9999999999.99,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.amount": 9999999999.99
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-RBVA-006",
+        "description": "rejects amount below minimum",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 0,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "amount"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-RBVA-007",
+        "description": "rejects amount above maximum",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 10000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "amount"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-008",
+        "description": "accepts null note",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": null,
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.note": null
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-009",
+        "description": "normalizes an empty note to null",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.note": null
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-010",
+        "description": "accepts note length 1",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                },
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 1
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-011",
+        "description": "accepts nominal note length 128",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 128
+                },
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 128
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-012",
+        "description": "accepts note length 254",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 254
+                },
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 254
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-013",
+        "description": "accepts maximum note length 255",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 255
+                },
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 255
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-RBVA-014",
+        "description": "rejects note length 256",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 256
+                },
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "note"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-015",
+        "description": "accepts label length 1",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    {
+                        "generator": "repeat",
+                        "character": "l",
+                        "length": 1
+                    }
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.labels.0": {
+                    "generator": "repeat",
+                    "character": "l",
+                    "length": 1
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-016",
+        "description": "accepts label length 2",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    {
+                        "generator": "repeat",
+                        "character": "l",
+                        "length": 2
+                    }
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.labels.0": {
+                    "generator": "repeat",
+                    "character": "l",
+                    "length": 2
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-017",
+        "description": "accepts nominal label length 15",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    {
+                        "generator": "repeat",
+                        "character": "l",
+                        "length": 15
+                    }
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.labels.0": {
+                    "generator": "repeat",
+                    "character": "l",
+                    "length": 15
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-018",
+        "description": "accepts label length 29",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    {
+                        "generator": "repeat",
+                        "character": "l",
+                        "length": 29
+                    }
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.labels.0": {
+                    "generator": "repeat",
+                    "character": "l",
+                    "length": 29
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BVA-019",
+        "description": "accepts maximum label length 30",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    {
+                        "generator": "repeat",
+                        "character": "l",
+                        "length": 30
+                    }
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.labels.0": {
+                    "generator": "repeat",
+                    "character": "l",
+                    "length": 30
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-020",
+        "description": "rejects an empty label item",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    ""
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "labels.0"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-021",
+        "description": "rejects a non-string label item",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    123
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "labels.0"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-RBVA-022",
+        "description": "rejects label length 31",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    {
+                        "generator": "repeat",
+                        "character": "a",
+                        "length": 31
+                    }
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "labels.0"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-023",
+        "description": "deduplicates repeated labels",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "salary",
+                    "salary"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.labels": [
+                    "salary"
+                ]
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-024",
+        "description": "creates a valid income transaction",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "income",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "income",
+                "data.status": "posted"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-025",
+        "description": "creates a valid expense transaction",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BUS-026",
+        "description": "forces a submitted pending status to posted",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ],
+                "status": "pending"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BUS-027",
+        "description": "normalizes an empty category alias to null",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.type": "expense",
+                "data.status": "posted",
+                "data.category_id": null
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "wallet_id": "@wallet.id"
+                }
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-028",
+        "description": "rejects invalid type enum",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "transfer",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "type"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-029",
+        "description": "rejects a nonexistent wallet",
+        "actor": "user",
+        "preconditions": [
+            "user_exists",
+            "global_active_category_exists",
+            "missing_id_available"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@missing.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "wallet_id"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-EP-030",
+        "description": "rejects a nonexistent category",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "missing_id_available"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@missing.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category_id"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-RBAC-031",
+        "description": "rejects another users wallet",
+        "actor": "user",
+        "preconditions": [
+            "user_exists",
+            "other_user_with_wallet_exists",
+            "global_active_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@other_wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "wallet_id"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-RBAC-032",
+        "description": "rejects another users private category",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "other_user_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@other_category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category_id"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-BUS-033",
+        "description": "rejects an inactive category",
+        "actor": "user",
+        "preconditions": [
+            "user_with_wallet_exists",
+            "inactive_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@inactive_category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category_id"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-RBAC-034",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    }
+]

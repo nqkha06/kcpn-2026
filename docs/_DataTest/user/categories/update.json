@@ -1,0 +1,1191 @@
+[
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-001",
+        "description": "accepts category name length 1",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 1
+                },
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 1
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-002",
+        "description": "accepts category name length 2",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 2
+                },
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 2
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-003",
+        "description": "accepts category name length 60",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 60
+                },
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 60
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-004",
+        "description": "accepts category name length 119",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 119
+                },
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 119
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-005",
+        "description": "accepts category name length 120",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 120
+                },
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 120
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-EP-006",
+        "description": "rejects a missing category name",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-EP-007",
+        "description": "rejects an empty category name",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-RBVA-008",
+        "description": "rejects category name length 121",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "c",
+                    "length": 121
+                },
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-009",
+        "description": "accepts null description",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": null
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.description": null
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-010",
+        "description": "accepts empty description",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": ""
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.description": null
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-011",
+        "description": "accepts description length 1",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 1
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 1
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-012",
+        "description": "accepts nominal description length 250",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-013",
+        "description": "accepts description length 499",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 499
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 499
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BVA-014",
+        "description": "accepts maximum description length 500",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 500
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 500
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-RBVA-015",
+        "description": "rejects description length 501",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 501
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "description"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-EP-016",
+        "description": "accepts three-digit hex color",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abc",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.color": "#abc"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-EP-017",
+        "description": "accepts six-digit hex color",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.color": "#abcdef"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-EP-018",
+        "description": "rejects invalid hex color",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "color"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BUS-019",
+        "description": "rejects a duplicate visible global category name",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_and_global_duplicate_exist"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Visible Duplicate",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BUS-020",
+        "description": "allows a name used only by another users private category",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_category_and_other_private_same_name_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Other Private Name",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.name": "Other Private Name"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-BUS-021",
+        "description": "updates an owned inactive category without changing its inactive status",
+        "actor": "user",
+        "preconditions": [
+            "user_with_own_inactive_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.status": "inactive"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "update",
+                "where": {
+                    "id": "@category.id"
+                }
+            }
+        },
+        "capture": {
+            "category_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-RBAC-022",
+        "description": "rejects updating another users category",
+        "actor": "user",
+        "preconditions": [
+            "user_and_other_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-RBAC-023",
+        "description": "rejects updating a global category",
+        "actor": "user",
+        "preconditions": [
+            "user_and_global_category_exist"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-EP-024",
+        "description": "returns not found for a nonexistent category",
+        "actor": "user",
+        "preconditions": [
+            "user_exists",
+            "missing_category_alias"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-CAT-UPDATE-RBAC-025",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [
+            "category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/user/categories/{category}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "category": "@category.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Nominal Category",
+                "color": "#abcdef",
+                "description": {
+                    "generator": "repeat",
+                    "character": "d",
+                    "length": 250
+                }
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "categories",
+                "operation": "none"
+            }
+        }
+    }
+]

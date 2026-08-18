@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Category;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -104,3 +106,63 @@ test('updating a missing category returns not found', function () {
         ])
         ->assertNotFound();
 });
+
+test('user category update follows shared execution data', function (array $case) {
+    $user = regularUser();
+    $categoryOwner = in_array('user_and_other_category_exists', $case['preconditions'], true)
+        ? regularUser()
+        : $user;
+    $isGlobal = in_array('user_and_global_category_exist', $case['preconditions'], true);
+    $isInactive = in_array('user_with_own_inactive_category_exists', $case['preconditions'], true);
+    $category = Category::factory()->create([
+        'user_id' => $isGlobal ? null : $categoryOwner->id,
+        'name' => 'Original Category',
+        'status' => $isInactive ? 'inactive' : 'active',
+    ]);
+
+    if (in_array('user_with_own_category_and_global_duplicate_exist', $case['preconditions'], true)) {
+        Category::factory()->create(['name' => 'Visible Duplicate']);
+    }
+
+    if (in_array('user_with_own_category_and_other_private_same_name_exists', $case['preconditions'], true)) {
+        Category::factory()->create([
+            'user_id' => regularUser()->id,
+            'name' => 'Other Private Name',
+        ]);
+    }
+
+    $isMissingCategory = in_array('missing_category_alias', $case['preconditions'], true);
+    $case = TestData::resolveAliases($case, [
+        'user' => ['id' => $user->id],
+        'category' => ['id' => $isMissingCategory ? 999_999_999 : $category->id],
+    ]);
+
+    if ($case['actor'] === 'user') {
+        $this->actingAs($user);
+    }
+
+    $endpoint = $case['request']['endpoint'];
+    foreach ($case['request']['path'] as $name => $value) {
+        $endpoint = str_replace('{'.$name.'}', (string) $value, $endpoint);
+    }
+
+    $original = $category->only(['user_id', 'name', 'color', 'description', 'status']);
+    $response = $this->json(
+        $case['request']['method'],
+        $endpoint,
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($case['expected']['database_change']['operation'] === 'update') {
+        $updated = $category->fresh();
+
+        expect($updated->user->is($user))->toBeTrue()
+            ->and($updated->expenseTransactions()->count())->toBe(0)
+            ->and($updated->budgets()->count())->toBe(0);
+    } else {
+        expect($category->fresh()->only(array_keys($original)))->toBe($original);
+    }
+})->with(TestData::load('user/categories/update.json'));

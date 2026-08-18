@@ -1,0 +1,830 @@
+[
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-001",
+        "description": "updates a transaction from expense to income",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "income",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@transaction.id",
+                "data.type": "income"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "update",
+                "where": {
+                    "id": "@transaction.id"
+                }
+            }
+        },
+        "capture": {
+            "transaction_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-002",
+        "description": "updates a transaction status to pending",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "pending",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@transaction.id",
+                "data.status": "pending"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "update",
+                "where": {
+                    "id": "@transaction.id"
+                }
+            }
+        },
+        "capture": {
+            "transaction_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-003",
+        "description": "updates a transaction status to cancelled",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "cancelled",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@transaction.id",
+                "data.status": "cancelled"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "update",
+                "where": {
+                    "id": "@transaction.id"
+                }
+            }
+        },
+        "capture": {
+            "transaction_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-004",
+        "description": "normalizes empty category and note to null",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@transaction.id",
+                "data.category_id": null,
+                "data.note": null
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "update",
+                "where": {
+                    "id": "@transaction.id"
+                }
+            }
+        },
+        "capture": {
+            "transaction_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-005",
+        "description": "deduplicates repeated labels on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "updated",
+                    "updated"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@transaction.id",
+                "data.labels": [
+                    "updated"
+                ]
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "update",
+                "where": {
+                    "id": "@transaction.id"
+                }
+            }
+        },
+        "capture": {
+            "transaction_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-006",
+        "description": "rejects invalid type enum",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "transfer",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "type"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-007",
+        "description": "rejects invalid status enum",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "approved",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "status"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBVA-008",
+        "description": "rejects amount below minimum",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 0,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "amount"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBVA-009",
+        "description": "rejects amount above maximum",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 10000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "amount"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBVA-010",
+        "description": "rejects note length 256",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": {
+                    "generator": "repeat",
+                    "character": "a",
+                    "length": 256
+                },
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "note"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBVA-011",
+        "description": "rejects label length 31",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    {
+                        "generator": "repeat",
+                        "character": "a",
+                        "length": 31
+                    }
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "labels.0"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBAC-012",
+        "description": "rejects a wallet belonging to another user",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "other_user_with_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@other_wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "wallet_id"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBAC-013",
+        "description": "rejects another users private category",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "other_user_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@other_category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category_id"
+            ],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBAC-014",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-RBAC-015",
+        "description": "rejects a regular user at the admin endpoint",
+        "actor": "user",
+        "preconditions": [
+            "admin_exists",
+            "transaction_with_owner_wallet_exists",
+            "global_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-TXN-UPDATE-EP-016",
+        "description": "returns not found for a nonexistent transaction",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "user_with_wallet_exists",
+            "global_category_exists",
+            "missing_transaction_alias"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/transactions/{transaction}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "transaction": "@transaction.id"
+            },
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@category.id",
+                "type": "expense",
+                "amount": 5000000000,
+                "transacted_at": "2026-08-15",
+                "status": "posted",
+                "note": "Nominal transaction note",
+                "labels": [
+                    "nominal-label"
+                ]
+            }
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "expense_transactions",
+                "operation": "none"
+            }
+        }
+    }
+]

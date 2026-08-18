@@ -13,6 +13,16 @@ const assignedDataFiles = [
     "public/configuration.json",
     "public/pages-show.json",
     "admin/appearance/update.json",
+    "admin/transactions/create.json",
+    "admin/transactions/index.json",
+    "admin/transactions/update.json",
+    "user/transactions/create.json",
+    "user/transactions/index.json",
+    "user/wallets/create.json",
+    "user/wallets/update.json",
+    "user/categories/create.json",
+    "user/categories/update.json",
+    "user/categories/delete.json",
 ];
 
 test("loads shared rows and resolves repeat generators", () => {

@@ -1,0 +1,1019 @@
+[
+    {
+        "case_id": "USR-WAL-CREATE-BVA-001",
+        "description": "accepts wallet name length 1",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 1
+                },
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 1
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": {
+                        "generator": "repeat",
+                        "character": "w",
+                        "length": 1
+                    }
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-002",
+        "description": "accepts wallet name length 2",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 2
+                },
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 2
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": {
+                        "generator": "repeat",
+                        "character": "w",
+                        "length": 2
+                    }
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-003",
+        "description": "accepts wallet name length 50",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 50
+                },
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 50
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": {
+                        "generator": "repeat",
+                        "character": "w",
+                        "length": 50
+                    }
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-004",
+        "description": "accepts wallet name length 99",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 99
+                },
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 99
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": {
+                        "generator": "repeat",
+                        "character": "w",
+                        "length": 99
+                    }
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-005",
+        "description": "accepts wallet name length 100",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 100
+                },
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 100
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": {
+                        "generator": "repeat",
+                        "character": "w",
+                        "length": 100
+                    }
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-EP-006",
+        "description": "rejects a missing wallet name",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-EP-007",
+        "description": "rejects an empty wallet name",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "",
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-RBVA-008",
+        "description": "rejects wallet name length 101",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "w",
+                    "length": 101
+                },
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-009",
+        "description": "accepts opening balance -9999999999.99",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": -9999999999.99,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.opening_balance": -9999999999.99,
+                "data.current_balance": -9999999999.99
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-010",
+        "description": "accepts opening balance -9999999999.98",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": -9999999999.98,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.opening_balance": -9999999999.98,
+                "data.current_balance": -9999999999.98
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-011",
+        "description": "accepts opening balance 0",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.opening_balance": 0,
+                "data.current_balance": 0
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-012",
+        "description": "accepts opening balance 9999999999.98",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": 9999999999.98,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.opening_balance": 9999999999.98,
+                "data.current_balance": 9999999999.98
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BVA-013",
+        "description": "accepts opening balance 9999999999.99",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": 9999999999.99,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.opening_balance": 9999999999.99,
+                "data.current_balance": 9999999999.99
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-RBVA-014",
+        "description": "rejects opening balance -10000000000",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": -10000000000,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "opening_balance"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-RBVA-015",
+        "description": "rejects opening balance 10000000000",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": 10000000000,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "opening_balance"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-EP-016",
+        "description": "accepts a three-letter currency and normalizes case",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "usd",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.currency": "USD"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-EP-017",
+        "description": "rejects a two-letter currency",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VN",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "currency"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-EP-018",
+        "description": "rejects a four-letter currency",
+        "actor": "user",
+        "preconditions": [
+            "user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "USDT",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "currency"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BUS-019",
+        "description": "rejects a duplicate wallet name for the same user",
+        "actor": "user",
+        "preconditions": [
+            "user_with_duplicate_wallet_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Duplicate Wallet",
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BUS-020",
+        "description": "makes the first wallet default even when false is submitted",
+        "actor": "user",
+        "preconditions": [
+            "user_without_wallets"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.is_default": true
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-BUS-021",
+        "description": "moves default status to a newly created default wallet",
+        "actor": "user",
+        "preconditions": [
+            "user_with_default_wallet_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": true
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.is_default": true
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Nominal Wallet"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-EP-022",
+        "description": "allows the same wallet name for another user",
+        "actor": "user",
+        "preconditions": [
+            "other_user_wallet_with_same_name_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Shared Wallet Name",
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": "Shared Wallet Name"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "insert",
+                "where": {
+                    "user_id": "@user.id",
+                    "name": "Shared Wallet Name"
+                }
+            }
+        },
+        "capture": {
+            "wallet_id": "data.id"
+        }
+    },
+    {
+        "case_id": "USR-WAL-CREATE-RBAC-023",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/wallets",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal Wallet",
+                "currency": "VND",
+                "opening_balance": 0,
+                "is_default": false
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "user_wallets",
+                "operation": "none"
+            }
+        }
+    }
+]

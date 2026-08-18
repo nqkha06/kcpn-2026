@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\UserWallet;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -114,3 +116,66 @@ test('updating a missing wallet returns not found', function () {
         ])
         ->assertNotFound();
 });
+
+test('user wallet update follows shared execution data', function (array $case) {
+    $user = regularUser();
+    $walletOwner = in_array('user_and_other_wallet_exists', $case['preconditions'], true)
+        ? regularUser()
+        : $user;
+    $isOnlyDefault = in_array('user_with_only_default_wallet_exists', $case['preconditions'], true);
+    $wallet = UserWallet::factory()->for($walletOwner)->create([
+        'name' => 'Original Wallet',
+        'opening_balance' => 25,
+        'is_default' => $isOnlyDefault,
+    ]);
+
+    if (in_array('user_with_wallet_and_duplicate_wallet_exists', $case['preconditions'], true)) {
+        UserWallet::factory()->for($user)->create(['name' => 'Duplicate Wallet']);
+    }
+
+    if (in_array('user_with_wallet_and_default_wallet_exists', $case['preconditions'], true)) {
+        UserWallet::factory()->for($user)->defaultWallet()->create(['name' => 'Previous Default']);
+    }
+
+    $isMissingWallet = in_array('missing_wallet_alias', $case['preconditions'], true);
+    $case = TestData::resolveAliases($case, [
+        'user' => ['id' => $user->id],
+        'wallet' => ['id' => $isMissingWallet ? 999_999_999 : $wallet->id],
+    ]);
+
+    if ($case['actor'] === 'user') {
+        $this->actingAs($user);
+    }
+
+    $endpoint = $case['request']['endpoint'];
+    foreach ($case['request']['path'] as $name => $value) {
+        $endpoint = str_replace('{'.$name.'}', (string) $value, $endpoint);
+    }
+
+    $original = $wallet->only(['name', 'currency', 'opening_balance', 'is_default']);
+    $response = $this->json(
+        $case['request']['method'],
+        $endpoint,
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($case['expected']['database_change']['operation'] === 'update') {
+        $updated = $wallet->fresh();
+
+        expect($updated->user->is($user))->toBeTrue();
+        $this->assertEqualsWithDelta(
+            (float) $updated->opening_balance,
+            (float) $response->json('data.current_balance'),
+            0.001,
+        );
+
+        if ($updated->is_default) {
+            expect($user->wallets()->where('is_default', true)->count())->toBe(1);
+        }
+    } else {
+        expect($wallet->fresh()->only(array_keys($original)))->toBe($original);
+    }
+})->with(TestData::load('user/wallets/update.json'));

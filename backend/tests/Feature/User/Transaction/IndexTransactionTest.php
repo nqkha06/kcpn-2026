@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\ExpenseTransaction;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -116,3 +118,21 @@ test('a user cannot filter transactions by another users wallet', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors('wallet_id');
 });
+
+test('user transaction index follows shared execution data', function (array $case) {
+    $user = regularUser();
+    ExpenseTransaction::factory()->forUser($user)->income()->posted()->create();
+    ExpenseTransaction::factory()->forUser(regularUser())->expense()->posted()->create();
+
+    if ($case['actor'] === 'user') {
+        $this->actingAs($user);
+    }
+
+    $query = http_build_query($case['request']['query']);
+    $endpoint = $case['request']['endpoint'].($query === '' ? '' : '?'.$query);
+    $beforeCount = ExpenseTransaction::query()->count();
+    $response = $this->json('GET', $endpoint, [], $case['request']['headers']);
+
+    TestResponseAssertions::assertForCase($response, $case);
+    expect(ExpenseTransaction::query()->count())->toBe($beforeCount);
+})->with(TestData::load('user/transactions/index.json'));

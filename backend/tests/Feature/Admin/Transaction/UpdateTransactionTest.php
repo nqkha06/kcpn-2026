@@ -1,7 +1,10 @@
 <?php
 
+use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\UserWallet;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -95,3 +98,62 @@ test('updating a missing admin transaction returns not found', function () {
         ])
         ->assertNotFound();
 });
+
+test('admin transaction update follows shared execution data', function (array $case) {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create(['opening_balance' => 100]);
+    $category = Category::factory()->create(['status' => 'active']);
+    $transaction = ExpenseTransaction::factory()->forUser($user)->expense()->posted()->create([
+        'wallet_id' => $wallet->id,
+        'category_id' => $category->id,
+        'amount' => 25,
+    ]);
+    $otherUser = regularUser();
+    $otherWallet = UserWallet::factory()->for($otherUser)->create();
+    $otherCategory = Category::factory()->create(['user_id' => $otherUser->id]);
+    $isMissingTransaction = in_array('missing_transaction_alias', $case['preconditions'], true);
+
+    $case = TestData::resolveAliases($case, [
+        'user' => ['id' => $user->id],
+        'wallet' => ['id' => $wallet->id],
+        'category' => ['id' => $category->id],
+        'transaction' => ['id' => $isMissingTransaction ? 999_999_999 : $transaction->id],
+        'other_wallet' => ['id' => $otherWallet->id],
+        'other_category' => ['id' => $otherCategory->id],
+    ]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs($user);
+    }
+
+    $endpoint = $case['request']['endpoint'];
+    foreach ($case['request']['path'] as $name => $value) {
+        $endpoint = str_replace('{'.$name.'}', (string) $value, $endpoint);
+    }
+
+    $original = $transaction->only(['user_id', 'wallet_id', 'category_id', 'type', 'amount', 'status', 'note', 'labels']);
+    $response = $this->json(
+        $case['request']['method'],
+        $endpoint,
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($case['expected']['database_change']['operation'] === 'update') {
+        $updated = $transaction->fresh()->load(['user', 'wallet', 'category']);
+
+        expect($updated->user->is($user))->toBeTrue()
+            ->and($updated->wallet->is($wallet))->toBeTrue();
+
+        $balanceChange = $updated->status === 'posted'
+            ? (float) $updated->amount * ($updated->type === 'income' ? 1 : -1)
+            : 0.0;
+        $this->assertEqualsWithDelta(100 + $balanceChange, $wallet->fresh()->currentBalance(), 0.001);
+    } else {
+        expect($transaction->fresh()->only(array_keys($original)))->toBe($original);
+    }
+})->with(TestData::load('admin/transactions/update.json'));

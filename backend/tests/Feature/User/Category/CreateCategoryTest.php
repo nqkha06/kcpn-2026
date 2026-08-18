@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Category;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -97,3 +99,44 @@ test('a private category always starts as active', function () {
         'status' => 'active',
     ]);
 });
+
+test('user category create follows shared execution data', function (array $case) {
+    $user = regularUser();
+
+    if (in_array('user_and_global_duplicate_category_exist', $case['preconditions'], true)) {
+        Category::factory()->create(['name' => 'Visible Duplicate']);
+    }
+
+    if (in_array('other_user_private_category_with_same_name_exists', $case['preconditions'], true)) {
+        Category::factory()->create([
+            'user_id' => regularUser()->id,
+            'name' => 'Other Private Name',
+        ]);
+    }
+
+    $case = TestData::resolveAliases($case, ['user' => ['id' => $user->id]]);
+
+    if ($case['actor'] === 'user') {
+        $this->actingAs($user);
+    }
+
+    $beforeCount = Category::query()->count();
+    $response = $this->json(
+        $case['request']['method'],
+        $case['request']['endpoint'],
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    $expectedDelta = $case['expected']['database_change']['operation'] === 'insert' ? 1 : 0;
+    expect(Category::query()->count())->toBe($beforeCount + $expectedDelta);
+
+    if ($expectedDelta === 1) {
+        $category = Category::query()->findOrFail($response->json('data.id'));
+
+        expect($category->user->is($user))->toBeTrue()
+            ->and($category->status)->toBe('active');
+    }
+})->with(TestData::load('user/categories/create.json'));

@@ -1,3 +1,16 @@
+const assert = require('node:assert/strict');
+const { loadTestData } = require('../../../support/test-data');
+
+Feature('User Categories - Edit shared data');
+
+for (const testCase of loadTestData('user/categories/update.json')) {
+    Scenario(`[${testCase.case_id}] ${testCase.description}`, () => {
+        assert.equal(testCase.request.method, 'PUT');
+        assert.equal(testCase.request.endpoint, '/api/v1/user/categories/{category}');
+        assert.ok(Number.isInteger(testCase.expected.status));
+    }).tag('@shared-data');
+}
+
 Feature('User Categories - Edit');
 
 const userOne = {

@@ -1,3 +1,16 @@
+const assert = require('node:assert/strict');
+const { loadTestData } = require('../../../support/test-data');
+
+Feature('User wallets - Edit shared data');
+
+for (const testCase of loadTestData('user/wallets/update.json')) {
+    Scenario(`[${testCase.case_id}] ${testCase.description}`, () => {
+        assert.equal(testCase.request.method, 'PUT');
+        assert.equal(testCase.request.endpoint, '/api/v1/user/wallets/{wallet}');
+        assert.ok(Number.isInteger(testCase.expected.status));
+    }).tag('@shared-data');
+}
+
 Feature('User wallets - Edit');
 
 Before(({ I }) => I.loginAsUser());
