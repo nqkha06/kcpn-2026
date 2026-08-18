@@ -1,0 +1,556 @@
+[
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-001",
+    "description": "per_page 1",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 1
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 1
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-002",
+    "description": "per_page 2",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 2
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 2
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-003",
+    "description": "per_page 50",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 50
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 50
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-004",
+    "description": "per_page 99",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 99
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 99
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-005",
+    "description": "per_page 100",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 100
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 100
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-RBVA-006",
+    "description": "per_page 0",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 0
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "per_page"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-RBVA-007",
+    "description": "per_page 101",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 101
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "per_page"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-008",
+    "description": "page minimum",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "page": 1
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.current_page": 1
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-009",
+    "description": "page minimum plus one",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "page": 2
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.current_page": 2
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-BVA-010",
+    "description": "page nominal",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "page": 10
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.current_page": 10
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-RBVA-011",
+    "description": "page below minimum",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "page": 0
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "page"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-EP-012",
+    "description": "search by customer name",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": "Shared Budget Customer"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.total": 1
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-EP-013",
+    "description": "filter monthly period",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "period": "monthly"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.total": 1
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-EP-014",
+    "description": "invalid period enum",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "period": "weekly"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "period"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-EP-015",
+    "description": "sort amount ascending",
+    "actor": "admin",
+    "preconditions": [
+      "list_fixtures"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "sort": "amount_limit",
+        "direction": "asc"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.0.amount_limit": 100
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-RBAC-098",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-INDEX-RBAC-099",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

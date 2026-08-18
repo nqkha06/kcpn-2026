@@ -1,0 +1,155 @@
+[
+  {
+    "case_id": "ADM-MENU-PARENTOPTIONS-EP-001",
+    "description": "only root menus are returned",
+    "actor": "admin",
+    "preconditions": [
+      "menu_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/menus/parent-options",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.0.title": "Shared Root"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-PARENTOPTIONS-EP-002",
+    "description": "specified root is excluded",
+    "actor": "admin",
+    "preconditions": [
+      "menu_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/menus/parent-options",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "exclude": "@parent_menu.id"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.0.title": "Shared Second Root"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-PARENTOPTIONS-EP-003",
+    "description": "missing exclude id is rejected",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/menus/parent-options",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "exclude": "@missing.id"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "exclude"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-PARENTOPTIONS-RBAC-004",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/menus/parent-options",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-PARENTOPTIONS-RBAC-005",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/menus/parent-options",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

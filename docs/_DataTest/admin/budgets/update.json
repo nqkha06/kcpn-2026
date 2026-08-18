@@ -1,0 +1,499 @@
+[
+  {
+    "case_id": "ADM-BDG-UPDATE-BVA-001",
+    "description": "minimum amount",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0.01,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.amount_limit": 0.01
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "budgets",
+        "where": {
+          "id": "@budget.id",
+          "amount_limit": 0.01
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-BVA-002",
+    "description": "minimum plus one cent",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0.02,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.amount_limit": 0.02
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "budgets",
+        "where": {
+          "id": "@budget.id",
+          "amount_limit": 0.02
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-BVA-003",
+    "description": "nominal amount",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.amount_limit": 5000000000
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "budgets",
+        "where": {
+          "id": "@budget.id",
+          "amount_limit": 5000000000
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-BVA-004",
+    "description": "maximum minus one cent",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 9999999999.98,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.amount_limit": 9999999999.98
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "budgets",
+        "where": {
+          "id": "@budget.id",
+          "amount_limit": 9999999999.98
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-BVA-005",
+    "description": "maximum amount",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 9999999999.99,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.amount_limit": 9999999999.99
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "budgets",
+        "where": {
+          "id": "@budget.id",
+          "amount_limit": 9999999999.99
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-RBVA-006",
+    "description": "below minimum amount",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "amount_limit"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-RBVA-007",
+    "description": "above maximum amount",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 10000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "amount_limit"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-BUS-008",
+    "description": "existing tuple can be retained",
+    "actor": "admin",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "message": "Budget updated successfully"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "budgets",
+        "where": {
+          "id": "@budget.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-BUS-009",
+    "description": "duplicate tuple is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "budget",
+      "duplicate_budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@duplicate_category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "category_id"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-EP-010",
+    "description": "budget does not exist",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@missing.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 404,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-RBAC-011",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-UPDATE-RBAC-012",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [
+      "budget"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/budgets/{budget}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "budget": "@budget.id"
+      },
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

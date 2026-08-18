@@ -1,0 +1,1384 @@
+[
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-001",
+    "description": "title length 1",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 1
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-002",
+    "description": "title length 2",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 2
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-003",
+    "description": "title length 60",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-004",
+    "description": "title length 119",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 119
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-005",
+    "description": "title length 120",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 120
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-RBVA-006",
+    "description": "title empty",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": "",
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "title"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-RBVA-007",
+    "description": "title length 121",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 121
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "title"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-008",
+    "description": "url null",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": null,
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-009",
+    "description": "url empty",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-010",
+    "description": "url length 1",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 1
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-011",
+    "description": "url length 128",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 128
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-012",
+    "description": "url length 254",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 254
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-013",
+    "description": "url length 255",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 255
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-RBVA-014",
+    "description": "url length 256",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 256
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "url"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-015",
+    "description": "sort_order minimum",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 0,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-016",
+    "description": "sort_order minimum plus one",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 1,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-017",
+    "description": "sort_order nominal",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-018",
+    "description": "sort_order maximum minus one",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 9998,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BVA-019",
+    "description": "sort_order maximum",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 9999,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-RBVA-020",
+    "description": "sort_order below minimum",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": -1,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "sort_order"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-RBVA-021",
+    "description": "sort_order above maximum",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 10000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "sort_order"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-022",
+    "description": "canonical length 79 valid regex",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "a.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-023",
+    "description": "canonical length 80 valid regex",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "a.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-024",
+    "description": "canonical missing",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "canonical"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-025",
+    "description": "canonical too long",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "a.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "canonical"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-026",
+    "description": "canonical invalid regex",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "Home Header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "canonical"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BUS-027",
+    "description": "root menu is created",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "data.parent": null
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    },
+    "capture": {
+      "menu.id": "data.id"
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BUS-028",
+    "description": "child inherits parent canonical",
+    "actor": "admin",
+    "preconditions": [
+      "parent_menu"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "user.header",
+        "parent_id": "@parent_menu.id",
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "data.canonical": "home.footer",
+        "data.parent.id": "@parent_menu.id"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "menus",
+        "where": {}
+      }
+    },
+    "capture": {
+      "child_menu.id": "data.id"
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-029",
+    "description": "target enum is invalid",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_popup",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "target"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-030",
+    "description": "status enum is invalid",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "hidden"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "status"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-EP-031",
+    "description": "parent does not exist",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": "@missing.id",
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "parent_id"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-RBAC-032",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-RBAC-033",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-CREATE-BLOCKED-034",
+    "description": "javascript URL handling is not specified",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/menus",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "javascript:alert(1)",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 0,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    },
+    "blocked": true,
+    "blocked_reason": "Chưa xác định: implementation hiện tại chỉ kiểm tra string|max:255 và chưa có quy tắc an toàn URL."
+  }
+]

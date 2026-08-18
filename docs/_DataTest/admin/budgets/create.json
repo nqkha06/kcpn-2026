@@ -1,0 +1,667 @@
+[
+  {
+    "case_id": "ADM-BDG-CREATE-BVA-001",
+    "description": "minimum amount",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0.01,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "message": "Budget created successfully",
+        "data.amount_limit": 0.01,
+        "data.spent": 0
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "budgets",
+        "where": {
+          "user_id": "@customer.id",
+          "category_id": "@category.id",
+          "amount_limit": 0.01
+        }
+      }
+    },
+    "capture": {
+      "budget.id": "data.id"
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-BVA-002",
+    "description": "minimum plus one cent",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0.02,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "message": "Budget created successfully",
+        "data.amount_limit": 0.02,
+        "data.spent": 0
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "budgets",
+        "where": {
+          "user_id": "@customer.id",
+          "category_id": "@category.id",
+          "amount_limit": 0.02
+        }
+      }
+    },
+    "capture": {
+      "budget.id": "data.id"
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-BVA-003",
+    "description": "nominal amount",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "message": "Budget created successfully",
+        "data.amount_limit": 5000000000,
+        "data.spent": 0
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "budgets",
+        "where": {
+          "user_id": "@customer.id",
+          "category_id": "@category.id",
+          "amount_limit": 5000000000
+        }
+      }
+    },
+    "capture": {
+      "budget.id": "data.id"
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-BVA-004",
+    "description": "maximum minus one cent",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 9999999999.98,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "message": "Budget created successfully",
+        "data.amount_limit": 9999999999.98,
+        "data.spent": 0
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "budgets",
+        "where": {
+          "user_id": "@customer.id",
+          "category_id": "@category.id",
+          "amount_limit": 9999999999.98
+        }
+      }
+    },
+    "capture": {
+      "budget.id": "data.id"
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-BVA-005",
+    "description": "maximum amount",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 9999999999.99,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 201,
+      "json_paths": {
+        "message": "Budget created successfully",
+        "data.amount_limit": 9999999999.99,
+        "data.spent": 0
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "insert",
+        "table": "budgets",
+        "where": {
+          "user_id": "@customer.id",
+          "category_id": "@category.id",
+          "amount_limit": 9999999999.99
+        }
+      }
+    },
+    "capture": {
+      "budget.id": "data.id"
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-RBVA-006",
+    "description": "below minimum amount",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 0,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "amount_limit"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-RBVA-007",
+    "description": "above maximum amount",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 10000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "amount_limit"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-EP-008",
+    "description": "required fields are missing",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "user_id",
+        "category_id",
+        "amount_limit",
+        "period",
+        "status"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-EP-009",
+    "description": "user does not exist",
+    "actor": "admin",
+    "preconditions": [
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@missing.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "user_id"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-EP-010",
+    "description": "category does not exist",
+    "actor": "admin",
+    "preconditions": [
+      "customer"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@missing.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "category_id"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-EP-011",
+    "description": "period enum is invalid",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "weekly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "period"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-EP-012",
+    "description": "status enum is invalid",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "archived",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "status"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-BUS-013",
+    "description": "duplicate user category period tuple is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "global_category",
+      "duplicate_budget"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "category_id"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-BUS-014",
+    "description": "category owned by another user is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "customer",
+      "other_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@other_category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "category_id"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-RBAC-015",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-BDG-CREATE-RBAC-016",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [
+      "customer",
+      "global_category"
+    ],
+    "request": {
+      "method": "POST",
+      "endpoint": "/api/v1/admin/budgets",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "user_id": "@customer.id",
+        "category_id": "@category.id",
+        "amount_limit": 5000000000,
+        "period": "monthly",
+        "status": "active",
+        "note": "Nominal budget"
+      }
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

@@ -1,0 +1,1457 @@
+[
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-001",
+    "description": "update title length 1",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 1
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-002",
+    "description": "update title length 2",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 2
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-003",
+    "description": "update title length 60",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-004",
+    "description": "update title length 119",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 119
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-005",
+    "description": "update title length 120",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 120
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-RBVA-006",
+    "description": "update title empty",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": "",
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "title"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-RBVA-007",
+    "description": "update title length 121",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 121
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "title"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-008",
+    "description": "update url null",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": null,
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-009",
+    "description": "update url empty",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-010",
+    "description": "update url length 1",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 1
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-011",
+    "description": "update url length 128",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 128
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-012",
+    "description": "update url length 254",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 254
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-013",
+    "description": "update url length 255",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 255
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-RBVA-014",
+    "description": "update url length 256",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": {
+          "generator": "repeat",
+          "character": "/",
+          "length": 256
+        },
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "url"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-015",
+    "description": "update sort_order minimum",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 0,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-016",
+    "description": "update sort_order minimum plus one",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 1,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-017",
+    "description": "update sort_order nominal",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-018",
+    "description": "update sort_order maximum minus one",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 9998,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BVA-019",
+    "description": "update sort_order maximum",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 9999,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-RBVA-020",
+    "description": "update sort_order below minimum",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": -1,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "sort_order"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-RBVA-021",
+    "description": "update sort_order above maximum",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 10000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "sort_order"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-EP-022",
+    "description": "update canonical length 79 valid regex",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "a.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-EP-023",
+    "description": "update canonical length 80 valid regex",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "a.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-EP-024",
+    "description": "update canonical missing",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "canonical"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-EP-025",
+    "description": "update canonical too long",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "a.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "canonical"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-EP-026",
+    "description": "update canonical invalid regex",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "Home Header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "canonical"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BUS-027",
+    "description": "self parent is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": "@menu.id",
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "parent_id"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BUS-028",
+    "description": "new child inherits parent canonical",
+    "actor": "admin",
+    "preconditions": [
+      "menu",
+      "parent_menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": "@parent_menu.id",
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.canonical": "home.footer"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "menus",
+        "where": {
+          "id": "@menu.id",
+          "canonical": "home.footer"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-EP-029",
+    "description": "menu does not exist",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@missing.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 404,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-RBAC-030",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-RBAC-031",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "/nominal",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-MENU-UPDATE-BLOCKED-032",
+    "description": "javascript URL handling on update is not specified",
+    "actor": "admin",
+    "preconditions": [
+      "menu"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/menus/{menu}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "menu": "@menu.id"
+      },
+      "query": {},
+      "body": {
+        "title": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 60
+        },
+        "url": "javascript:alert(1)",
+        "canonical": "home.header",
+        "parent_id": null,
+        "sort_order": 5000,
+        "target": "_self",
+        "status": "active"
+      }
+    },
+    "expected": {
+      "status": 0,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    },
+    "blocked": true,
+    "blocked_reason": "Chưa xác định: implementation hiện tại chỉ kiểm tra string|max:255 và chưa có quy tắc an toàn URL."
+  }
+]
