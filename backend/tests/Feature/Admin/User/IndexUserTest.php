@@ -71,6 +71,8 @@ test('an admin can filter users by role and creation date', function () {
 
 test('an admin can sort and paginate users', function () {
     $admin = adminUser();
+    $admin->update(['name' => 'Middle Admin']);
+
     User::factory()->create(['name' => 'Zulu']);
     $alpha = User::factory()->create(['name' => 'Alpha']);
 
