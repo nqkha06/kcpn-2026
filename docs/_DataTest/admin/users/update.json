@@ -1,0 +1,617 @@
+[
+    {
+        "case_id": "ADM-USR-UPDATE-EP-001",
+        "description": "updates a user without sending a password",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists",
+            "original_password_captured"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-user@example.test",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@user.id",
+                "data.name": "Updated User",
+                "data.email": "updated-user@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "update",
+                "where": {
+                    "id": "@user.id"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-002",
+        "description": "updates a user password and role",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-password@example.test",
+                "roles": [
+                    "@role.id"
+                ],
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@user.id",
+                "data.name": "Updated User",
+                "data.email": "updated-password@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "update",
+                "where": {
+                    "id": "@user.id"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-BVA-003",
+        "description": "accepts user name length 255 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 255
+                },
+                "email": "update-name-max@example.test",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@user.id",
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 255
+                },
+                "data.email": "update-name-max@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "update",
+                "where": {
+                    "id": "@user.id"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-RBVA-004",
+        "description": "rejects user name length 256 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 256
+                },
+                "email": "update-name-over@example.test",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-BVA-005",
+        "description": "accepts email length 255 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "@email_255.value",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@user.id",
+                "data.name": "Updated User",
+                "data.email": "@email_255.value"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "update",
+                "where": {
+                    "id": "@user.id"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-RBVA-006",
+        "description": "rejects email length 256 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "@email_256.value",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-007",
+        "description": "rejects another users duplicate email",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "existing_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "@existing_user.email",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-008",
+        "description": "rejects a nonexistent role ID",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "missing_id_available"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-user@example.test",
+                "roles": [
+                    "@missing.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles.0"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-009",
+        "description": "rejects duplicate role IDs",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-user@example.test",
+                "roles": [
+                    "@role.id",
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles.1"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-010",
+        "description": "rejects mismatched password confirmation",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-user@example.test",
+                "roles": [
+                    "@role.id"
+                ],
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.other_password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "password"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-RBAC-011",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-user@example.test",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-RBAC-012",
+        "description": "rejects a regular user without admin permission",
+        "actor": "user",
+        "preconditions": [
+            "managed_user_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-user@example.test",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-013",
+        "description": "returns not found for a nonexistent user",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "missing_user_alias",
+            "role_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "updated-user@example.test",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    }
+]

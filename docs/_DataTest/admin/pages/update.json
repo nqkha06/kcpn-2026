@@ -1,0 +1,842 @@
+[
+    {
+        "case_id": "ADM-PAGE-UPDATE-EP-001",
+        "description": "updates a page and category relation",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Updated Page",
+                "slug": "updated-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "published"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": "Updated Page",
+                "data.status": "published",
+                "data.slug": "updated-page",
+                "data.category.id": "@category.id"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BVA-002",
+        "description": "accepts page title length 255 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 255
+                },
+                "slug": "updated-title-max",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 255
+                },
+                "data.status": "draft"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-RBVA-003",
+        "description": "rejects page title length 256 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 256
+                },
+                "slug": "updated-title-over",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "title"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BVA-004",
+        "description": "accepts slug length 255 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Updated Slug Max",
+                "slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 255
+                },
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": "Updated Slug Max",
+                "data.status": "draft",
+                "data.slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 255
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-RBVA-005",
+        "description": "rejects slug length 256 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Updated Slug Over",
+                "slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 256
+                },
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "slug"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BVA-006",
+        "description": "accepts meta title length 255 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Updated Meta Max",
+                "slug": "updated-meta-max",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 255
+                },
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": "Updated Meta Max",
+                "data.status": "draft",
+                "data.meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 255
+                }
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-RBVA-007",
+        "description": "rejects meta title length 256 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Updated Meta Over",
+                "slug": "updated-meta-over",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 256
+                },
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "meta_title"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-EP-008",
+        "description": "rejects another pages duplicate slug",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists",
+            "existing_page_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Duplicate Slug Update",
+                "slug": "@existing_page.slug",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "slug"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-EP-009",
+        "description": "rejects an invalid status enum",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Invalid Status Update",
+                "slug": "invalid-status-update",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "archived"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "status"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-EP-010",
+        "description": "rejects a nonexistent category relation",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "missing_id_available"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Missing Category Update",
+                "slug": "missing-category-update",
+                "image": null,
+                "category_id": "@missing.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category_id"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BUS-011",
+        "description": "deduplicates repeated tags on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Updated Duplicate Tags",
+                "slug": "updated-duplicate-tags",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "news",
+                    "news"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": "Updated Duplicate Tags",
+                "data.status": "draft",
+                "data.tags": [
+                    "news"
+                ]
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BUS-012",
+        "description": "normalizes empty tags on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Updated Empty Tags",
+                "slug": "updated-empty-tags",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "",
+                    " "
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": "Updated Empty Tags",
+                "data.status": "draft",
+                "data.tags": []
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-RBAC-013",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Nominal Page",
+                "slug": "nominal-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-RBAC-014",
+        "description": "rejects a regular user without admin permission",
+        "actor": "user",
+        "preconditions": [
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Nominal Page",
+                "slug": "nominal-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-EP-015",
+        "description": "returns not found for a nonexistent page",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "missing_page_alias",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Nominal Page",
+                "slug": "nominal-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 404,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    }
+]

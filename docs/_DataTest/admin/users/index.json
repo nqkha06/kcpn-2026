@@ -1,0 +1,367 @@
+[
+    {
+        "case_id": "ADM-USR-INDEX-BVA-001",
+        "description": "accepts per_page 1",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 1
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 1
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-BVA-002",
+        "description": "accepts per_page 2",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 2
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 2
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-BVA-003",
+        "description": "accepts per_page 50",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 50
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 50
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-BVA-004",
+        "description": "accepts per_page 99",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 99
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 99
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-BVA-005",
+        "description": "accepts per_page 100",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 100
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "meta.per_page": 100
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-RBVA-006",
+        "description": "rejects per_page 0",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 0
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "per_page"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-RBVA-007",
+        "description": "rejects per_page 101",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "per_page": 101
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "per_page"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-EP-008",
+        "description": "filters by an existing role",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "role": "@role.name"
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-EP-009",
+        "description": "rejects a nonexistent role name",
+        "actor": "admin",
+        "preconditions": [
+            "users_exist"
+        ],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {
+                "role": "missing-role"
+            },
+            "body": {}
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "role"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-RBAC-010",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-INDEX-RBAC-011",
+        "description": "rejects a regular user without admin permission",
+        "actor": "user",
+        "preconditions": [],
+        "request": {
+            "method": "GET",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {}
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    }
+]

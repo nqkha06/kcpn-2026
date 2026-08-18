@@ -1,0 +1,954 @@
+[
+    {
+        "case_id": "ADM-USR-CREATE-BVA-001",
+        "description": "accepts user name length 1",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 1
+                },
+                "email": "name-1@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 1
+                },
+                "data.email": "name-1@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "name-1@example.test"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-002",
+        "description": "accepts user name length 2",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 2
+                },
+                "email": "name-2@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 2
+                },
+                "data.email": "name-2@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "name-2@example.test"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-003",
+        "description": "accepts user name length 128",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 128
+                },
+                "email": "name-128@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 128
+                },
+                "data.email": "name-128@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "name-128@example.test"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-004",
+        "description": "accepts user name length 254",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 254
+                },
+                "email": "name-254@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 254
+                },
+                "data.email": "name-254@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "name-254@example.test"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-005",
+        "description": "accepts user name length 255",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 255
+                },
+                "email": "name-255@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 255
+                },
+                "data.email": "name-255@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "name-255@example.test"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-006",
+        "description": "rejects a missing user name",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "email": "missing-name@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-007",
+        "description": "rejects an empty user name",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "",
+                "email": "empty-name@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-RBVA-008",
+        "description": "rejects user name length 256",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": {
+                    "generator": "repeat",
+                    "character": "n",
+                    "length": 256
+                },
+                "email": "name-256@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "name"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-009",
+        "description": "accepts a nominal valid email",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "nominal-user@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": "Nominal User",
+                "data.email": "nominal-user@example.test"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "nominal-user@example.test"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-010",
+        "description": "accepts a valid email length 254",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "@email_254.value",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": "Nominal User",
+                "data.email": "@email_254.value"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "@email_254.value"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-011",
+        "description": "accepts a valid email length 255",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "@email_255.value",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": "Nominal User",
+                "data.email": "@email_255.value"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "@email_255.value"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-012",
+        "description": "rejects a missing email",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Missing Email User",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-013",
+        "description": "rejects an invalid email format",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "not-an-email",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-RBVA-014",
+        "description": "rejects a valid email length 256",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "@email_256.value",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-015",
+        "description": "rejects a duplicate email",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists",
+            "existing_user_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "@existing_user.email",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-016",
+        "description": "rejects a nonexistent role ID",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "missing_id_available"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "missing-role@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@missing.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles.0"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-017",
+        "description": "rejects duplicate role IDs",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "duplicate-role@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id",
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles.1"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-018",
+        "description": "rejects mismatched password confirmation",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "password-mismatch@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.other_password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "password"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-RBAC-019",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "guest-create@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-RBAC-020",
+        "description": "rejects a regular user without admin permission",
+        "actor": "user",
+        "preconditions": [
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "forbidden-create@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    }
+]

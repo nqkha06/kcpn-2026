@@ -2,6 +2,8 @@
 
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -71,8 +73,6 @@ test('an admin can filter users by role and creation date', function () {
 
 test('an admin can sort and paginate users', function () {
     $admin = adminUser();
-    $admin->update(['name' => 'Middle Admin']);
-
     User::factory()->create(['name' => 'Zulu']);
     $alpha = User::factory()->create(['name' => 'Alpha']);
 
@@ -90,3 +90,25 @@ test('user list query parameters are validated', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['role', 'created_from', 'sort', 'direction', 'per_page']);
 });
+
+test('admin user index follows shared execution data', function (array $case) {
+    $role = Role::findOrCreate('data-manager', 'web');
+    $listedUser = User::factory()->create();
+    $listedUser->assignRole($role);
+
+    $case = TestData::resolveAliases($case, ['role' => ['name' => $role->name]]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $query = http_build_query($case['request']['query']);
+    $endpoint = $case['request']['endpoint'].($query === '' ? '' : '?'.$query);
+    $beforeCount = User::query()->count();
+    $response = $this->json('GET', $endpoint, [], $case['request']['headers']);
+
+    TestResponseAssertions::assertForCase($response, $case);
+    expect(User::query()->count())->toBe($beforeCount);
+})->with(TestData::load('admin/users/index.json'));

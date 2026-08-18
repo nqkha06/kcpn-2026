@@ -3,6 +3,8 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -121,3 +123,68 @@ test('updating a missing user returns not found', function () {
         ])
         ->assertNotFound();
 });
+
+test('admin user update follows shared execution data', function (array $case) {
+    $role = Role::findOrCreate('data-manager', 'web');
+    $user = User::factory()->create([
+        'email' => 'managed-data-user@example.test',
+        'password' => Hash::make('OriginalPassword123!'),
+    ]);
+    $existingUser = User::factory()->create(['email' => 'existing-update-user@example.test']);
+    $originalPassword = $user->password;
+    $emailBoundary = static function (int $length): string {
+        return str_repeat('a', 64).'@'
+            .str_repeat('b', 61).'.'
+            .str_repeat('c', 61).'.'
+            .str_repeat('d', $length - 193).'.com';
+    };
+    $isMissingUser = in_array('missing_user_alias', $case['preconditions'], true);
+
+    $case = TestData::resolveAliases($case, [
+        'user' => ['id' => $isMissingUser ? 999_999_999 : $user->id],
+        'role' => ['id' => $role->id],
+        'existing_user' => ['email' => $existingUser->email],
+        'new_user' => [
+            'password' => 'ValidPassword123!',
+            'other_password' => 'DifferentPassword123!',
+        ],
+        'email_255' => ['value' => $emailBoundary(255)],
+        'email_256' => ['value' => $emailBoundary(256)],
+        'missing' => ['id' => 999_999_999],
+    ]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $endpoint = $case['request']['endpoint'];
+    foreach ($case['request']['path'] as $name => $value) {
+        $endpoint = str_replace('{'.$name.'}', (string) $value, $endpoint);
+    }
+
+    $original = $user->only(['name', 'email', 'password']);
+    $response = $this->json(
+        $case['request']['method'],
+        $endpoint,
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($case['expected']['database_change']['operation'] === 'update') {
+        $updatedUser = $user->fresh()->load('roles');
+
+        expect($updatedUser->hasRole($role))->toBeTrue();
+
+        if (array_key_exists('password', $case['request']['body'])) {
+            expect(Hash::check($case['request']['body']['password'], $updatedUser->password))->toBeTrue();
+        } else {
+            expect($updatedUser->password)->toBe($originalPassword);
+        }
+    } else {
+        expect($user->fresh()->only(array_keys($original)))->toBe($original);
+    }
+})->with(TestData::load('admin/users/update.json'));

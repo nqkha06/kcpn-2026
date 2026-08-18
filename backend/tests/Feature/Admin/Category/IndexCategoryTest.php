@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Category;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -56,3 +58,22 @@ test('admin category list query parameters are validated', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['status', 'sort', 'direction', 'per_page']);
 });
+
+test('admin category index follows shared execution data', function (array $case) {
+    Category::factory()->create(['user_id' => null, 'status' => 'active']);
+    Category::factory()->create(['user_id' => regularUser()->id, 'status' => 'active']);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $query = http_build_query($case['request']['query']);
+    $endpoint = $case['request']['endpoint'].($query === '' ? '' : '?'.$query);
+    $beforeCount = Category::query()->count();
+    $response = $this->json('GET', $endpoint, [], $case['request']['headers']);
+
+    TestResponseAssertions::assertForCase($response, $case);
+    expect(Category::query()->count())->toBe($beforeCount);
+})->with(TestData::load('admin/categories/index.json'));

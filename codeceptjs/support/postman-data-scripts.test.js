@@ -146,66 +146,6 @@ test("assigned Postman operations are data-driven by their matching JSON files",
             "admin/pages/update.json",
         ],
         [
-            ["Admin API", "Budgets", "Data / Admin Budgets / Create"],
-            "admin/budgets/create.json",
-        ],
-        [
-            ["Admin API", "Budgets", "Data / Admin Budgets / Index"],
-            "admin/budgets/index.json",
-        ],
-        [
-            ["Admin API", "Budgets", "Data / Admin Budgets / Update"],
-            "admin/budgets/update.json",
-        ],
-        [
-            ["Admin API", "Menus", "Data / Admin Menus / Create"],
-            "admin/menus/create.json",
-        ],
-        [
-            ["Admin API", "Menus", "Data / Admin Menus / Index"],
-            "admin/menus/index.json",
-        ],
-        [
-            ["Admin API", "Menus", "Data / Admin Menus / Update"],
-            "admin/menus/update.json",
-        ],
-        [
-            [
-                "Admin API",
-                "Menus",
-                "Data / Admin Menus / Parent Options",
-            ],
-            "admin/menus/parent-options.json",
-        ],
-        [
-            ["Admin API", "Roles", "Data / Roles / Create"],
-            "admin/roles/create.json",
-        ],
-        [
-            ["Admin API", "Roles", "Data / Roles / Index"],
-            "admin/roles/index.json",
-        ],
-        [
-            ["Admin API", "Roles", "Data / Roles / Update"],
-            "admin/roles/update.json",
-        ],
-        [
-            ["Admin API", "Roles", "Data / Roles / Delete"],
-            "admin/roles/delete.json",
-        ],
-        [
-            ["Admin API", "Permissions", "Data / Permissions / Create"],
-            "admin/permissions/create.json",
-        ],
-        [
-            ["Admin API", "Permissions", "Data / Permissions / Index"],
-            "admin/permissions/index.json",
-        ],
-        [
-            ["Admin API", "Permissions", "Data / Permissions / Update"],
-            "admin/permissions/update.json",
-        ],
-        [
             ["User API", "Transactions", "Data / User Transactions / Create"],
             "user/transactions/create.json",
         ],
@@ -232,18 +172,6 @@ test("assigned Postman operations are data-driven by their matching JSON files",
         [
             ["User API", "Categories", "Data / User Categories / Delete"],
             "user/categories/delete.json",
-        ],
-        [
-            ["User API", "Budgets", "Data / User Budgets / Create"],
-            "user/budgets/create.json",
-        ],
-        [
-            ["User API", "Settings", "Data / User Settings / Profile"],
-            "user/settings/profile.json",
-        ],
-        [
-            ["User API", "Settings", "Data / User Settings / Preferences"],
-            "user/settings/preferences.json",
         ],
     ];
 

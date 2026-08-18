@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Page;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -51,3 +53,25 @@ test('admin page list query parameters are validated', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['status', 'sort', 'direction', 'per_page']);
 });
+
+test('admin page index follows shared execution data', function (array $case) {
+    Page::query()->create([
+        'title' => 'Shared Index Page',
+        'slug' => 'shared-index-page',
+        'status' => 'published',
+    ]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $query = http_build_query($case['request']['query']);
+    $endpoint = $case['request']['endpoint'].($query === '' ? '' : '?'.$query);
+    $beforeCount = Page::query()->count();
+    $response = $this->json('GET', $endpoint, [], $case['request']['headers']);
+
+    TestResponseAssertions::assertForCase($response, $case);
+    expect(Page::query()->count())->toBe($beforeCount);
+})->with(TestData::load('admin/pages/index.json'));

@@ -3,6 +3,8 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -108,3 +110,53 @@ test('an admin can create a user with roles and a hashed password', function () 
     expect($user->hasRole('manager'))->toBeTrue()
         ->and(Hash::check('password123', $user->password))->toBeTrue();
 });
+
+test('admin user create follows shared execution data', function (array $case) {
+    $role = Role::findOrCreate('data-manager', 'web');
+    $existingUser = User::factory()->create(['email' => 'existing-data-user@example.test']);
+    $emailBoundary = static function (int $length): string {
+        return str_repeat('a', 64).'@'
+            .str_repeat('b', 61).'.'
+            .str_repeat('c', 61).'.'
+            .str_repeat('d', $length - 193).'.com';
+    };
+
+    $case = TestData::resolveAliases($case, [
+        'role' => ['id' => $role->id],
+        'existing_user' => ['email' => $existingUser->email],
+        'new_user' => [
+            'password' => 'ValidPassword123!',
+            'other_password' => 'DifferentPassword123!',
+        ],
+        'email_254' => ['value' => $emailBoundary(254)],
+        'email_255' => ['value' => $emailBoundary(255)],
+        'email_256' => ['value' => $emailBoundary(256)],
+        'missing' => ['id' => 999_999_999],
+    ]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $beforeCount = User::query()->count();
+    $response = $this->json(
+        $case['request']['method'],
+        $case['request']['endpoint'],
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    $expectedDelta = $case['expected']['database_change']['operation'] === 'insert' ? 1 : 0;
+    expect(User::query()->count())->toBe($beforeCount + $expectedDelta);
+
+    if ($expectedDelta === 1) {
+        $createdUser = User::query()->with('roles')->findOrFail($response->json('data.id'));
+
+        expect($createdUser->hasRole($role))->toBeTrue()
+            ->and(Hash::check($case['request']['body']['password'], $createdUser->password))->toBeTrue();
+    }
+})->with(TestData::load('admin/users/create.json'));

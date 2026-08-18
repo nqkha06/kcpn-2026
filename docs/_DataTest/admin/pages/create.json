@@ -1,0 +1,1985 @@
+[
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-001",
+        "description": "accepts page title length 1",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 1
+                },
+                "slug": "title-boundary-1",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 1
+                },
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "title-boundary-1"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": {
+                        "generator": "repeat",
+                        "character": "t",
+                        "length": 1
+                    }
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-002",
+        "description": "accepts page title length 2",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 2
+                },
+                "slug": "title-boundary-2",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 2
+                },
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "title-boundary-2"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": {
+                        "generator": "repeat",
+                        "character": "t",
+                        "length": 2
+                    }
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-003",
+        "description": "accepts page title length 128",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 128
+                },
+                "slug": "title-boundary-128",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 128
+                },
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "title-boundary-128"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": {
+                        "generator": "repeat",
+                        "character": "t",
+                        "length": 128
+                    }
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-004",
+        "description": "accepts page title length 254",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 254
+                },
+                "slug": "title-boundary-254",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 254
+                },
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "title-boundary-254"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": {
+                        "generator": "repeat",
+                        "character": "t",
+                        "length": 254
+                    }
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-005",
+        "description": "accepts page title length 255",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 255
+                },
+                "slug": "title-boundary-255",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 255
+                },
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "title-boundary-255"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": {
+                        "generator": "repeat",
+                        "character": "t",
+                        "length": 255
+                    }
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-EP-006",
+        "description": "rejects a missing page title",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "slug": "nominal-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "title"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-EP-007",
+        "description": "rejects an empty page title",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "",
+                "slug": "nominal-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "title"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-RBVA-008",
+        "description": "rejects page title length 256",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "t",
+                    "length": 256
+                },
+                "slug": "title-boundary-256",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "title"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-009",
+        "description": "accepts a nullable slug and generates it from title",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Nullable Slug Page",
+                "slug": null,
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Nullable Slug Page",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "nullable-slug-page"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Nullable Slug Page"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-010",
+        "description": "accepts a nominal slug",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Slug nominal",
+                "slug": "custom-page-slug",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Slug nominal",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "custom-page-slug"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Slug nominal"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-011",
+        "description": "accepts slug length 254",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Slug 254",
+                "slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 254
+                },
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Slug 254",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 254
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Slug 254"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-012",
+        "description": "accepts slug length 255",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Slug 255",
+                "slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 255
+                },
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Slug 255",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 255
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Slug 255"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-RBVA-013",
+        "description": "rejects slug length 256",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Slug 256",
+                "slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 256
+                },
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "slug"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-014",
+        "description": "accepts a nullable meta title",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Meta null",
+                "slug": "page-meta-null",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": null,
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Meta null",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "page-meta-null",
+                "data.meta_title": null
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Meta null"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-015",
+        "description": "accepts a nominal meta title",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Meta nominal",
+                "slug": "page-meta-nominal",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "SEO title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Meta nominal",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "page-meta-nominal",
+                "data.meta_title": "SEO title"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Meta nominal"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-016",
+        "description": "accepts meta title length 254",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Meta 254",
+                "slug": "page-meta-254",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 254
+                },
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Meta 254",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "page-meta-254",
+                "data.meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 254
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Meta 254"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-017",
+        "description": "accepts meta title length 255",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Meta 255",
+                "slug": "page-meta-255",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 255
+                },
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Meta 255",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "page-meta-255",
+                "data.meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 255
+                }
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Meta 255"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-RBVA-018",
+        "description": "rejects meta title length 256",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Meta 256",
+                "slug": "page-meta-256",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": {
+                    "generator": "repeat",
+                    "character": "m",
+                    "length": 256
+                },
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "meta_title"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BVA-019",
+        "description": "accepts a null image",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Null Image",
+                "slug": "page-null-image",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Null Image",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.image": null
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Null Image"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BLOCKED-020",
+        "description": "validates image upload size 1 KB",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Image 1 KB",
+                "slug": "page-image-1",
+                "image": {
+                    "generator": "file",
+                    "name": "test-image.jpg",
+                    "kilobytes": 1,
+                    "mime_type": "image/jpeg"
+                },
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Image 1 KB",
+                "data.category_id": "@category.id",
+                "data.status": "draft"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Image 1 KB"
+                }
+            }
+        },
+        "blocked": {
+            "reason": "PageRequest.image is implemented as nullable|string|max:2048 and AdminPageService has no upload storage side effect.",
+            "expected_rule": "nullable image file with jpeg/png MIME and max 2048 KB"
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BLOCKED-021",
+        "description": "validates image upload size 1024 KB",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Image 1024 KB",
+                "slug": "page-image-1024",
+                "image": {
+                    "generator": "file",
+                    "name": "test-image.jpg",
+                    "kilobytes": 1024,
+                    "mime_type": "image/jpeg"
+                },
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Image 1024 KB",
+                "data.category_id": "@category.id",
+                "data.status": "draft"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Image 1024 KB"
+                }
+            }
+        },
+        "blocked": {
+            "reason": "PageRequest.image is implemented as nullable|string|max:2048 and AdminPageService has no upload storage side effect.",
+            "expected_rule": "nullable image file with jpeg/png MIME and max 2048 KB"
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BLOCKED-022",
+        "description": "validates image upload size 2047 KB",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Image 2047 KB",
+                "slug": "page-image-2047",
+                "image": {
+                    "generator": "file",
+                    "name": "test-image.jpg",
+                    "kilobytes": 2047,
+                    "mime_type": "image/jpeg"
+                },
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Image 2047 KB",
+                "data.category_id": "@category.id",
+                "data.status": "draft"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Image 2047 KB"
+                }
+            }
+        },
+        "blocked": {
+            "reason": "PageRequest.image is implemented as nullable|string|max:2048 and AdminPageService has no upload storage side effect.",
+            "expected_rule": "nullable image file with jpeg/png MIME and max 2048 KB"
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BLOCKED-023",
+        "description": "validates image upload size 2048 KB",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Image 2048 KB",
+                "slug": "page-image-2048",
+                "image": {
+                    "generator": "file",
+                    "name": "test-image.jpg",
+                    "kilobytes": 2048,
+                    "mime_type": "image/jpeg"
+                },
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Page Image 2048 KB",
+                "data.category_id": "@category.id",
+                "data.status": "draft"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Page Image 2048 KB"
+                }
+            }
+        },
+        "blocked": {
+            "reason": "PageRequest.image is implemented as nullable|string|max:2048 and AdminPageService has no upload storage side effect.",
+            "expected_rule": "nullable image file with jpeg/png MIME and max 2048 KB"
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BLOCKED-024",
+        "description": "rejects image upload size 2049 KB",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Image 2049 KB",
+                "slug": "page-image-2049",
+                "image": {
+                    "generator": "file",
+                    "name": "test-image.jpg",
+                    "kilobytes": 2049,
+                    "mime_type": "image/jpeg"
+                },
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "image"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        },
+        "blocked": {
+            "reason": "PageRequest.image validates a string length rather than uploaded file size.",
+            "expected_rule": "image file max 2048 KB"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BLOCKED-025",
+        "description": "rejects an image with invalid MIME type",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Page Invalid Image MIME",
+                "slug": "page-invalid-image-mime",
+                "image": {
+                    "generator": "file",
+                    "name": "test-image.txt",
+                    "kilobytes": 1,
+                    "mime_type": "text/plain"
+                },
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "image"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        },
+        "blocked": {
+            "reason": "PageRequest.image has no MIME validation rule.",
+            "expected_rule": "jpeg/png image MIME"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BUS-026",
+        "description": "generates a non-empty slug when an empty slug is submitted",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Auto Generated Slug Page",
+                "slug": "",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Auto Generated Slug Page",
+                "data.category_id": "@category.id",
+                "data.status": "draft"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Auto Generated Slug Page"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BUS-027",
+        "description": "adds a suffix when a generated slug collides",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists",
+            "generated_slug_collision_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Collision Page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Collision Page",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.slug": "collision-page-1"
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Collision Page"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-EP-028",
+        "description": "rejects an explicitly duplicated slug",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists",
+            "existing_page_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Explicit Duplicate Slug",
+                "slug": "@existing_page.slug",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "slug"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-EP-029",
+        "description": "rejects an invalid status enum",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Invalid Status Page",
+                "slug": "invalid-status-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "archived"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "status"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-EP-030",
+        "description": "rejects a nonexistent category relation",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "missing_id_available"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Missing Category Page",
+                "slug": "missing-category-page",
+                "image": null,
+                "category_id": "@missing.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "category_id"
+            ],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BUS-031",
+        "description": "deduplicates repeated tags",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Duplicate Tags Page",
+                "slug": "duplicate-tags-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "news",
+                    "news"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Duplicate Tags Page",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.tags": [
+                    "news"
+                ]
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Duplicate Tags Page"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-BUS-032",
+        "description": "normalizes empty tags to an empty response list",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Empty Tags Page",
+                "slug": "empty-tags-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "",
+                    " "
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.title": "Empty Tags Page",
+                "data.category_id": "@category.id",
+                "data.status": "draft",
+                "data.tags": []
+            },
+            "json_absent": [
+                "data.password"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "insert",
+                "where": {
+                    "title": "Empty Tags Page"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-RBAC-033",
+        "description": "rejects a guest",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Nominal Page",
+                "slug": "nominal-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 401,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-CREATE-RBAC-034",
+        "description": "rejects a regular user without admin permission",
+        "actor": "user",
+        "preconditions": [
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/pages",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "title": "Nominal Page",
+                "slug": "nominal-page",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 403,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "none"
+            }
+        }
+    }
+]

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Category;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -78,3 +80,51 @@ test('updating a missing admin category returns not found', function () {
         ])
         ->assertNotFound();
 });
+
+test('admin category update follows shared execution data', function (array $case) {
+    $category = Category::factory()->create([
+        'user_id' => null,
+        'name' => 'Managed Global Category',
+        'status' => 'active',
+    ]);
+
+    if (in_array('duplicate_global_category_exists', $case['preconditions'], true)) {
+        Category::factory()->create(['name' => 'Duplicate Global Category', 'user_id' => null]);
+    }
+
+    $isMissingCategory = in_array('missing_category_alias', $case['preconditions'], true);
+    $case = TestData::resolveAliases($case, [
+        'category' => ['id' => $isMissingCategory ? 999_999_999 : $category->id],
+    ]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $endpoint = $case['request']['endpoint'];
+    foreach ($case['request']['path'] as $name => $value) {
+        $endpoint = str_replace('{'.$name.'}', (string) $value, $endpoint);
+    }
+
+    $original = $category->only(['user_id', 'name', 'color', 'description', 'status']);
+    $response = $this->json(
+        $case['request']['method'],
+        $endpoint,
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($case['expected']['database_change']['operation'] === 'update') {
+        $updated = $category->fresh();
+
+        expect($updated->user_id)->toBeNull()
+            ->and($updated->expenseTransactions()->count())->toBe(0)
+            ->and($updated->budgets()->count())->toBe(0);
+    } else {
+        expect($category->fresh()->only(array_keys($original)))->toBe($original);
+    }
+})->with(TestData::load('admin/categories/update.json'));

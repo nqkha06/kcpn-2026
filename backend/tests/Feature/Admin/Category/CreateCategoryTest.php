@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Category;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -91,3 +93,36 @@ test('an admin can create a global category with the same name as a private cate
         'name' => 'Private Name',
     ]);
 });
+
+test('admin category create follows shared execution data', function (array $case) {
+    if (in_array('duplicate_global_category_exists', $case['preconditions'], true)) {
+        Category::factory()->create(['name' => 'Duplicate Global Category', 'user_id' => null]);
+    }
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $beforeCount = Category::query()->count();
+    $response = $this->json(
+        $case['request']['method'],
+        $case['request']['endpoint'],
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    $expectedDelta = $case['expected']['database_change']['operation'] === 'insert' ? 1 : 0;
+    expect(Category::query()->count())->toBe($beforeCount + $expectedDelta);
+
+    if ($expectedDelta === 1) {
+        $category = Category::query()->findOrFail($response->json('data.id'));
+
+        expect($category->user_id)->toBeNull()
+            ->and($category->expenseTransactions()->count())->toBe(0)
+            ->and($category->budgets()->count())->toBe(0);
+    }
+})->with(TestData::load('admin/categories/create.json'));

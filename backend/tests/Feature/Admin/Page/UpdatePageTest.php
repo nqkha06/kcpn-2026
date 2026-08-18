@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Page;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -89,3 +92,59 @@ test('updating a missing admin page returns not found', function () {
         ])
         ->assertNotFound();
 });
+
+test('admin page update follows shared execution data', function (array $case) {
+    $admin = adminUser();
+    $category = Category::factory()->create(['user_id' => null]);
+    $page = Page::query()->create([
+        'user_id' => $admin->id,
+        'category_id' => $category->id,
+        'title' => 'Managed Data Page',
+        'slug' => 'managed-data-page',
+        'status' => 'draft',
+    ]);
+    $existingPage = Page::query()->create([
+        'user_id' => $admin->id,
+        'title' => 'Existing Update Page',
+        'slug' => 'existing-page',
+        'status' => 'published',
+    ]);
+    $isMissingPage = in_array('missing_page_alias', $case['preconditions'], true);
+
+    $case = TestData::resolveAliases($case, [
+        'page' => ['id' => $isMissingPage ? 999_999_999 : $page->id],
+        'category' => ['id' => $category->id],
+        'existing_page' => ['slug' => $existingPage->slug],
+        'missing' => ['id' => 999_999_999],
+    ]);
+
+    if ($case['actor'] === 'admin') {
+        $this->actingAs($admin);
+    } elseif ($case['actor'] === 'user') {
+        $this->actingAs(regularUser());
+    }
+
+    $endpoint = $case['request']['endpoint'];
+    foreach ($case['request']['path'] as $name => $value) {
+        $endpoint = str_replace('{'.$name.'}', (string) $value, $endpoint);
+    }
+
+    $original = $page->only(['user_id', 'category_id', 'title', 'slug', 'image', 'tags', 'status']);
+    $response = $this->json(
+        $case['request']['method'],
+        $endpoint,
+        $case['request']['body'],
+        $case['request']['headers'],
+    );
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($case['expected']['database_change']['operation'] === 'update') {
+        $updated = $page->fresh()->load(['user', 'category']);
+
+        expect($updated->user->is($admin))->toBeTrue()
+            ->and($updated->category->is($category))->toBeTrue();
+    } else {
+        expect($page->fresh()->only(array_keys($original)))->toBe($original);
+    }
+})->with(TestData::load('admin/pages/update.json'));
