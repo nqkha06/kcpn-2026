@@ -1,0 +1,169 @@
+[
+  {
+    "case_id": "ADM-ROLE-DELETE-BUS-001",
+    "description": "ordinary role can be deleted",
+    "actor": "admin",
+    "preconditions": [
+      "role"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "message": "Role deleted successfully"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "delete",
+        "table": "roles",
+        "where": {
+          "id": "@role.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-DELETE-BUS-002",
+    "description": "admin system role is protected",
+    "actor": "admin",
+    "preconditions": [
+      "admin_role"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@admin_role.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-DELETE-BUS-003",
+    "description": "super-admin system role is protected",
+    "actor": "admin",
+    "preconditions": [
+      "super_admin_role"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@super_admin_role.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-DELETE-RBAC-004",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [
+      "role"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-DELETE-RBAC-005",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [
+      "role"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

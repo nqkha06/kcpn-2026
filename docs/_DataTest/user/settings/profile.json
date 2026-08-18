@@ -1,0 +1,612 @@
+[
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-001",
+    "description": "name length 1",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 1
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 1
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-002",
+    "description": "name length 2",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 2
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 2
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-003",
+    "description": "name length 128",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-004",
+    "description": "name length 254",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 254
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 254
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-005",
+    "description": "name length 255",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 255
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 255
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-RBVA-006",
+    "description": "name missing",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "name"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-RBVA-007",
+    "description": "name length 256",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 256
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "name"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-008",
+    "description": "email nominal valid",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.email": "shared-profile@example.test"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-009",
+    "description": "email length 254",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "@email_254.value"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.email": "@email_254.value"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BVA-010",
+    "description": "email length 255",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "@email_255.value"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.email": "@email_255.value"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-EP-011",
+    "description": "email missing",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        }
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "email"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-EP-012",
+    "description": "email invalid format",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "not-an-email"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "email"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-RBVA-013",
+    "description": "email length 256",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "@email_256.value"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "email"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BUS-014",
+    "description": "same email preserves verification",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "@user.email"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.email": "@user.email"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "users",
+        "where": {
+          "id": "@user.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-BUS-015",
+    "description": "existing email is rejected",
+    "actor": "user",
+    "preconditions": [
+      "existing_user"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "@existing_user.email"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "email"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PROFILE-UPDATE-RBAC-016",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/profile",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "email": "shared-profile@example.test"
+      }
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

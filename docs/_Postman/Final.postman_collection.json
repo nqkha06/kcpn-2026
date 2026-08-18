@@ -96,6 +96,10 @@
           "    }",
           "",
           "    const resolvedRow = resolveSharedValue(iterationRow);",
+          "    if (resolvedRow.blocked === true) {",
+          "        pm.execution.skipRequest();",
+          "    }",
+          "",
           "    const requestData = resolvedRow.request || {};",
           "",
           "    if (typeof requestData.endpoint !== 'string' || requestData.endpoint === '') {",
@@ -1116,135 +1120,92 @@
           "name": "Users",
           "item": [
             {
-              "name": "GET /admin/users",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_base_url}}/admin/users?per_page=15&page=1",
-                  "host": [
-                    "{{api_base_url}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "users"
-                  ],
-                  "query": [
-                    {
-                      "key": "search",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "email",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "role",
-                      "value": "user",
-                      "disabled": true,
-                      "description": "Tên role phải tồn tại với guard web."
-                    },
-                    {
-                      "key": "created_date",
-                      "value": "2026-07-28",
-                      "disabled": true,
-                      "description": "Định dạng Y-m-d"
-                    },
-                    {
-                      "key": "created_from",
-                      "value": "2026-07-01",
-                      "disabled": true
-                    },
-                    {
-                      "key": "created_to",
-                      "value": "2026-07-31",
-                      "disabled": true
-                    },
-                    {
-                      "key": "sort",
-                      "value": "created_at",
-                      "disabled": true,
-                      "description": "id, name, email hoặc created_at"
-                    },
-                    {
-                      "key": "direction",
-                      "value": "desc",
-                      "disabled": true
-                    },
-                    {
-                      "key": "per_page",
-                      "value": "15"
-                    },
-                    {
-                      "key": "page",
-                      "value": "1"
-                    }
-                  ]
-                }
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Users / Index",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('User list is paginated', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.data).to.be.an('array');",
-                      "    pm.expect(json.meta).to.have.property('total');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/users/index.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] GET shared execution row",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/users/index.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
-              "name": "POST /admin/users",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"name\": \"Postman API User\",\n    \"email\": \"postman.admin-user.{{$timestamp}}@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"roles\": []\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/users",
-                "description": "roles là array role ID tùy chọn; để giữ collection độc lập với dữ liệu seed, request mẫu dùng mảng rỗng."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Users / Create",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('User is created', function () {",
-                      "    pm.response.to.have.status(201);",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data).to.have.property('id');",
-                      "    pm.expect(data.roles).to.be.an('array');",
-                      "});",
-                      "",
-                      "if (pm.response.code === 201) {",
-                      "    const data = pm.response.json().data;",
-                      "    pm.collectionVariables.set('user_id', String(data.id));",
-                      "    pm.collectionVariables.set('created_user_email', data.email);",
-                      "}"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/users/create.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] POST shared execution row",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/users/create.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -1274,42 +1235,47 @@
               ]
             },
             {
-              "name": "PATCH /admin/users/{user}",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"name\": \"Postman API User Updated\",\n    \"email\": \"postman.admin-user.updated.{{$timestamp}}@example.com\",\n    \"roles\": []\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/users/{{user_id}}",
-                "description": "name và email là bắt buộc khi PATCH. password, password_confirmation và roles là tùy chọn; request mẫu vẫn để roles rỗng để không phụ thuộc seed data."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Users / Update",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('User is updated', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data.name).to.eql('Postman API User Updated');",
-                      "    pm.expect(data.email).to.include('postman.admin-user.updated.');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/users/update.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] PUT shared execution row",
+                  "request": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/users/update.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -1342,112 +1308,92 @@
           "name": "Categories",
           "item": [
             {
-              "name": "GET /admin/categories",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_base_url}}/admin/categories?per_page=15&page=1",
-                  "host": [
-                    "{{api_base_url}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "categories"
-                  ],
-                  "query": [
-                    {
-                      "key": "search",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "status",
-                      "value": "active",
-                      "disabled": true,
-                      "description": "active hoặc inactive"
-                    },
-                    {
-                      "key": "sort",
-                      "value": "created_at",
-                      "disabled": true,
-                      "description": "id, name, status hoặc created_at"
-                    },
-                    {
-                      "key": "direction",
-                      "value": "desc",
-                      "disabled": true
-                    },
-                    {
-                      "key": "per_page",
-                      "value": "15"
-                    },
-                    {
-                      "key": "page",
-                      "value": "1"
-                    }
-                  ]
-                }
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Categories / Index",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Category list is paginated', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.data).to.be.an('array');",
-                      "    pm.expect(json.meta).to.have.property('total');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/categories/index.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] GET shared execution row",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/categories/index.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
-              "name": "POST /admin/categories",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"name\": \"Postman Category {{$timestamp}}\",\n    \"color\": \"#10B981\",\n    \"description\": \"Category created from Postman collection\",\n    \"status\": \"active\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/categories",
-                "description": "color phải là mã hex 3 hoặc 6 ký tự; status chỉ nhận active hoặc inactive."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Categories / Create",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Category is created', function () {",
-                      "    pm.response.to.have.status(201);",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data.name).to.include('Postman Category ');",
-                      "    pm.expect(data.status).to.eql('active');",
-                      "});",
-                      "",
-                      "if (pm.response.code === 201) {",
-                      "    pm.collectionVariables.set('category_id', String(pm.response.json().data.id));",
-                      "}"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/categories/create.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] POST shared execution row",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/categories/create.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -1475,43 +1421,47 @@
               ]
             },
             {
-              "name": "PATCH /admin/categories/{category}",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"name\": \"Postman Category Updated {{$timestamp}}\",\n    \"color\": \"#3B82F6\",\n    \"description\": \"Updated from Postman collection\",\n    \"status\": \"inactive\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/categories/{{category_id}}",
-                "description": "CategoryRequest yêu cầu name, color và status cả khi dùng PATCH."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Categories / Update",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Category is updated', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data.name).to.include('Postman Category Updated ');",
-                      "    pm.expect(data.color).to.eql('#3B82F6');",
-                      "    pm.expect(data.status).to.eql('inactive');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/categories/update.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] PUT shared execution row",
+                  "request": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/categories/update.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -1544,115 +1494,92 @@
           "name": "Pages",
           "item": [
             {
-              "name": "GET /admin/pages",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_base_url}}/admin/pages?per_page=15&page=1",
-                  "host": [
-                    "{{api_base_url}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "pages"
-                  ],
-                  "query": [
-                    {
-                      "key": "search",
-                      "value": "",
-                      "disabled": true
-                    },
-                    {
-                      "key": "status",
-                      "value": "published",
-                      "disabled": true,
-                      "description": "published, draft hoặc pending"
-                    },
-                    {
-                      "key": "sort",
-                      "value": "created_at",
-                      "disabled": true,
-                      "description": "id, title, slug, status hoặc created_at"
-                    },
-                    {
-                      "key": "direction",
-                      "value": "desc",
-                      "disabled": true
-                    },
-                    {
-                      "key": "per_page",
-                      "value": "15"
-                    },
-                    {
-                      "key": "page",
-                      "value": "1"
-                    }
-                  ]
-                }
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Pages / Index",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Page list is paginated', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json.data).to.be.an('array');",
-                      "    pm.expect(json.meta).to.have.property('total');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/pages/index.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] GET shared execution row",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/pages/index.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
             {
-              "name": "POST /admin/pages",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"title\": \"Postman API Page {{$timestamp}}\",\n    \"image\": null,\n    \"category_id\": null,\n    \"tags\": \"postman, api, postman\",\n    \"content\": \"<p>Page created from Postman collection</p>\",\n    \"meta_title\": \"Postman API Page {{$timestamp}}\",\n    \"meta_description\": \"Page used for API testing\",\n    \"meta_keywords\": \"postman,api,test\",\n    \"status\": \"published\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/pages",
-                "description": "status hỗ trợ published, draft, pending. tags nhận chuỗi phân tách bằng dấu phẩy hoặc array; service tự loại tag trùng."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Pages / Create",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Page is created', function () {",
-                      "    pm.response.to.have.status(201);",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data.status).to.eql('published');",
-                      "    pm.expect(data.tags).to.eql(['postman', 'api']);",
-                      "    pm.expect(data.slug).to.include('postman-api-page-');",
-                      "});",
-                      "",
-                      "if (pm.response.code === 201) {",
-                      "    const data = pm.response.json().data;",
-                      "    pm.collectionVariables.set('page_id', String(data.id));",
-                      "    pm.collectionVariables.set('page_slug', data.slug);",
-                      "}"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/pages/create.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] POST shared execution row",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/pages/create.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -1682,43 +1609,47 @@
               ]
             },
             {
-              "name": "PATCH /admin/pages/{page}",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"title\": \"Postman API Page Updated\",\n    \"slug\": \"postman-api-page-updated-{{$timestamp}}\",\n    \"image\": null,\n    \"category_id\": null,\n    \"tags\": [\"postman\", \"updated\"],\n    \"content\": \"<p>Updated from Postman collection</p>\",\n    \"meta_title\": \"Postman API Page Updated\",\n    \"meta_description\": \"Updated page used for API testing\",\n    \"meta_keywords\": \"postman,api,updated\",\n    \"status\": \"draft\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": "{{api_base_url}}/admin/pages/{{page_id}}",
-                "description": "PageRequest yêu cầu title và status cả khi dùng PATCH; các field còn lại có thể nullable."
-              },
-              "response": [],
-              "event": [
+              "name": "Data / Admin Pages / Update",
+              "variable": [
                 {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Page is updated', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "    const data = pm.response.json().data;",
-                      "    pm.expect(data.title).to.eql('Postman API Page Updated');",
-                      "    pm.expect(data.slug).to.include('postman-api-page-updated-');",
-                      "    pm.expect(data.status).to.eql('draft');",
-                      "});"
-                    ]
-                  }
+                  "key": "data_driven",
+                  "value": "true"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/pages/update.json"
+                }
+              ],
+              "item": [
+                {
+                  "name": "[{{case_id}}] PUT shared execution row",
+                  "request": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Data-driven operation. Run with docs/_DataTest/admin/pages/update.json."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             },
@@ -2005,6 +1936,184 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "Data / Admin Menus / Create",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/menus/create.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "POST /admin/menus [shared data]",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "canonical phải có dạng home.header, home.footer hoặc user.header. target chỉ nhận _self hoặc _blank."
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Admin Menus / Index",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/menus/index.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "GET /admin/menus [shared data]",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Admin Menus / Update",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/menus/update.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "PATCH /admin/menus/{menu} [shared data]",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "MenuRequest yêu cầu title, canonical, target và status cả khi dùng PATCH."
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Admin Menus / Parent Options",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/menus/parent-options.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "GET /admin/menus/parent-options [shared data]",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
             }
           ]
         },
@@ -2262,6 +2371,142 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "Data / Admin Budgets / Create",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/budgets/create.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "POST /admin/budgets [shared data]",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "user_id và category_id phải tồn tại; category phải là global hoặc thuộc user. Bộ ba user_id + category_id + period phải là duy nhất."
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Admin Budgets / Index",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/budgets/index.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "GET /admin/budgets [shared data]",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Admin Budgets / Update",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/budgets/update.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "PATCH /admin/budgets/{budget} [shared data]",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "BudgetRequest yêu cầu gửi đầy đủ user_id, category_id, amount_limit, period và status cả khi dùng PATCH."
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
             }
           ]
         },
@@ -2472,6 +2717,140 @@
                       "});"
                     ]
                   }
+                }
+              ]
+            },
+            {
+              "name": "Data / Permissions / Create",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/permissions/create.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "POST /admin/permissions [shared data]",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}"
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Permissions / Index",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/permissions/index.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "GET /admin/permissions [shared data]",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Permissions / Update",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/permissions/update.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "PATCH /admin/permissions/{permission} [shared data]",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}"
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }
@@ -2700,6 +3079,186 @@
                       "});"
                     ]
                   }
+                }
+              ]
+            },
+            {
+              "name": "Data / Roles / Create",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/roles/create.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "POST /admin/roles [shared data]",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Tạo role guard web. name bắt buộc, duy nhất, tối đa 255 ký tự. permissions là mảng ID permission guard web, không trùng nhau."
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Roles / Index",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/roles/index.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "GET /admin/roles [shared data]",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Danh sách role phân trang. sort hợp lệ: id, name, created_at; direction: asc|desc; per_page: 1-100.",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Roles / Update",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/roles/update.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "PATCH /admin/roles/{role} [shared data]",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Cập nhật role theo role_id. Dù dùng PATCH, request hiện tại vẫn yêu cầu name; permissions nếu gửi sẽ đồng bộ toàn bộ permission của role."
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / Roles / Delete",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "admin/roles/delete.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "DELETE /admin/roles/{role} [shared data]",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Xóa role vừa tạo. Policy từ chối xóa các system role admin và user.",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }
@@ -3138,6 +3697,100 @@
                       "});"
                     ]
                   }
+                }
+              ]
+            },
+            {
+              "name": "Data / User Settings / Profile",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/settings/profile.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "PATCH /user/settings/profile [shared data]",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Cập nhật name và email của user hiện tại."
+                  },
+                  "response": [],
+                  "event": []
+                }
+              ]
+            },
+            {
+              "name": "Data / User Settings / Preferences",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/settings/preferences.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "PATCH /user/settings/preferences [shared data]",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Cập nhật currency bằng mã tiền tệ 3 ký tự."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }
@@ -3582,6 +4235,53 @@
                       "});"
                     ]
                   }
+                }
+              ]
+            },
+            {
+              "name": "Data / User Budgets / Create",
+              "variable": [
+                {
+                  "key": "data_driven",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "test_data_file",
+                  "value": "user/budgets/create.json",
+                  "type": "string"
+                }
+              ],
+              "item": [
+                {
+                  "name": "POST /user/budgets [shared data]",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Data-Driven",
+                        "value": "true",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{{case_body}}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": "{{base_url}}{{case_endpoint}}",
+                    "description": "Tạo yearly budget cho category active thuộc phạm vi user."
+                  },
+                  "response": [],
+                  "event": []
                 }
               ]
             }

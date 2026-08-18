@@ -1,0 +1,565 @@
+[
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-001",
+    "description": "search length 0",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": ""
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-002",
+    "description": "search length 1",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 1
+        }
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-003",
+    "description": "search length 128",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        }
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-004",
+    "description": "search length 254",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 254
+        }
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-005",
+    "description": "search length 255",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 255
+        }
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-RBVA-006",
+    "description": "search length 256",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 256
+        }
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "search"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-007",
+    "description": "per_page 1",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 1
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 1
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-008",
+    "description": "per_page 2",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 2
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 2
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-009",
+    "description": "per_page 50",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 50
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 50
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-010",
+    "description": "per_page 99",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 99
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 99
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-BVA-011",
+    "description": "per_page 100",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 100
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.per_page": 100
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-RBVA-012",
+    "description": "per_page 0",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 0
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "per_page"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-RBVA-013",
+    "description": "per_page 101",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "per_page": 101
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "per_page"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-EP-014",
+    "description": "search matches one record",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "search": "shared-match"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "meta.total": 1
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-EP-015",
+    "description": "invalid sort is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "role_list"
+    ],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {
+        "sort": "guard_name"
+      },
+      "body": {}
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "sort"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-RBAC-016",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-INDEX-RBAC-017",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "GET",
+      "endpoint": "/api/v1/admin/roles",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

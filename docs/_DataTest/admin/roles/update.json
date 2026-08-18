@@ -1,0 +1,648 @@
+[
+  {
+    "case_id": "ADM-ROLE-UPDATE-BVA-001",
+    "description": "name length 1",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 1
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 1
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "roles",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-BVA-002",
+    "description": "name length 2",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 2
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 2
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "roles",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-BVA-003",
+    "description": "name length 128",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "roles",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-BVA-004",
+    "description": "name length 254",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 254
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 254
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "roles",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-BVA-005",
+    "description": "name length 255",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 255
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 255
+        }
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "roles",
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-RBVA-006",
+    "description": "name missing",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "name"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-RBVA-007",
+    "description": "name length 256",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 256
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "name"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-BUS-008",
+    "description": "permission pivot is replaced",
+    "actor": "admin",
+    "preconditions": [
+      "role",
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": "updated-shared-role",
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.permissions.0.id": "@permission.id"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "roles",
+        "where": {
+          "id": "@role.id",
+          "name": "updated-shared-role"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-EP-009",
+    "description": "duplicate name is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "role",
+      "duplicate_role",
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": "shared-duplicate-role",
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "name"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-EP-010",
+    "description": "missing permission id is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "role"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "permissions": [
+          "@missing.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "permissions.0"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-EP-011",
+    "description": "duplicate permission ids are rejected",
+    "actor": "admin",
+    "preconditions": [
+      "role",
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "permissions": [
+          "@permission.id",
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "permissions.1"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-EP-012",
+    "description": "wrong guard permission is rejected",
+    "actor": "admin",
+    "preconditions": [
+      "role",
+      "wrong_guard_permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "permissions": [
+          "@wrong_guard_permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "permissions.0"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-EP-013",
+    "description": "missing role returns not found",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@missing.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 404,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-RBAC-014",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [
+      "role",
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-ROLE-UPDATE-RBAC-015",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [
+      "role",
+      "permission"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/admin/roles/{role}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "role": "@role.id"
+      },
+      "query": {},
+      "body": {
+        "name": {
+          "generator": "repeat",
+          "character": "a",
+          "length": 128
+        },
+        "permissions": [
+          "@permission.id"
+        ]
+      }
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

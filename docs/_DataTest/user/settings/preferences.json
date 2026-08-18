@@ -1,0 +1,329 @@
+[
+  {
+    "case_id": "USR-SET-PREF-UPDATE-EP-001",
+    "description": "VND currency is accepted",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "VND"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.preferences.currency": "VND"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "user_meta",
+        "where": {
+          "user_id": "@user.id",
+          "currency": "VND"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-EP-002",
+    "description": "USD currency is accepted",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "USD"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.preferences.currency": "USD"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "user_meta",
+        "where": {
+          "user_id": "@user.id",
+          "currency": "USD"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-EP-003",
+    "description": "EUR currency is accepted",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "EUR"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.preferences.currency": "EUR"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "user_meta",
+        "where": {
+          "user_id": "@user.id",
+          "currency": "EUR"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-EP-004",
+    "description": "GBP currency is accepted",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "GBP"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.preferences.currency": "GBP"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "user_meta",
+        "where": {
+          "user_id": "@user.id",
+          "currency": "GBP"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-RBVA-005",
+    "description": "currency length 2 is rejected",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "US"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "currency"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-RBVA-006",
+    "description": "currency length 4 is rejected",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "USDD"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "currency"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-EP-007",
+    "description": "currency outside enum is rejected",
+    "actor": "user",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "JPY"
+      }
+    },
+    "expected": {
+      "status": 422,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [
+        "currency"
+      ],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-BUS-008",
+    "description": "repeated update for same user is idempotent",
+    "actor": "user",
+    "preconditions": [
+      "currency_already_usd"
+    ],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "USD"
+      }
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "data.preferences.currency": "USD"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "update",
+        "table": "user_meta",
+        "where": {
+          "user_id": "@user.id",
+          "currency": "USD"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-RBAC-009",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "VND"
+      }
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "USR-SET-PREF-UPDATE-RBAC-010",
+    "description": "admin role is forbidden by user route",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "PATCH",
+      "endpoint": "/api/v1/user/settings/preferences",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {},
+      "query": {},
+      "body": {
+        "currency": "VND"
+      }
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]
