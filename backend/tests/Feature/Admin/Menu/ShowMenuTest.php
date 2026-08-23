@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Menu;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -25,8 +23,7 @@ test('guests cannot view a menu', function () {
 });
 
 test('non admin users cannot view a menu', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $menu = Menu::factory()->create();
 
     actingAs($user, 'web')
@@ -36,8 +33,7 @@ test('non admin users cannot view a menu', function () {
 });
 
 test('admin can view a single menu', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $menu = Menu::factory()->create([
         'title' => 'Contact',
@@ -55,8 +51,7 @@ test('admin can view a single menu', function () {
 });
 
 test('admin viewing a menu with a parent receives parent details', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $parent = Menu::factory()->header()->create(['title' => 'Main Menu']);
     $child = Menu::factory()->header()->create([
@@ -72,8 +67,7 @@ test('admin viewing a menu with a parent receives parent details', function () {
 });
 
 test('viewing a non existent menu returns not found', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/999999')

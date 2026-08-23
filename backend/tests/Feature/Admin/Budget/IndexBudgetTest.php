@@ -4,7 +4,6 @@ use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -25,8 +24,7 @@ test('guests cannot list budgets', function () {
 });
 
 test('non admin users cannot list budgets', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
 
     actingAs($user, 'web')
         ->getJson('/api/v1/admin/budgets')
@@ -35,8 +33,7 @@ test('non admin users cannot list budgets', function () {
 });
 
 test('admin can list budgets with default pagination', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     Budget::factory()->count(3)->create();
 
@@ -55,8 +52,7 @@ test('admin can list budgets with default pagination', function () {
 });
 
 test('admin can search budgets by user name email category name note or id', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create(['name' => 'Budget Customer']);
     $category = Category::factory()->create(['name' => 'Food Budget']);
@@ -81,8 +77,7 @@ test('admin can search budgets by id', function () {
 })->todo('AdminBudgetService calls the undefined Eloquent Builder method orWhereKey');
 
 test('admin can filter budgets by period status user and category', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -97,8 +92,7 @@ test('admin can filter budgets by period status user and category', function () 
 });
 
 test('admin budget index computes spent amount for the current period', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -145,8 +139,7 @@ test('budget spent only includes posted expenses in its current period', functio
 });
 
 test('admin can sort and paginate budgets', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     Budget::factory()->create(['amount_limit' => 500]);
     Budget::factory()->create(['amount_limit' => 100]);
@@ -162,8 +155,7 @@ test('admin can sort and paginate budgets', function () {
 });
 
 test('budget index query parameters are validated', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets?period=weekly&status=archived&user_id=999999&category_id=999999&sort=invalid&direction=up&per_page=200')

@@ -2,9 +2,7 @@
 
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
-use App\Models\User;
 use App\Models\UserWallet;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -25,8 +23,7 @@ test('guests cannot view the dashboard', function () {
 });
 
 test('dashboard exposes the expected top level structure', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
 
     actingAs($user, 'web')
         ->getJson('/api/v1/user/dashboard')
@@ -39,10 +36,8 @@ test('dashboard exposes the expected top level structure', function () {
 });
 
 test('dashboard returns only the authenticated users finance data', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
-    $otherUser = User::factory()->create();
-    $otherUser->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
+    $otherUser = regularUser();
 
     $wallet = UserWallet::factory()->for($user)->defaultWallet()->create([
         'opening_balance' => 1000,
@@ -68,8 +63,7 @@ test('dashboard returns only the authenticated users finance data', function () 
 });
 
 test('dashboard only exposes active categories', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
 
     $active = Category::factory()->create(['name' => 'Active']);
     Category::factory()->inactive()->create(['name' => 'Inactive']);
@@ -122,8 +116,7 @@ test('dashboard returns empty finance collections for a new user', function () {
 });
 
 test('admin can also view their own dashboard', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $wallet = UserWallet::factory()->for($admin)->defaultWallet()->create();
 
@@ -134,9 +127,44 @@ test('admin can also view their own dashboard', function () {
         ->assertJsonPath('data.wallets.0.id', $wallet->id);
 });
 
+test('dashboard transaction list still includes pending transactions even though wallet balance ignores them', function () {
+    // Decision table note: wallet.current_balance only sums posted transactions, but
+    // UserTransactionService::allForDashboard() has no status filter at all, so a
+    // pending transaction is excluded from the balance calculation yet still shows up
+    // in data.transactions. This documents the current, intentional-looking behaviour
+    // so a UI relying on "transactions == balance history" is aware of the mismatch.
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create(['opening_balance' => 1000]);
+    $pending = ExpenseTransaction::factory()->forUser($user)->expense()->pending()->create([
+        'wallet_id' => $wallet->id,
+        'amount' => 900,
+    ]);
+
+    actingAs($user, 'web')
+        ->getJson('/api/v1/user/dashboard')
+        ->assertOk()
+        ->assertJsonPath('data.wallets.0.current_balance', 1000)
+        ->assertJsonCount(1, 'data.transactions')
+        ->assertJsonPath('data.transactions.0.id', $pending->id);
+});
+
+test('dashboard transactions expose the related wallet and category', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create(['name' => 'Cash']);
+    $category = Category::factory()->create(['name' => 'Groceries']);
+
+    ExpenseTransaction::factory()->forUser($user)->for($category)
+        ->expense()->posted()->create(['wallet_id' => $wallet->id]);
+
+    actingAs($user, 'web')
+        ->getJson('/api/v1/user/dashboard')
+        ->assertOk()
+        ->assertJsonPath('data.transactions.0.wallet.name', 'Cash')
+        ->assertJsonPath('data.transactions.0.category.name', 'Groceries');
+});
+
 test('dashboard transactions are ordered by most recent transacted date', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $wallet = UserWallet::factory()->for($user)->create();
     $category = Category::factory()->create();
 

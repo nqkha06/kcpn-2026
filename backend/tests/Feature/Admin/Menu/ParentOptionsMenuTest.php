@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Menu;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -23,8 +21,7 @@ test('guests cannot fetch parent menu options', function () {
 });
 
 test('non admin users cannot fetch parent menu options', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
 
     actingAs($user, 'web')
         ->getJson('/api/v1/admin/menus/parent-options')
@@ -33,8 +30,7 @@ test('non admin users cannot fetch parent menu options', function () {
 });
 
 test('parent options only include root level menus ordered by title', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $root1 = Menu::factory()->create(['title' => 'Zebra', 'parent_id' => null]);
     $root2 = Menu::factory()->create(['title' => 'Alpha', 'parent_id' => null]);
@@ -52,8 +48,7 @@ test('parent options only include root level menus ordered by title', function (
 });
 
 test('parent options exclude the given menu id', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $menu = Menu::factory()->create(['parent_id' => null]);
     $other = Menu::factory()->create(['parent_id' => null]);
@@ -69,11 +64,40 @@ test('parent options exclude the given menu id', function () {
 });
 
 test('parent options exclude filter validates the menu exists', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus/parent-options?exclude=999999')
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['exclude']);
+});
+
+test('parent options include inactive root menus, not just active ones', function () {
+    // Decision table note: AdminMenuService::parentOptions() has no status filter, so a
+    // disabled root menu can still be picked as a parent for a new child. This is
+    // recorded as documented behaviour, not a defect -- flag for product owner
+    // confirmation if inactive sections should be un-selectable as parents.
+    $admin = adminUser();
+
+    $inactiveRoot = Menu::factory()->inactive()->create(['title' => 'Disabled Section', 'parent_id' => null]);
+
+    $response = actingAs($admin, 'web')
+        ->getJson('/api/v1/admin/menus/parent-options')
+        ->assertOk();
+
+    expect(collect($response->json('data'))->pluck('id')->all())->toContain($inactiveRoot->id);
+});
+
+test('parent options only ever return root menus even when every menu is nested', function () {
+    $admin = adminUser();
+
+    Menu::factory()->count(3)->create(['parent_id' => null])->each(
+        fn (Menu $root) => Menu::factory()->create(['parent_id' => $root->id])
+    );
+
+    $response = actingAs($admin, 'web')
+        ->getJson('/api/v1/admin/menus/parent-options')
+        ->assertOk();
+
+    expect($response->json('data'))->toHaveCount(3);
 });

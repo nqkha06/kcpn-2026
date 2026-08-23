@@ -3,10 +3,8 @@
 use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
-use App\Models\User;
 use App\Models\UserWallet;
 use Illuminate\Support\Carbon;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -33,10 +31,8 @@ test('guests cannot list budgets', function () {
 });
 
 test('user can list only their own active budgets', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
-    $otherUser = User::factory()->create();
-    $otherUser->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
+    $otherUser = regularUser();
 
     $category = Category::factory()->create();
     $inactiveCategory = Category::factory()->create();
@@ -52,8 +48,7 @@ test('user can list only their own active budgets', function () {
 });
 
 test('admin can also list their own active budgets', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $category = Category::factory()->create();
     $budget = Budget::factory()->for($admin)->for($category)->active()->create();
@@ -66,10 +61,8 @@ test('admin can also list their own active budgets', function () {
 });
 
 test('budget list calculates posted spending for the current period and user', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
-    $otherUser = User::factory()->create();
-    $otherUser->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
+    $otherUser = regularUser();
 
     $wallet = UserWallet::factory()->for($user)->create();
     $otherWallet = UserWallet::factory()->for($otherUser)->create();
@@ -114,8 +107,7 @@ test('budget list calculates posted spending for the current period and user', f
 });
 
 test('yearly budgets are calculated against the full year window', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $wallet = UserWallet::factory()->for($user)->create();
     $category = Category::factory()->create();
     $budget = Budget::factory()->for($user)->for($category)->active()->create([
@@ -144,8 +136,7 @@ test('yearly budgets are calculated against the full year window', function () {
 });
 
 test('budgets ordered by period then newest id', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $category1 = Category::factory()->create();
     $category2 = Category::factory()->create();
 

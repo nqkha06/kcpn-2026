@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Budget;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -29,8 +27,7 @@ test('guests cannot delete a budget', function () {
 });
 
 test('non admin users cannot delete a budget', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $budget = Budget::factory()->create();
 
     actingAs($user, 'web')
@@ -42,8 +39,7 @@ test('non admin users cannot delete a budget', function () {
 });
 
 test('admin can delete a budget', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $budget = Budget::factory()->create();
 
@@ -56,8 +52,7 @@ test('admin can delete a budget', function () {
 });
 
 test('deleting a non existent budget returns not found', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->deleteJson('/api/v1/admin/budgets/999999')

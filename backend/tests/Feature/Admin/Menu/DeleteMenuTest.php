@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Menu;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -29,8 +27,7 @@ test('guests cannot delete a menu', function () {
 });
 
 test('non admin users cannot delete a menu', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $menu = Menu::factory()->create();
 
     actingAs($user, 'web')
@@ -42,8 +39,7 @@ test('non admin users cannot delete a menu', function () {
 });
 
 test('admin can delete a menu item', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $menu = Menu::factory()->create();
 
@@ -56,8 +52,7 @@ test('admin can delete a menu item', function () {
 });
 
 test('deleting a non existent menu returns not found', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->deleteJson('/api/v1/admin/menus/999999')
@@ -65,8 +60,7 @@ test('deleting a non existent menu returns not found', function () {
 });
 
 test('deleting a parent menu nulls out children parent_id', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $parent = Menu::factory()->create();
     $child = Menu::factory()->create(['parent_id' => $parent->id]);

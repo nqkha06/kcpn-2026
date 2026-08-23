@@ -2,7 +2,6 @@
 
 use App\Models\Category;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -23,8 +22,7 @@ test('guests cannot fetch budget options', function () {
 });
 
 test('non admin users cannot fetch budget options', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
 
     actingAs($user, 'web')
         ->getJson('/api/v1/admin/budgets/options')
@@ -33,8 +31,7 @@ test('non admin users cannot fetch budget options', function () {
 });
 
 test('admin can fetch budget options with users and active categories', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create(['name' => 'Budget Customer', 'email' => 'customer@example.com']);
     $activeCategory = Category::factory()->create(['name' => 'Active Category', 'status' => 'active']);

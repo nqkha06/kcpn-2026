@@ -4,7 +4,6 @@ use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -35,8 +34,7 @@ test('guests cannot create a budget', function () {
 });
 
 test('non admin users cannot create a budget', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $customer = User::factory()->create();
     $category = Category::factory()->create();
 
@@ -53,8 +51,7 @@ test('non admin users cannot create a budget', function () {
 });
 
 test('admin can create a budget and it is persisted with spent amount', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create(['name' => 'Budget Customer']);
     $category = Category::factory()->create(['name' => 'Food Budget']);
@@ -96,8 +93,7 @@ test('admin can create a budget and it is persisted with spent amount', function
 });
 
 test('empty note is stored as null', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -121,8 +117,7 @@ test('empty note is stored as null', function () {
 });
 
 test('budget creation requires user_id category_id amount_limit period and status', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [])
@@ -131,8 +126,7 @@ test('budget creation requires user_id category_id amount_limit period and statu
 });
 
 test('budget creation validates user_id and category_id exist', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->postJson('/api/v1/admin/budgets', [
@@ -147,8 +141,7 @@ test('budget creation validates user_id and category_id exist', function () {
 });
 
 test('budget creation validates amount_limit range', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -166,8 +159,7 @@ test('budget creation validates amount_limit range', function () {
 });
 
 test('budget creation validates period and status enums', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -185,8 +177,7 @@ test('budget creation validates period and status enums', function () {
 });
 
 test('budget creation prevents duplicate user category and period combination', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -205,8 +196,7 @@ test('budget creation prevents duplicate user category and period combination', 
 });
 
 test('budget creation validates category belongs to selected user or is shared', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $otherUser = User::factory()->create();
@@ -222,4 +212,100 @@ test('budget creation validates category belongs to selected user or is shared',
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['category_id']);
+});
+
+// --- Boundary Value Analysis: amount_limit (rule: numeric, between:0.01,9999999999.99) ---
+dataset('amount_limit boundaries', [
+    'below min (0.00)' => [0.00, false],
+    'just below min (0.009)' => [0.009, false],
+    'min boundary (0.01)' => [0.01, true],
+    'just above min (0.02)' => [0.02, true],
+    'typical mid value (999999.99)' => [999999.99, true],
+    'just below max (9999999999.98)' => [9999999999.98, true],
+    'max boundary (9999999999.99)' => [9999999999.99, true],
+    'just above max (10000000000.00)' => [10000000000.00, false],
+    'negative value (-1)' => [-1, false],
+]);
+
+test('budget creation enforces amount_limit boundaries', function (float $amount, bool $shouldPass) {
+    $admin = adminUser();
+    $customer = User::factory()->create();
+    $category = Category::factory()->create();
+
+    $response = actingAs($admin, 'web')
+        ->postJson('/api/v1/admin/budgets', [
+            'user_id' => $customer->id,
+            'category_id' => $category->id,
+            'amount_limit' => $amount,
+            'period' => 'monthly',
+            'status' => 'active',
+        ]);
+
+    $shouldPass
+        ? $response->assertCreated()
+        : $response->assertUnprocessable()->assertJsonValidationErrors(['amount_limit']);
+})->with('amount_limit boundaries');
+
+test('budget creation rejects a non numeric amount_limit', function () {
+    $admin = adminUser();
+    $customer = User::factory()->create();
+    $category = Category::factory()->create();
+
+    actingAs($admin, 'web')
+        ->postJson('/api/v1/admin/budgets', [
+            'user_id' => $customer->id,
+            'category_id' => $category->id,
+            'amount_limit' => 'not-a-number',
+            'period' => 'monthly',
+            'status' => 'active',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['amount_limit']);
+});
+
+// --- Boundary Value Analysis: period (rule: in:monthly,yearly) ---
+dataset('period equivalence classes', [
+    'valid monthly' => ['monthly', true],
+    'valid yearly' => ['yearly', true],
+    'wrong case (Monthly)' => ['Monthly', false],
+    'unsupported enum value (weekly)' => ['weekly', false],
+    // Laravel's global TrimStrings middleware trims the payload before validation
+    // runs, so ' monthly ' becomes 'monthly' and is accepted.
+    'padded with whitespace ( monthly )' => [' monthly ', true],
+    'empty string' => ['', false],
+]);
+
+test('budget creation enforces the period enum strictly', function (string $period, bool $shouldPass) {
+    $admin = adminUser();
+    $customer = User::factory()->create();
+    $category = Category::factory()->create();
+
+    $response = actingAs($admin, 'web')
+        ->postJson('/api/v1/admin/budgets', [
+            'user_id' => $customer->id,
+            'category_id' => $category->id,
+            'amount_limit' => 500,
+            'period' => $period,
+            'status' => 'active',
+        ]);
+
+    $shouldPass
+        ? $response->assertCreated()
+        : $response->assertUnprocessable()->assertJsonValidationErrors(['period']);
+})->with('period equivalence classes');
+
+test('budget creation rejects a missing period value entirely', function () {
+    $admin = adminUser();
+    $customer = User::factory()->create();
+    $category = Category::factory()->create();
+
+    actingAs($admin, 'web')
+        ->postJson('/api/v1/admin/budgets', [
+            'user_id' => $customer->id,
+            'category_id' => $category->id,
+            'amount_limit' => 500,
+            'status' => 'active',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['period']);
 });

@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Menu;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -31,8 +29,7 @@ test('guests cannot update a menu', function () {
 });
 
 test('non admin users cannot update a menu', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $menu = Menu::factory()->create();
 
     actingAs($user, 'web')
@@ -47,8 +44,7 @@ test('non admin users cannot update a menu', function () {
 });
 
 test('admin can update a menu item', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $menu = Menu::factory()->create();
 
@@ -83,8 +79,7 @@ test('admin can update a menu item', function () {
 });
 
 test('updating a menu to be its own parent is rejected', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $menu = Menu::factory()->create();
 
@@ -106,8 +101,7 @@ test('updating a menu to be its own parent is rejected', function () {
 });
 
 test('admin updating a menu with a new parent inherits the parent canonical', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $parent = Menu::factory()->footer()->create();
     $menu = Menu::factory()->header()->create();
@@ -132,8 +126,7 @@ test('admin updating a menu with a new parent inherits the parent canonical', fu
 });
 
 test('menu update validates required fields', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $menu = Menu::factory()->create();
 
@@ -146,6 +139,56 @@ test('menu update validates required fields', function () {
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['title', 'canonical', 'target', 'status']);
+});
+
+test('detaching a child menu from its parent makes it a root menu with its own canonical', function () {
+    $parent = Menu::factory()->footer()->create();
+    $child = Menu::factory()->footer()->create(['parent_id' => $parent->id]);
+
+    actingAs(adminUser())
+        ->patchJson('/api/v1/admin/menus/'.$child->id, [
+            'title' => $child->title,
+            'canonical' => 'user.header',
+            'parent_id' => null,
+            'target' => '_self',
+            'status' => 'active',
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.parent_id', null)
+        ->assertJsonPath('data.parent', null)
+        ->assertJsonPath('data.canonical', 'user.header');
+
+    assertDatabaseHas('menus', [
+        'id' => $child->id,
+        'parent_id' => null,
+        'canonical' => 'user.header',
+    ]);
+});
+
+test('a menu status can be toggled from active to inactive and back', function () {
+    $admin = adminUser();
+    $menu = Menu::factory()->create(['status' => 'active']);
+
+    $payload = fn (string $status) => [
+        'title' => $menu->title,
+        'canonical' => $menu->canonical,
+        'target' => '_self',
+        'status' => $status,
+    ];
+
+    actingAs($admin, 'web')
+        ->patchJson('/api/v1/admin/menus/'.$menu->id, $payload('inactive'))
+        ->assertOk()
+        ->assertJsonPath('data.status', 'inactive');
+
+    assertDatabaseHas('menus', ['id' => $menu->id, 'status' => 'inactive']);
+
+    actingAs($admin, 'web')
+        ->patchJson('/api/v1/admin/menus/'.$menu->id, $payload('active'))
+        ->assertOk()
+        ->assertJsonPath('data.status', 'active');
+
+    assertDatabaseHas('menus', ['id' => $menu->id, 'status' => 'active']);
 });
 
 test('updating a menu cannot create an indirect parent cycle', function () {

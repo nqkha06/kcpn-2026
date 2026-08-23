@@ -4,7 +4,6 @@ use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -27,8 +26,7 @@ test('guests cannot view a budget', function () {
 });
 
 test('non admin users cannot view a budget', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $budget = Budget::factory()->create();
 
     actingAs($user, 'web')
@@ -38,8 +36,7 @@ test('non admin users cannot view a budget', function () {
 });
 
 test('admin can view a single budget with user and category details', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create(['name' => 'Budget Owner']);
     $category = Category::factory()->create(['name' => 'Groceries']);
@@ -61,8 +58,7 @@ test('admin can view a single budget with user and category details', function (
 });
 
 test('admin viewing a budget receives the computed spent amount', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -81,8 +77,7 @@ test('admin viewing a budget receives the computed spent amount', function () {
 });
 
 test('viewing a non existent budget returns not found', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->getJson('/api/v1/admin/budgets/999999')

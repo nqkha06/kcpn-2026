@@ -3,7 +3,6 @@
 use App\Models\Budget;
 use App\Models\Category;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -33,8 +32,7 @@ test('guests cannot update a budget', function () {
 });
 
 test('non admin users cannot update a budget', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
     $budget = Budget::factory()->create();
 
     actingAs($user, 'web')
@@ -50,8 +48,7 @@ test('non admin users cannot update a budget', function () {
 });
 
 test('admin can update a budget', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -87,8 +84,7 @@ test('admin can update a budget', function () {
 });
 
 test('updating a budget to duplicate an existing user category period combination fails', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -109,8 +105,7 @@ test('updating a budget to duplicate an existing user category period combinatio
 });
 
 test('a budget can keep its own combination when updated', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -131,8 +126,7 @@ test('a budget can keep its own combination when updated', function () {
 });
 
 test('budget update validates required fields', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $budget = Budget::factory()->create();
 
@@ -143,8 +137,7 @@ test('budget update validates required fields', function () {
 });
 
 test('updating a non existent budget returns not found', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $customer = User::factory()->create();
     $category = Category::factory()->create();
@@ -159,3 +152,100 @@ test('updating a non existent budget returns not found', function () {
         ])
         ->assertNotFound();
 });
+
+test('reassigning a budget to another user who already has that category and period fails', function () {
+    $admin = adminUser();
+
+    $ownerA = User::factory()->create();
+    $ownerB = User::factory()->create();
+    $category = Category::factory()->create();
+
+    $budget = Budget::factory()->for($ownerA)->for($category)->monthly()->create();
+    Budget::factory()->for($ownerB)->for($category)->monthly()->create();
+
+    actingAs($admin, 'web')
+        ->patchJson('/api/v1/admin/budgets/'.$budget->id, [
+            'user_id' => $ownerB->id,
+            'category_id' => $category->id,
+            'amount_limit' => 500,
+            'period' => 'monthly',
+            'status' => 'active',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['category_id']);
+});
+
+test('reassigning a budget to another user with no conflicting combination succeeds', function () {
+    $admin = adminUser();
+
+    $ownerA = User::factory()->create();
+    $ownerB = User::factory()->create();
+    $category = Category::factory()->create();
+
+    $budget = Budget::factory()->for($ownerA)->for($category)->monthly()->create();
+
+    actingAs($admin, 'web')
+        ->patchJson('/api/v1/admin/budgets/'.$budget->id, [
+            'user_id' => $ownerB->id,
+            'category_id' => $category->id,
+            'amount_limit' => 500,
+            'period' => 'monthly',
+            'status' => 'active',
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.user.id', $ownerB->id);
+
+    assertDatabaseHas('budgets', ['id' => $budget->id, 'user_id' => $ownerB->id]);
+});
+
+// --- Boundary Value Analysis: amount_limit on update ---
+dataset('update amount_limit boundaries', [
+    'min boundary (0.01)' => [0.01, true],
+    'below min (0.00)' => [0.00, false],
+    'max boundary (9999999999.99)' => [9999999999.99, true],
+    'above max (10000000000.00)' => [10000000000.00, false],
+]);
+
+test('budget update enforces amount_limit boundaries', function (float $amount, bool $shouldPass) {
+    $admin = adminUser();
+    $budget = Budget::factory()->create();
+
+    $response = actingAs($admin, 'web')
+        ->patchJson('/api/v1/admin/budgets/'.$budget->id, [
+            'user_id' => $budget->user_id,
+            'category_id' => $budget->category_id,
+            'amount_limit' => $amount,
+            'period' => $budget->period,
+            'status' => 'active',
+        ]);
+
+    $shouldPass
+        ? $response->assertOk()
+        : $response->assertUnprocessable()->assertJsonValidationErrors(['amount_limit']);
+})->with('update amount_limit boundaries');
+
+// --- Decision table: status enum on update ---
+dataset('update status equivalence classes', [
+    'valid active' => ['active', true],
+    'valid inactive' => ['inactive', true],
+    'wrong case (Active)' => ['Active', false],
+    'unsupported value (archived)' => ['archived', false],
+]);
+
+test('budget update enforces the status enum strictly', function (string $status, bool $shouldPass) {
+    $admin = adminUser();
+    $budget = Budget::factory()->create();
+
+    $response = actingAs($admin, 'web')
+        ->patchJson('/api/v1/admin/budgets/'.$budget->id, [
+            'user_id' => $budget->user_id,
+            'category_id' => $budget->category_id,
+            'amount_limit' => 500,
+            'period' => $budget->period,
+            'status' => $status,
+        ]);
+
+    $shouldPass
+        ? $response->assertOk()
+        : $response->assertUnprocessable()->assertJsonValidationErrors(['status']);
+})->with('update status equivalence classes');

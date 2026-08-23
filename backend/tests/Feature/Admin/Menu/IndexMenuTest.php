@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Menu;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -23,8 +21,7 @@ test('guests cannot list menus', function () {
 });
 
 test('non admin users cannot list menus', function () {
-    $user = User::factory()->create();
-    $user->assignRole(Role::findOrCreate('user', 'web'));
+    $user = regularUser();
 
     actingAs($user, 'web')
         ->getJson('/api/v1/admin/menus')
@@ -33,8 +30,7 @@ test('non admin users cannot list menus', function () {
 });
 
 test('admin can list menus with default pagination', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     Menu::factory()->count(3)->create();
 
@@ -54,8 +50,7 @@ test('admin can list menus with default pagination', function () {
 });
 
 test('admin can search menus by title or url', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     Menu::factory()->create(['title' => 'Pricing Plans', 'url' => '/pricing']);
     Menu::factory()->create(['title' => 'About Us', 'url' => '/about']);
@@ -68,8 +63,7 @@ test('admin can search menus by title or url', function () {
 });
 
 test('admin can filter menus by status canonical and parent_id', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     $parent = Menu::factory()->header()->create();
     Menu::factory()->header()->create(['parent_id' => $parent->id, 'status' => 'active']);
@@ -81,9 +75,21 @@ test('admin can filter menus by status canonical and parent_id', function () {
         ->assertJsonPath('meta.total', 1);
 });
 
+test('admin can filter menus by inactive status', function () {
+    $admin = adminUser();
+
+    Menu::factory()->create(['status' => 'active']);
+    $inactive = Menu::factory()->inactive()->create();
+
+    actingAs($admin, 'web')
+        ->getJson('/api/v1/admin/menus?status=inactive')
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.id', $inactive->id);
+});
+
 test('admin can sort and paginate menus', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     Menu::factory()->create(['title' => 'Alpha', 'sort_order' => 3]);
     Menu::factory()->create(['title' => 'Bravo', 'sort_order' => 1]);
@@ -100,8 +106,7 @@ test('admin can sort and paginate menus', function () {
 });
 
 test('menu index query parameters are validated', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole(Role::findOrCreate('admin', 'web'));
+    $admin = adminUser();
 
     actingAs($admin, 'web')
         ->getJson('/api/v1/admin/menus?status=archived&sort=invalid_field&direction=up&per_page=500&parent_id=999999')
