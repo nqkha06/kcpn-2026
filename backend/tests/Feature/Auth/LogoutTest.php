@@ -2,32 +2,27 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
-use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
-use function Pest\Laravel\withHeader;
+test('logout follows the shared test data contract', function (array $case) {
+    if ($case['actor'] === 'authenticated_user') {
+        User::factory()->create(['email' => 'logout@example.com', 'password' => 'password']);
 
-test('an authenticated user can logout through the API', function () {
-    User::factory()->create(['email' => 'logout@example.com', 'password' => 'password']);
+        $this->postJson('/api/v1/auth/login', [
+            'email' => 'logout@example.com',
+            'password' => 'password',
+        ])->assertOk();
+    }
 
-    withHeader('Origin', 'http://localhost');
+    $request = $case['request'];
+    $response = $this->postJson($request['endpoint'], $request['body'], $request['headers']);
 
-    postJson('/api/v1/auth/login', [
-        'email' => 'logout@example.com',
-        'password' => 'password',
-    ])->assertOk();
+    TestResponseAssertions::assertForCase($response, $case);
 
-    postJson('/api/v1/auth/logout')
-        ->assertOk()
-        ->assertJsonPath('message', 'Logout successful');
+    if ($case['actor'] === 'authenticated_user') {
+        Auth::forgetGuards();
 
-    Auth::forgetGuards();
-
-    getJson('/api/v1/auth/me')->assertUnauthorized();
-});
-
-test('a guest cannot logout through the API', function () {
-    postJson('/api/v1/auth/logout')
-        ->assertUnauthorized()
-        ->assertJsonPath('message', 'Unauthenticated');
-});
+        $this->getJson('/api/v1/auth/me')->assertUnauthorized();
+    }
+})->with(TestData::load('auth/logout.json'));

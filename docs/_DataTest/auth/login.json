@@ -171,5 +171,55 @@
             "database_change": { "table": "users", "operation": "none" }
         },
         "capture": { "two_factor_session": "data.requires_two_factor" }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-EP-008",
+        "description": "Login rejects a non-boolean remember flag",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": { "email": "login@example.com", "password": "password", "remember": "yes" }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["remember"],
+            "database_change": { "table": "users", "operation": "none" }
+        }
+    },
+    {
+        "case_id": "AUTH-LOGIN-SUBMIT-BUS-009",
+        "description": "An unconfirmed two-factor setup does not start a challenge",
+        "actor": "guest",
+        "preconditions": ["unconfirmed_two_factor_user_exists"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/login",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "email": "@unconfirmed_two_factor_user.email",
+                "password": "@unconfirmed_two_factor_user.password"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": { "success": true, "data.requires_two_factor": false },
+            "json_absent": [
+                "data.user.password",
+                "data.user.remember_token",
+                "data.user.two_factor_secret",
+                "data.user.two_factor_recovery_codes"
+            ],
+            "validation_errors": [],
+            "database_change": { "table": "users", "operation": "none" }
+        }
     }
 ]

@@ -4,32 +4,36 @@ use App\Models\Budget;
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\UserWallet;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\getJson;
 
-test('an admin can view dashboard aggregates', function () {
-    $admin = adminUser();
-    $user = regularUser();
-    ExpenseTransaction::factory()->forUser($user)->income()->posted()->create();
+test('admin dashboard retrieval follows the shared test data contract', function (array $case) {
+    if ($case['actor'] === 'admin') {
+        $admin = adminUser();
+        $user = regularUser();
 
-    actingAs($admin)
-        ->getJson('/api/v1/admin/dashboard')
-        ->assertOk()
-        ->assertJsonPath('data.stats.users', 2)
-        ->assertJsonCount(6, 'data.monthlyFlow')
-        ->assertJsonStructure(['data' => ['stats', 'monthlyFlow', 'topExpenseCategories', 'recentTransactions']]);
-});
+        if (in_array('posted_income_exists', $case['preconditions'], true)) {
+            ExpenseTransaction::factory()->forUser($user)->income()->posted()->create();
+        }
 
-test('a guest cannot view the admin dashboard', function () {
-    getJson('/api/v1/admin/dashboard')->assertUnauthorized();
-});
+        actingAs($admin);
+    } elseif ($case['actor'] === 'user') {
+        actingAs(regularUser());
+    }
 
-test('a regular user cannot view the admin dashboard', function () {
-    actingAs(regularUser())
-        ->getJson('/api/v1/admin/dashboard')
-        ->assertForbidden();
-});
+    $request = $case['request'];
+    $response = $this->getJson($request['endpoint'], $request['headers']);
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($case['actor'] === 'admin') {
+        $response
+            ->assertJsonCount(6, 'data.monthlyFlow')
+            ->assertJsonStructure(['data' => ['stats', 'monthlyFlow', 'topExpenseCategories', 'recentTransactions']]);
+    }
+})->with(TestData::load('admin/dashboard/show.json'));
 
 test('admin dashboard aggregates only transactions relevant to each metric', function () {
     $admin = adminUser();

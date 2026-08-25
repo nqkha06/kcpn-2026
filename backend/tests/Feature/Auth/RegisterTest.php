@@ -44,8 +44,9 @@ test('registration follows the shared boundary and partition data', function (ar
         assertDatabaseHas('users', ['email' => $email]);
 
         $user = User::query()->where('email', $email)->firstOrFail();
+        $password = $request['body']['password'];
 
-        expect(Hash::check('password', $user->password))->toBeTrue();
+        expect(is_string($password) && Hash::check($password, $user->password))->toBeTrue();
         assertAuthenticatedAs($user);
         Event::assertDispatched(
             Registered::class,

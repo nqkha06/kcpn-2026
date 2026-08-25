@@ -7,6 +7,8 @@ use Tests\Support\TestResponseAssertions;
 
 $assignedDataFiles = [
     'auth/login.json',
+    'auth/logout.json',
+    'auth/me.json',
     'auth/register.json',
     'auth/two-factor-challenge.json',
     'auth/forgot-password.json',
@@ -14,6 +16,8 @@ $assignedDataFiles = [
     'public/configuration.json',
     'public/pages-show.json',
     'admin/appearance/update.json',
+    'admin/appearance/show.json',
+    'admin/dashboard/show.json',
     'admin/transactions/create.json',
     'admin/transactions/index.json',
     'admin/transactions/update.json',
@@ -66,11 +70,11 @@ test('it resolves nested and flat fixture aliases', function () {
 
 test('it rejects paths outside the shared data directory', function () {
     TestData::load('../_Postman/Final.postman_collection.json');
-})->throws(\InvalidArgumentException::class, 'must stay inside docs/_DataTest');
+})->throws(InvalidArgumentException::class, 'must stay inside docs/_DataTest');
 
 test('it reports missing aliases with their full reference', function () {
     TestData::resolveAliases('@missing.id', []);
-})->throws(\InvalidArgumentException::class, 'Missing test fixture alias [@missing.id]');
+})->throws(InvalidArgumentException::class, 'Missing test fixture alias [@missing.id]');
 
 test('it applies shared status and JSON assertions', function () {
     $response = TestResponse::fromBaseResponse(new JsonResponse([
@@ -134,6 +138,17 @@ test('assigned operation files have a complete contract and globally unique case
                     'validation_errors',
                     'database_change',
                 ]);
+
+            expect($row['request']['method'])
+                ->toBeString()
+                ->and($row['request']['headers'])->toBeArray()
+                ->and($row['request']['path'])->toBeArray()
+                ->and($row['request']['query'])->toBeArray()
+                ->and($row['request']['body'])->toBeArray()
+                ->and($row['expected']['json_paths'])->toBeArray()
+                ->and($row['expected']['json_absent'])->toBeArray()
+                ->and($row['expected']['validation_errors'])->toBeArray()
+                ->and($row['expected']['database_change'])->toBeArray();
 
             $caseIds->push($row['case_id']);
         }

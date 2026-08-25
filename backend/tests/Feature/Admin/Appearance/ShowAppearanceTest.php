@@ -1,34 +1,27 @@
 <?php
 
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
+
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\getJson;
 
-test('an admin can view appearance settings', function () {
-    actingAs(adminUser())
-        ->getJson('/api/v1/admin/appearance')
-        ->assertOk()
-        ->assertJsonStructure(['data' => ['languages', 'logos', 'general']]);
-});
+test('appearance retrieval follows the shared test data contract', function (array $case) {
+    if ($case['actor'] === 'admin') {
+        actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        actingAs(regularUser());
+    }
 
-test('a guest cannot view appearance settings', function () {
-    getJson('/api/v1/admin/appearance')->assertUnauthorized();
-});
+    $request = $case['request'];
+    $response = $this->getJson($request['endpoint'], $request['headers']);
 
-test('a regular user cannot view appearance settings', function () {
-    actingAs(regularUser())
-        ->getJson('/api/v1/admin/appearance')
-        ->assertForbidden();
-});
+    TestResponseAssertions::assertForCase($response, $case);
 
-test('appearance settings expose configured languages and empty logo paths by default', function () {
-    $response = actingAs(adminUser())
-        ->getJson('/api/v1/admin/appearance')
-        ->assertOk()
-        ->assertJsonPath('data.languages.0.code', 'vi')
-        ->assertJsonPath('data.logos.logo_light.path', null)
-        ->assertJsonPath('data.logos.logo_light.url', null);
+    if ($case['actor'] === 'admin') {
+        $response->assertJsonStructure(['data' => ['languages', 'logos', 'general']]);
 
-    $defaultLanguage = collect($response->json('data.languages'))->firstWhere('is_default', true);
+        $defaultLanguage = collect($response->json('data.languages'))->firstWhere('is_default', true);
 
-    expect($defaultLanguage['code'])->toBe(strtolower((string) config('app.locale')));
-});
+        expect($defaultLanguage['code'])->toBe(strtolower((string) config('app.locale')));
+    }
+})->with(TestData::load('admin/appearance/show.json'));

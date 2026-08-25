@@ -1,0 +1,18 @@
+[
+    {
+        "case_id": "AUTH-ME-RBAC-001",
+        "description": "An authenticated user can retrieve their account",
+        "actor": "user",
+        "preconditions": ["authenticated_session"],
+        "request": {"method": "GET", "endpoint": "/api/v1/auth/me", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 200, "json_paths": {"success": true, "data.user.roles.0": "user"}, "json_absent": ["data.user.password", "data.user.remember_token", "data.user.two_factor_secret", "data.user.two_factor_recovery_codes"], "validation_errors": [], "database_change": {"table": "users", "operation": "none"}}
+    },
+    {
+        "case_id": "AUTH-ME-RBAC-002",
+        "description": "A guest cannot retrieve an account",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {"method": "GET", "endpoint": "/api/v1/auth/me", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 401, "json_paths": {"message": "Unauthenticated"}, "json_absent": [], "validation_errors": [], "database_change": {"table": "users", "operation": "none"}}
+    }
+]

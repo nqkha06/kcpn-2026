@@ -28,13 +28,26 @@ test('login follows the shared test data contract', function (array $case) {
         $this->withSession([]);
     }
 
+    if (in_array('unconfirmed_two_factor_user_exists', $case['preconditions'], true)) {
+        $user = User::factory()->create([
+            'email' => 'unconfirmed-two-factor@example.com',
+            'password' => 'password',
+        ]);
+        $user->forceFill([
+            'two_factor_secret' => encrypt('two-factor-secret'),
+            'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code'], JSON_THROW_ON_ERROR)),
+            'two_factor_confirmed_at' => null,
+        ])->save();
+        $aliases['unconfirmed_two_factor_user'] = ['email' => $user->email, 'password' => 'password'];
+    }
+
     $case = TestData::resolveAliases($case, $aliases);
     $request = $case['request'];
     $response = $this->postJson($request['endpoint'], $request['body'], $request['headers']);
 
     TestResponseAssertions::assertForCase($response, $case);
 
-    if ($case['case_id'] === 'AUTH-LOGIN-SUBMIT-EP-001') {
+    if (($case['expected']['json_paths']['data.requires_two_factor'] ?? null) === false) {
         assertAuthenticatedAs($user);
         $response->assertJsonPath('data.user.id', $user?->id);
     } else {

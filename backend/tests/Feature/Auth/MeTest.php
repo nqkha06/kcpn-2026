@@ -1,22 +1,24 @@
 <?php
 
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
+
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\getJson;
 
-test('an authenticated user can retrieve their account', function () {
-    $user = regularUser();
+test('account retrieval follows the shared test data contract', function (array $case) {
+    $user = null;
 
-    actingAs($user)
-        ->getJson('/api/v1/auth/me')
-        ->assertOk()
-        ->assertJsonPath('data.user.email', $user->email)
-        ->assertJsonPath('data.user.roles.0', 'user')
-        ->assertJsonMissingPath('data.user.password')
-        ->assertJsonMissingPath('data.user.remember_token')
-        ->assertJsonMissingPath('data.user.two_factor_secret')
-        ->assertJsonMissingPath('data.user.two_factor_recovery_codes');
-});
+    if ($case['actor'] === 'user') {
+        $user = regularUser();
+        actingAs($user);
+    }
 
-test('the account endpoint rejects guests', function () {
-    getJson('/api/v1/auth/me')->assertUnauthorized();
-});
+    $request = $case['request'];
+    $response = $this->getJson($request['endpoint'], $request['headers']);
+
+    TestResponseAssertions::assertForCase($response, $case);
+
+    if ($user !== null) {
+        $response->assertJsonPath('data.user.email', $user->email);
+    }
+})->with(TestData::load('auth/me.json'));

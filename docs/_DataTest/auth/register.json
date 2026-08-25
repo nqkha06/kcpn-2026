@@ -578,5 +578,83 @@
                 }
             }
         }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-019",
+        "description": "Password rejects minimum minus one length 7",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Password Boundary User",
+                "email": "register-password-7@example.com",
+                "password": { "generator": "repeat", "character": "a", "length": 7 },
+                "password_confirmation": { "generator": "repeat", "character": "a", "length": 7 }
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": { "success": false },
+            "json_absent": ["data.user"],
+            "validation_errors": ["password"],
+            "database_change": { "table": "users", "operation": "none", "where": { "email": "register-password-7@example.com" } }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-020",
+        "description": "Password accepts minimum length 8",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Password Boundary User",
+                "email": "register-password-8@example.com",
+                "password": { "generator": "repeat", "character": "a", "length": 8 },
+                "password_confirmation": { "generator": "repeat", "character": "a", "length": 8 }
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": { "success": true, "data.user.email": "register-password-8@example.com" },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": { "table": "users", "operation": "insert", "where": { "email": "register-password-8@example.com" } }
+        }
+    },
+    {
+        "case_id": "AUTH-REG-CREATE-BVA-021",
+        "description": "Password accepts minimum plus one length 9",
+        "actor": "guest",
+        "preconditions": ["email_available"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/auth/register",
+            "headers": { "Accept": "application/json" },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Password Boundary User",
+                "email": "register-password-9@example.com",
+                "password": { "generator": "repeat", "character": "a", "length": 9 },
+                "password_confirmation": { "generator": "repeat", "character": "a", "length": 9 }
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": { "success": true, "data.user.email": "register-password-9@example.com" },
+            "json_absent": ["data.user.password", "data.user.remember_token"],
+            "validation_errors": [],
+            "database_change": { "table": "users", "operation": "insert", "where": { "email": "register-password-9@example.com" } }
+        }
     }
 ]

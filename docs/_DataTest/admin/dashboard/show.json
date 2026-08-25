@@ -1,0 +1,26 @@
+[
+    {
+        "case_id": "ADM-DASH-SHOW-RBAC-001",
+        "description": "An admin can view dashboard aggregates",
+        "actor": "admin",
+        "preconditions": ["posted_income_exists"],
+        "request": {"method": "GET", "endpoint": "/api/v1/admin/dashboard", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 200, "json_paths": {"success": true, "data.stats.users": 2}, "json_absent": [], "validation_errors": [], "database_change": {"table": "expense_transactions", "operation": "none"}}
+    },
+    {
+        "case_id": "ADM-DASH-SHOW-RBAC-002",
+        "description": "A guest cannot view the admin dashboard",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {"method": "GET", "endpoint": "/api/v1/admin/dashboard", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 401, "json_paths": {"message": "Unauthenticated"}, "json_absent": [], "validation_errors": [], "database_change": {"table": "expense_transactions", "operation": "none"}}
+    },
+    {
+        "case_id": "ADM-DASH-SHOW-RBAC-003",
+        "description": "A regular user cannot view the admin dashboard",
+        "actor": "user",
+        "preconditions": [],
+        "request": {"method": "GET", "endpoint": "/api/v1/admin/dashboard", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 403, "json_paths": {"message": "Forbidden"}, "json_absent": [], "validation_errors": [], "database_change": {"table": "expense_transactions", "operation": "none"}}
+    }
+]

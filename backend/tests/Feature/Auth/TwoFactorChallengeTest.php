@@ -27,14 +27,16 @@ test('two-factor challenge follows the shared test data contract', function (arr
         ],
     ];
 
-    if ($case['actor'] === 'two_factor_user') {
+    if (in_array($case['actor'], ['two_factor_user', 'two_factor_user_without_secret'], true)) {
         $recoveryCodes = in_array('used_recovery_code', $case['preconditions'], true)
             ? ['unused-recovery-code']
             : ['recovery-code'];
 
         $user = regularUser();
         $user->forceFill([
-            'two_factor_secret' => encrypt('two-factor-secret'),
+            'two_factor_secret' => $case['actor'] === 'two_factor_user_without_secret'
+                ? null
+                : encrypt('two-factor-secret'),
             'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes, JSON_THROW_ON_ERROR)),
             'two_factor_confirmed_at' => now(),
         ])->save();

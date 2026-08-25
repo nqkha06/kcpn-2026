@@ -1,0 +1,26 @@
+[
+    {
+        "case_id": "ADM-APP-SHOW-RBAC-001",
+        "description": "An admin can view appearance settings",
+        "actor": "admin",
+        "preconditions": [],
+        "request": {"method": "GET", "endpoint": "/api/v1/admin/appearance", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 200, "json_paths": {"success": true, "data.languages.0.code": "vi", "data.logos.logo_light.path": null, "data.logos.logo_light.url": null}, "json_absent": [], "validation_errors": [], "database_change": {"table": "settings", "operation": "none"}}
+    },
+    {
+        "case_id": "ADM-APP-SHOW-RBAC-002",
+        "description": "A guest cannot view appearance settings",
+        "actor": "guest",
+        "preconditions": [],
+        "request": {"method": "GET", "endpoint": "/api/v1/admin/appearance", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 401, "json_paths": {"message": "Unauthenticated"}, "json_absent": [], "validation_errors": [], "database_change": {"table": "settings", "operation": "none"}}
+    },
+    {
+        "case_id": "ADM-APP-SHOW-RBAC-003",
+        "description": "A regular user cannot view appearance settings",
+        "actor": "user",
+        "preconditions": [],
+        "request": {"method": "GET", "endpoint": "/api/v1/admin/appearance", "headers": {"Accept": "application/json"}, "path": {}, "query": {}, "body": {}},
+        "expected": {"status": 403, "json_paths": {"message": "Forbidden"}, "json_absent": [], "validation_errors": [], "database_change": {"table": "settings", "operation": "none"}}
+    }
+]
