@@ -950,5 +950,215 @@
                 "operation": "none"
             }
         }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-021",
+        "description": "rejects a string roles value",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "roles-string@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": "manager"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-022",
+        "description": "rejects non-integer roles elements",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "roles-invalid-element@example.test",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "manager"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles.0"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-EP-023",
+        "description": "rejects a password that is too short",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "password-short@example.test",
+                "password": "short",
+                "password_confirmation": "short"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "password"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-BVA-024",
+        "description": "accepts shortest valid email format",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "role_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "a@b.co",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password",
+                "roles": [
+                    "@role.id"
+                ]
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {
+                "success": true,
+                "data.name": "Nominal User",
+                "data.email": "a@b.co"
+            },
+            "json_absent": [
+                "data.password",
+                "data.remember_token"
+            ],
+            "validation_errors": [],
+            "database_change": {
+                "table": "users",
+                "operation": "insert",
+                "where": {
+                    "email": "a@b.co"
+                }
+            }
+        },
+        "capture": {
+            "user_id": "data.id"
+        }
+    },
+    {
+        "case_id": "ADM-USR-CREATE-RBVA-025",
+        "description": "rejects shortest invalid email length",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists"
+        ],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/users",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {},
+            "query": {},
+            "body": {
+                "name": "Nominal User",
+                "email": "a",
+                "password": "@new_user.password",
+                "password_confirmation": "@new_user.password"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
     }
 ]

@@ -613,5 +613,211 @@
                 "operation": "none"
             }
         }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-014",
+        "description": "rejects a string roles value on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "user_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "roles-string-update@example.test",
+                "roles": "manager"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-015",
+        "description": "rejects non-integer roles elements on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "user_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "roles-invalid-element-update@example.test",
+                "roles": [
+                    "manager"
+                ]
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "roles.0"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-016",
+        "description": "rejects a password that is too short on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "user_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "password-short-update@example.test",
+                "password": "short",
+                "password_confirmation": "short"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "password"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-017",
+        "description": "rejects an invalid email format on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "user_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": "not-an-email"
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
+    },
+    {
+        "case_id": "ADM-USR-UPDATE-EP-018",
+        "description": "rejects an empty email on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "user_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/users/{user}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "user": "@user.id"
+            },
+            "query": {},
+            "body": {
+                "name": "Updated User",
+                "email": ""
+            }
+        },
+        "expected": {
+            "status": 422,
+            "json_paths": {
+                "success": false
+            },
+            "json_absent": [
+                "data"
+            ],
+            "validation_errors": [
+                "email"
+            ],
+            "database_change": {
+                "table": "users",
+                "operation": "none"
+            }
+        }
     }
 ]

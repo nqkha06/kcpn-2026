@@ -838,5 +838,267 @@
                 "operation": "none"
             }
         }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BVA-016",
+        "description": "accepts page title length 1 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 1
+                },
+                "slug": "updated-title-min-1",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 1
+                },
+                "data.status": "draft"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BVA-017",
+        "description": "accepts page title length 2 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 2
+                },
+                "slug": "updated-title-min-2",
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": {
+                    "generator": "repeat",
+                    "character": "u",
+                    "length": 2
+                },
+                "data.status": "draft"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BVA-018",
+        "description": "accepts page slug length 1 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Nominal Page Title",
+                "slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 1
+                },
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": "Nominal Page Title",
+                "data.slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 1
+                },
+                "data.status": "draft"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
+    },
+    {
+        "case_id": "ADM-PAGE-UPDATE-BVA-019",
+        "description": "accepts page slug length 2 on update",
+        "actor": "admin",
+        "preconditions": [
+            "admin_exists",
+            "managed_page_exists",
+            "page_category_exists"
+        ],
+        "request": {
+            "method": "PUT",
+            "endpoint": "/api/v1/admin/pages/{page}",
+            "headers": {
+                "Accept": "application/json"
+            },
+            "path": {
+                "page": "@page.id"
+            },
+            "query": {},
+            "body": {
+                "title": "Nominal Page Title",
+                "slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 2
+                },
+                "image": null,
+                "category_id": "@category.id",
+                "tags": [
+                    "nominal-tag"
+                ],
+                "content": "Nominal page content",
+                "meta_title": "Nominal meta title",
+                "meta_description": "Nominal meta description",
+                "meta_keywords": "nominal, page",
+                "status": "draft"
+            }
+        },
+        "expected": {
+            "status": 200,
+            "json_paths": {
+                "success": true,
+                "data.id": "@page.id",
+                "data.title": "Nominal Page Title",
+                "data.slug": {
+                    "generator": "repeat",
+                    "character": "s",
+                    "length": 2
+                },
+                "data.status": "draft"
+            },
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {
+                "table": "pages",
+                "operation": "update",
+                "where": {
+                    "id": "@page.id"
+                }
+            }
+        },
+        "capture": {
+            "page_id": "data.id",
+            "page_slug": "data.slug"
+        }
     }
 ]
