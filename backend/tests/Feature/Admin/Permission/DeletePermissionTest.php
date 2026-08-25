@@ -3,39 +3,38 @@
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\getJson;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\deleteJson;
 
-test('an admin can show a permission', function () {
-    $permission = Permission::firstOrCreate(['name' => 'edit articles', 'guard_name' => 'web']);
+test('an admin can delete a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'delete-me', 'guard_name' => 'web']);
 
-    $response = actingAs(adminUser(), 'sanctum')->getJson("/api/v1/admin/permissions/{$permission->id}");
+    $response = actingAs(adminUser(), 'sanctum')->deleteJson("/api/v1/admin/permissions/{$permission->id}");
 
-    $response->assertStatus(200)
-        ->assertJson([
-            'data' => [
-                'id' => $permission->id,
-                'name' => 'edit articles',
-            ],
-        ]);
+    $response->assertStatus(200);
+
+    assertDatabaseMissing('permissions', [
+        'id' => $permission->id,
+    ]);
 });
 
-test('a guest cannot show a permission', function () {
-    $permission = Permission::create(['name' => 'guest view', 'guard_name' => 'web']);
+test('a guest cannot delete a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'guest-delete-perm', 'guard_name' => 'web']);
 
-    getJson("/api/v1/admin/permissions/{$permission->id}")
+    deleteJson("/api/v1/admin/permissions/{$permission->id}")
         ->assertUnauthorized();
 });
 
-test('a regular user cannot show a permission', function () {
-    $permission = Permission::create(['name' => 'user view', 'guard_name' => 'web']);
+test('a regular user cannot delete a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'user-delete-perm', 'guard_name' => 'web']);
 
     actingAs(regularUser())
-        ->getJson("/api/v1/admin/permissions/{$permission->id}")
+        ->deleteJson("/api/v1/admin/permissions/{$permission->id}")
         ->assertForbidden();
 });
 
-test('showing a missing permission returns not found', function () {
+test('deleting a missing permission returns not found', function () {
     actingAs(adminUser(), 'sanctum')
-        ->getJson('/api/v1/admin/permissions/999999')
+        ->deleteJson('/api/v1/admin/permissions/999999')
         ->assertNotFound();
 });

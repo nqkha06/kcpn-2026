@@ -1,64 +1,68 @@
 <?php
 
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
-use function Pest\Laravel\postJson;
+use function Pest\Laravel\deleteJson;
 
-test('an admin can create a role and assign permissions', function () {
-    $permission = Permission::create(['name' => 'publish articles', 'guard_name' => 'web']);
+test('an admin can delete a role', function () {
+    $role = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
 
-    $response = actingAs(adminUser(), 'sanctum')->postJson('/api/v1/admin/roles', [
-        'name' => 'writer',
-        'permissions' => [$permission->id],
+    $response = actingAs(adminUser(), 'sanctum')->deleteJson("/api/v1/admin/roles/{$role->id}");
+
+    $response->assertStatus(200);
+
+    assertDatabaseMissing('roles', [
+        'id' => $role->id,
     ]);
-
-    $response->assertStatus(201);
-
-    assertDatabaseHas('roles', [
-        'name' => 'writer',
-        'guard_name' => 'web',
-    ]);
-
-    $role = Role::where('name', 'writer')->first();
-    expect($role->hasPermissionTo('publish articles'))->toBeTrue();
 });
 
-test('a guest cannot create a role', function () {
-    postJson('/api/v1/admin/roles', ['name' => 'guest-role'])
-        ->assertUnauthorized();
+test('an admin cannot delete the admin system role', function () {
+    $admin = adminUser();
+    $role = Role::where('name', 'admin')->first();
 
-    assertDatabaseMissing('roles', ['name' => 'guest-role']);
+    if ($role) {
+        $response = actingAs($admin, 'sanctum')->deleteJson("/api/v1/admin/roles/{$role->id}");
+
+        $response->assertStatus(403);
+
+        assertDatabaseHas('roles', [
+            'id' => $role->id,
+        ]);
+    }
 });
 
-test('a regular user cannot create a role', function () {
-    actingAs(regularUser())
-        ->postJson('/api/v1/admin/roles', ['name' => 'unauthorized-role'])
+test('an admin cannot delete the super admin system role', function () {
+    $role = Role::firstOrCreate(['name' => 'super-admin', 'guard_name' => 'web']);
+
+    actingAs(adminUser(), 'sanctum')
+        ->deleteJson("/api/v1/admin/roles/{$role->id}")
         ->assertForbidden();
 
-    assertDatabaseMissing('roles', ['name' => 'unauthorized-role']);
+    assertDatabaseHas('roles', ['id' => $role->id]);
 });
 
-test('role creation validates the name and selected permissions', function () {
-    $permission = Permission::create(['name' => 'manage reports', 'guard_name' => 'web']);
+test('a guest cannot delete a role', function () {
+    $role = Role::firstOrCreate(['name' => 'guest-delete', 'guard_name' => 'web']);
 
-    actingAs(adminUser(), 'sanctum')
-        ->postJson('/api/v1/admin/roles', [
-            'name' => '',
-            'permissions' => [$permission->id, $permission->id, 999999],
-        ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['name', 'permissions.1', 'permissions.2']);
+    deleteJson("/api/v1/admin/roles/{$role->id}")
+        ->assertUnauthorized();
+
+    assertDatabaseHas('roles', ['id' => $role->id]);
 });
 
-test('role creation rejects a duplicate web guard name', function () {
-    Role::create(['name' => 'writer', 'guard_name' => 'web']);
+test('a regular user cannot delete a role', function () {
+    $role = Role::firstOrCreate(['name' => 'user-delete', 'guard_name' => 'web']);
 
+    actingAs(regularUser())
+        ->deleteJson("/api/v1/admin/roles/{$role->id}")
+        ->assertForbidden();
+});
+
+test('deleting a missing role returns not found', function () {
     actingAs(adminUser(), 'sanctum')
-        ->postJson('/api/v1/admin/roles', ['name' => 'writer'])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('name');
+        ->deleteJson('/api/v1/admin/roles/999999')
+        ->assertNotFound();
 });

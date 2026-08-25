@@ -3,55 +3,39 @@
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\patchJson;
+use function Pest\Laravel\getJson;
 
-test('an admin can update a permission', function () {
-    $permission = Permission::firstOrCreate(['name' => 'manage users', 'guard_name' => 'web']);
+test('an admin can show a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'edit articles', 'guard_name' => 'web']);
 
-    $response = actingAs(adminUser(), 'sanctum')->patchJson("/api/v1/admin/permissions/{$permission->id}", [
-        'name' => 'manage staff',
-    ]);
+    $response = actingAs(adminUser(), 'sanctum')->getJson("/api/v1/admin/permissions/{$permission->id}");
 
-    $response->assertStatus(200);
-
-    assertDatabaseHas('permissions', [
-        'id' => $permission->id,
-        'name' => 'manage staff',
-    ]);
+    $response->assertStatus(200)
+        ->assertJson([
+            'data' => [
+                'id' => $permission->id,
+                'name' => 'edit articles',
+            ],
+        ]);
 });
 
-test('permission update validates a unique name', function () {
-    $permission1 = Permission::firstOrCreate(['name' => 'manage users', 'guard_name' => 'web']);
-    Permission::firstOrCreate(['name' => 'manage staff', 'guard_name' => 'web']);
+test('a guest cannot show a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'guest view', 'guard_name' => 'web']);
 
-    $response = actingAs(adminUser(), 'sanctum')->patchJson("/api/v1/admin/permissions/{$permission1->id}", [
-        'name' => 'manage staff',
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['name']);
-});
-
-test('a guest cannot update a permission', function () {
-    $permission = Permission::create(['name' => 'guest update', 'guard_name' => 'web']);
-
-    patchJson("/api/v1/admin/permissions/{$permission->id}", ['name' => 'changed'])
+    getJson("/api/v1/admin/permissions/{$permission->id}")
         ->assertUnauthorized();
-
-    expect($permission->fresh()->name)->toBe('guest update');
 });
 
-test('a regular user cannot update a permission', function () {
-    $permission = Permission::create(['name' => 'user update', 'guard_name' => 'web']);
+test('a regular user cannot show a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'user view', 'guard_name' => 'web']);
 
     actingAs(regularUser())
-        ->patchJson("/api/v1/admin/permissions/{$permission->id}", ['name' => 'changed'])
+        ->getJson("/api/v1/admin/permissions/{$permission->id}")
         ->assertForbidden();
 });
 
-test('updating a missing permission returns not found', function () {
+test('showing a missing permission returns not found', function () {
     actingAs(adminUser(), 'sanctum')
-        ->patchJson('/api/v1/admin/permissions/999999', ['name' => 'missing permission'])
+        ->getJson('/api/v1/admin/permissions/999999')
         ->assertNotFound();
 });

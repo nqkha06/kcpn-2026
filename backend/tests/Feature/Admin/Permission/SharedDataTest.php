@@ -39,7 +39,12 @@ function executeAdminPermissionDataCase(object $testCase, array $case): void
     TestResponseAssertions::assertForCase($response, $case);
 
     $operation = $case['expected']['database_change']['operation'];
-    expect(Permission::query()->count())->toBe($beforeCount + ($operation === 'insert' ? 1 : 0));
+    $expectedDelta = match ($operation) {
+        'insert' => 1,
+        'delete' => -1,
+        default => 0,
+    };
+    expect(Permission::query()->count())->toBe($beforeCount + $expectedDelta);
 
     if ($operation === 'insert') {
         expect(Permission::query()->where('name', $case['request']['body']['name'])->value('guard_name'))->toBe('web');
@@ -57,3 +62,7 @@ test('admin permission index follows shared execution data', function (array $ca
 test('admin permission update follows shared execution data', function (array $case): void {
     executeAdminPermissionDataCase($this, $case);
 })->with(TestData::load('admin/permissions/update.json'));
+
+test('admin permission delete follows shared execution data', function (array $case): void {
+    executeAdminPermissionDataCase($this, $case);
+})->with(TestData::load('admin/permissions/delete.json'));

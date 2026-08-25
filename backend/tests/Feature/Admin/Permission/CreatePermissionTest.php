@@ -3,28 +3,50 @@
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\getJson;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\postJson;
 
-test('an admin can get permission options', function () {
-    Permission::firstOrCreate(['name' => 'manage users', 'guard_name' => 'web']);
-    Permission::firstOrCreate(['name' => 'manage roles', 'guard_name' => 'web']);
+test('an admin can create a permission', function () {
+    $response = actingAs(adminUser(), 'sanctum')->postJson('/api/v1/admin/permissions', [
+        'name' => 'publish articles',
+    ]);
 
-    $response = actingAs(adminUser(), 'sanctum')->getJson('/api/v1/admin/permissions/options');
+    $response->assertStatus(201);
 
-    $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => ['id', 'name'],
-            ],
-        ]);
+    assertDatabaseHas('permissions', [
+        'name' => 'publish articles',
+        'guard_name' => 'web',
+    ]);
 });
 
-test('a guest cannot get permission options', function () {
-    getJson('/api/v1/admin/permissions/options')->assertUnauthorized();
+test('permission creation validates a unique name', function () {
+    Permission::firstOrCreate(['name' => 'publish articles', 'guard_name' => 'web']);
+
+    $response = actingAs(adminUser(), 'sanctum')->postJson('/api/v1/admin/permissions', [
+        'name' => 'publish articles',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['name']);
 });
 
-test('a regular user cannot get permission options', function () {
+test('a guest cannot create a permission', function () {
+    postJson('/api/v1/admin/permissions', ['name' => 'guest permission'])
+        ->assertUnauthorized();
+
+    assertDatabaseMissing('permissions', ['name' => 'guest permission']);
+});
+
+test('a regular user cannot create a permission', function () {
     actingAs(regularUser())
-        ->getJson('/api/v1/admin/permissions/options')
+        ->postJson('/api/v1/admin/permissions', ['name' => 'user permission'])
         ->assertForbidden();
+});
+
+test('permission creation requires a name', function () {
+    actingAs(adminUser(), 'sanctum')
+        ->postJson('/api/v1/admin/permissions', [])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
 });

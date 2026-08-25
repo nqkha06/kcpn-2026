@@ -1,0 +1,132 @@
+[
+  {
+    "case_id": "ADM-PERM-DELETE-BUS-001",
+    "description": "ordinary permission can be deleted",
+    "actor": "admin",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/permissions/{permission}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "permission": "@permission.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 200,
+      "json_paths": {
+        "message": "Permission deleted successfully"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "delete",
+        "table": "permissions",
+        "where": {
+          "id": "@permission.id"
+        }
+      }
+    }
+  },
+  {
+    "case_id": "ADM-PERM-DELETE-RBAC-002",
+    "description": "guest is unauthenticated",
+    "actor": "guest",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/permissions/{permission}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "permission": "@permission.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 401,
+      "json_paths": {
+        "message": "Unauthenticated"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-PERM-DELETE-RBAC-003",
+    "description": "user role is forbidden",
+    "actor": "user",
+    "preconditions": [
+      "permission"
+    ],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/permissions/{permission}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "permission": "@permission.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 403,
+      "json_paths": {
+        "message": "Forbidden"
+      },
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  },
+  {
+    "case_id": "ADM-PERM-DELETE-EP-004",
+    "description": "missing permission returns not found",
+    "actor": "admin",
+    "preconditions": [],
+    "request": {
+      "method": "DELETE",
+      "endpoint": "/api/v1/admin/permissions/{permission}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "path": {
+        "permission": "@missing.id"
+      },
+      "query": {},
+      "body": {}
+    },
+    "expected": {
+      "status": 404,
+      "json_paths": {},
+      "json_absent": [],
+      "validation_errors": [],
+      "database_change": {
+        "operation": "none",
+        "table": null,
+        "where": {}
+      }
+    }
+  }
+]

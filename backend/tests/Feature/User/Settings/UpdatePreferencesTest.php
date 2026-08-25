@@ -1,112 +1,63 @@
 <?php
 
-use App\Models\User;
-
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\patchJson;
 
-test('a user can update their profile', function () {
-    $user = User::factory()->create();
-    $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
+test('a user can update their currency preference', function () {
+    $user = regularUser();
 
-    $response = actingAs($user, 'sanctum')->patchJson('/api/v1/user/settings/profile', [
-        'name' => 'Jane Smith',
-        'email' => 'jane@example.com',
+    $response = actingAs($user, 'sanctum')->patchJson('/api/v1/user/settings/preferences', [
+        'currency' => 'USD',
     ]);
 
-    $response->assertStatus(200);
+    $response->assertStatus(200)
+        ->assertJsonPath('data.preferences.currency', 'USD');
 
-    assertDatabaseHas('users', [
-        'id' => $user->id,
-        'name' => 'Jane Smith',
-        'email' => 'jane@example.com',
-    ]);
+    expect($user->fresh()->getMeta('currency'))->toBe('USD');
 });
 
-test('profile update validates the name', function () {
-    $user = User::factory()->create();
-    $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
-
-    $response = actingAs($user, 'sanctum')->patchJson('/api/v1/user/settings/profile', [
-        'name' => '',
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['name']);
-});
-
-test('a guest cannot update a profile', function () {
-    patchJson('/api/v1/user/settings/profile', [
-        'name' => 'Guest User',
-        'email' => 'guest@example.com',
+test('a guest cannot update preferences', function () {
+    patchJson('/api/v1/user/settings/preferences', [
+        'currency' => 'USD',
     ])->assertUnauthorized();
-
-    assertDatabaseMissing('users', ['email' => 'guest@example.com']);
 });
 
-test('profile update validates required fields', function () {
+test('an admin cannot update preferences on this endpoint', function () {
+    actingAs(adminUser())
+        ->patchJson('/api/v1/user/settings/preferences', [
+            'currency' => 'USD',
+        ])
+        ->assertForbidden();
+});
+
+test('preference update validates currency is required', function () {
     actingAs(regularUser())
-        ->patchJson('/api/v1/user/settings/profile', [])
+        ->patchJson('/api/v1/user/settings/preferences', [])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['name', 'email']);
+        ->assertJsonValidationErrors('currency');
 });
 
-test('a user cannot update their profile to an existing email', function () {
-    $user = regularUser();
-    User::factory()->create(['email' => 'existing@example.com']);
-
-    actingAs($user)
-        ->patchJson('/api/v1/user/settings/profile', [
-            'name' => $user->name,
-            'email' => 'existing@example.com',
+test('preference update validates currency is exactly 3 characters', function () {
+    actingAs(regularUser())
+        ->patchJson('/api/v1/user/settings/preferences', [
+            'currency' => 'US',
         ])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors('email');
+        ->assertJsonValidationErrors('currency');
 
-    expect($user->fresh()->email)->toBe($user->email);
+    actingAs(regularUser())
+        ->patchJson('/api/v1/user/settings/preferences', [
+            'currency' => 'USDD',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('currency');
 });
 
-test('changing an email clears the verification timestamp', function () {
-    $user = regularUser();
-
-    actingAs($user)
-        ->patchJson('/api/v1/user/settings/profile', [
-            'name' => $user->name,
-            'email' => 'changed@example.com',
+test('preference update validates currency is in the allowed list', function () {
+    actingAs(regularUser())
+        ->patchJson('/api/v1/user/settings/preferences', [
+            'currency' => 'JPY',
         ])
-        ->assertOk()
-        ->assertJsonPath('data.email_verified_at', null);
-
-    expect($user->fresh()->email_verified_at)->toBeNull();
-});
-
-test('keeping the same email preserves the verification timestamp', function () {
-    $user = regularUser();
-    $verifiedAt = $user->email_verified_at;
-
-    actingAs($user)
-        ->patchJson('/api/v1/user/settings/profile', [
-            'name' => 'Updated Name',
-            'email' => $user->email,
-        ])
-        ->assertOk();
-
-    expect($user->fresh()->email_verified_at?->equalTo($verifiedAt))->toBeTrue();
-});
-
-test('profile update response does not expose sensitive fields', function () {
-    $user = regularUser();
-
-    actingAs($user)
-        ->patchJson('/api/v1/user/settings/profile', [
-            'name' => 'Safe Response',
-            'email' => $user->email,
-        ])
-        ->assertOk()
-        ->assertJsonMissingPath('data.password')
-        ->assertJsonMissingPath('data.remember_token')
-        ->assertJsonMissingPath('data.two_factor_secret')
-        ->assertJsonMissingPath('data.two_factor_recovery_codes');
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('currency');
 });

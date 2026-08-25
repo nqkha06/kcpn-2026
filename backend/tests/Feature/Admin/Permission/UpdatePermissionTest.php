@@ -3,46 +3,55 @@
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\getJson;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\patchJson;
 
-test('an admin can list permissions', function () {
-    Permission::firstOrCreate(['name' => 'edit articles', 'guard_name' => 'web']);
+test('an admin can update a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'manage users', 'guard_name' => 'web']);
 
-    $response = actingAs(adminUser(), 'sanctum')->getJson('/api/v1/admin/permissions');
+    $response = actingAs(adminUser(), 'sanctum')->patchJson("/api/v1/admin/permissions/{$permission->id}", [
+        'name' => 'manage staff',
+    ]);
 
-    $response->assertStatus(200)
-        ->assertJsonStructure([
-            'data' => [
-                '*' => ['id', 'name', 'created_at'],
-            ],
-        ]);
+    $response->assertStatus(200);
+
+    assertDatabaseHas('permissions', [
+        'id' => $permission->id,
+        'name' => 'manage staff',
+    ]);
 });
 
-test('a guest cannot list permissions', function () {
-    $response = getJson('/api/v1/admin/permissions');
-    $response->assertStatus(401);
+test('permission update validates a unique name', function () {
+    $permission1 = Permission::firstOrCreate(['name' => 'manage users', 'guard_name' => 'web']);
+    Permission::firstOrCreate(['name' => 'manage staff', 'guard_name' => 'web']);
+
+    $response = actingAs(adminUser(), 'sanctum')->patchJson("/api/v1/admin/permissions/{$permission1->id}", [
+        'name' => 'manage staff',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['name']);
 });
 
-test('a regular user cannot list permissions', function () {
+test('a guest cannot update a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'guest update', 'guard_name' => 'web']);
+
+    patchJson("/api/v1/admin/permissions/{$permission->id}", ['name' => 'changed'])
+        ->assertUnauthorized();
+
+    expect($permission->fresh()->name)->toBe('guest update');
+});
+
+test('a regular user cannot update a permission', function () {
+    $permission = Permission::firstOrCreate(['name' => 'user update', 'guard_name' => 'web']);
+
     actingAs(regularUser())
-        ->getJson('/api/v1/admin/permissions')
+        ->patchJson("/api/v1/admin/permissions/{$permission->id}", ['name' => 'changed'])
         ->assertForbidden();
 });
 
-test('an admin can search sort and paginate permissions', function () {
-    Permission::create(['name' => 'zulu report', 'guard_name' => 'web']);
-    $matching = Permission::create(['name' => 'alpha report', 'guard_name' => 'web']);
-
+test('updating a missing permission returns not found', function () {
     actingAs(adminUser(), 'sanctum')
-        ->getJson('/api/v1/admin/permissions?search=report&sort=name&direction=asc&per_page=1')
-        ->assertOk()
-        ->assertJsonPath('meta.total', 2)
-        ->assertJsonPath('data.0.id', $matching->id);
-});
-
-test('permission list query parameters are validated', function () {
-    actingAs(adminUser(), 'sanctum')
-        ->getJson('/api/v1/admin/permissions?sort=guard_name&direction=sideways&per_page=101')
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['sort', 'direction', 'per_page']);
+        ->patchJson('/api/v1/admin/permissions/999999', ['name' => 'missing permission'])
+        ->assertNotFound();
 });

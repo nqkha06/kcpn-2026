@@ -3,50 +3,45 @@
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertDatabaseMissing;
-use function Pest\Laravel\postJson;
+use function Pest\Laravel\getJson;
 
-test('an admin can create a permission', function () {
-    $response = actingAs(adminUser(), 'sanctum')->postJson('/api/v1/admin/permissions', [
-        'name' => 'publish articles',
-    ]);
+test('an admin can list permissions', function () {
+    Permission::firstOrCreate(['name' => 'edit articles', 'guard_name' => 'web']);
 
-    $response->assertStatus(201);
+    $response = actingAs(adminUser(), 'sanctum')->getJson('/api/v1/admin/permissions');
 
-    assertDatabaseHas('permissions', [
-        'name' => 'publish articles',
-        'guard_name' => 'web',
-    ]);
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'name', 'created_at'],
+            ],
+        ]);
 });
 
-test('permission creation validates a unique name', function () {
-    Permission::firstOrCreate(['name' => 'publish articles', 'guard_name' => 'web']);
-
-    $response = actingAs(adminUser(), 'sanctum')->postJson('/api/v1/admin/permissions', [
-        'name' => 'publish articles',
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['name']);
+test('a guest cannot list permissions', function () {
+    getJson('/api/v1/admin/permissions')->assertStatus(401);
 });
 
-test('a guest cannot create a permission', function () {
-    postJson('/api/v1/admin/permissions', ['name' => 'guest permission'])
-        ->assertUnauthorized();
-
-    assertDatabaseMissing('permissions', ['name' => 'guest permission']);
-});
-
-test('a regular user cannot create a permission', function () {
+test('a regular user cannot list permissions', function () {
     actingAs(regularUser())
-        ->postJson('/api/v1/admin/permissions', ['name' => 'user permission'])
+        ->getJson('/api/v1/admin/permissions')
         ->assertForbidden();
 });
 
-test('permission creation requires a name', function () {
+test('an admin can search sort and paginate permissions', function () {
+    Permission::firstOrCreate(['name' => 'zulu report', 'guard_name' => 'web']);
+    $matching = Permission::firstOrCreate(['name' => 'alpha report', 'guard_name' => 'web']);
+
     actingAs(adminUser(), 'sanctum')
-        ->postJson('/api/v1/admin/permissions', [])
+        ->getJson('/api/v1/admin/permissions?search=report&sort=name&direction=asc&per_page=1')
+        ->assertOk()
+        ->assertJsonPath('meta.total', 2)
+        ->assertJsonPath('data.0.id', $matching->id);
+});
+
+test('permission list query parameters are validated', function () {
+    actingAs(adminUser(), 'sanctum')
+        ->getJson('/api/v1/admin/permissions?sort=guard_name&direction=sideways&per_page=101')
         ->assertUnprocessable()
-        ->assertJsonValidationErrors('name');
+        ->assertJsonValidationErrors(['sort', 'direction', 'per_page']);
 });
