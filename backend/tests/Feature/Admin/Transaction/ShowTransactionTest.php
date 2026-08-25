@@ -1,36 +1,38 @@
 <?php
 
-use App\Models\ExpenseTransaction;
+use App\Models\Category;
+use App\Models\UserWallet;
+use Tests\Support\TestData;
+use Tests\Support\TestResponseAssertions;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\getJson;
 
-test('an admin can view a transaction', function () {
-    $transaction = ExpenseTransaction::factory()->create();
+test('admin transaction options follow the shared test data contract', function (array $case) {
+    $user = null;
+    $wallet = null;
+    $category = null;
 
-    actingAs(adminUser())
-        ->getJson("/api/v1/admin/transactions/{$transaction->id}")
-        ->assertOk()
-        ->assertJsonPath('data.id', $transaction->id);
-});
+    if (in_array('user_wallet_and_category_exist', $case['preconditions'], true)) {
+        $user = regularUser();
+        $wallet = UserWallet::factory()->for($user)->create();
+        $category = Category::factory()->create();
+    }
 
-test('a guest cannot view an admin transaction', function () {
-    $transaction = ExpenseTransaction::factory()->create();
+    if ($case['actor'] === 'admin') {
+        actingAs(adminUser());
+    } elseif ($case['actor'] === 'user') {
+        actingAs(regularUser());
+    }
 
-    getJson("/api/v1/admin/transactions/{$transaction->id}")
-        ->assertUnauthorized();
-});
+    $request = $case['request'];
+    $response = $this->getJson($request['endpoint'], $request['headers']);
 
-test('a regular user cannot view a transaction through the admin endpoint', function () {
-    $transaction = ExpenseTransaction::factory()->forUser(regularUser())->create();
+    TestResponseAssertions::assertForCase($response, $case);
 
-    actingAs($transaction->user)
-        ->getJson("/api/v1/admin/transactions/{$transaction->id}")
-        ->assertForbidden();
-});
-
-test('viewing a missing admin transaction returns not found', function () {
-    actingAs(adminUser())
-        ->getJson('/api/v1/admin/transactions/999999')
-        ->assertNotFound();
-});
+    if ($case['actor'] === 'admin') {
+        $response
+            ->assertJsonFragment(['id' => $user?->id, 'name' => $user?->name, 'email' => $user?->email])
+            ->assertJsonFragment(['id' => $wallet?->id, 'user_id' => $user?->id, 'name' => $wallet?->name])
+            ->assertJsonFragment(['id' => $category?->id, 'name' => $category?->name]);
+    }
+})->with(TestData::load('admin/transactions/options.json'));

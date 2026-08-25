@@ -1711,5 +1711,32 @@
                 "operation": "none"
             }
         }
+    },
+    {
+        "case_id": "USR-TXN-CREATE-DT-035",
+        "description": "creates a transaction with the authenticated user's private category",
+        "actor": "user",
+        "preconditions": ["user_with_wallet_exists", "user_active_category_exists"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/user/transactions",
+            "headers": {"Accept": "application/json"},
+            "path": {},
+            "query": {},
+            "body": {
+                "wallet_id": "@wallet.id",
+                "category_id": "@own_category.id",
+                "type": "expense",
+                "amount": 100,
+                "transacted_at": "2026-08-15"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {"success": true, "data.type": "expense", "data.status": "posted", "data.category_id": "@own_category.id"},
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {"table": "expense_transactions", "operation": "insert"}
+        }
     }
 ]

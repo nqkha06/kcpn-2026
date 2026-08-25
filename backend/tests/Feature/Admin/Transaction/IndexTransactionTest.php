@@ -52,7 +52,7 @@ test('an admin can search transactions by id', function () {
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
         ->assertJsonPath('data.0.id', $transaction->id);
-})->todo('AdminTransactionService calls the undefined Eloquent Builder method orWhereKey');
+})->todo('AdminTransactionService uses the undefined Eloquent Builder method orWhereKey');
 
 test('an admin can filter transactions by business fields and inclusive dates', function () {
     $user = regularUser();

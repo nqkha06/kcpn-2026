@@ -169,6 +169,7 @@ test('admin transaction create follows shared execution data', function (array $
         'is_default' => true,
     ]);
     $category = Category::factory()->create(['status' => 'active']);
+    $userCategory = Category::factory()->create(['user_id' => $user->id, 'status' => 'active']);
     $otherUser = regularUser();
     $otherWallet = UserWallet::factory()->for($otherUser)->create();
     $otherCategory = Category::factory()->create(['user_id' => $otherUser->id]);
@@ -177,6 +178,7 @@ test('admin transaction create follows shared execution data', function (array $
         'user' => ['id' => $user->id],
         'wallet' => ['id' => $wallet->id],
         'category' => ['id' => $category->id],
+        'user_category' => ['id' => $userCategory->id],
         'other_wallet' => ['id' => $otherWallet->id],
         'other_category' => ['id' => $otherCategory->id],
         'missing' => ['id' => 999_999_999],

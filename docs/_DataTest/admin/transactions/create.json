@@ -1756,5 +1756,63 @@
                 "operation": "none"
             }
         }
+    },
+    {
+        "case_id": "ADM-TXN-CREATE-DT-034",
+        "description": "creates a pending income transaction with the selected user's private category",
+        "actor": "admin",
+        "preconditions": ["admin_exists", "user_with_wallet_exists", "user_active_category_exists"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/transactions",
+            "headers": {"Accept": "application/json"},
+            "path": {},
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "@user_category.id",
+                "type": "income",
+                "amount": 100,
+                "transacted_at": "2026-08-15",
+                "status": "pending"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {"success": true, "data.type": "income", "data.status": "pending", "data.category_id": "@user_category.id"},
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {"table": "expense_transactions", "operation": "insert"}
+        }
+    },
+    {
+        "case_id": "ADM-TXN-CREATE-DT-035",
+        "description": "creates a cancelled expense transaction without a category",
+        "actor": "admin",
+        "preconditions": ["admin_exists", "user_with_wallet_exists"],
+        "request": {
+            "method": "POST",
+            "endpoint": "/api/v1/admin/transactions",
+            "headers": {"Accept": "application/json"},
+            "path": {},
+            "query": {},
+            "body": {
+                "user_id": "@user.id",
+                "wallet_id": "@wallet.id",
+                "category_id": "none",
+                "type": "expense",
+                "amount": 100,
+                "transacted_at": "2026-08-15",
+                "status": "cancelled"
+            }
+        },
+        "expected": {
+            "status": 201,
+            "json_paths": {"success": true, "data.type": "expense", "data.status": "cancelled", "data.category_id": null},
+            "json_absent": [],
+            "validation_errors": [],
+            "database_change": {"table": "expense_transactions", "operation": "insert"}
+        }
     }
 ]

@@ -155,6 +155,7 @@ test('user transaction create follows shared execution data', function (array $c
         'is_default' => true,
     ]);
     $category = Category::factory()->create(['status' => 'active']);
+    $ownCategory = Category::factory()->create(['user_id' => $user->id, 'status' => 'active']);
     $inactiveCategory = Category::factory()->inactive()->create();
     $otherUser = regularUser();
     $otherWallet = UserWallet::factory()->for($otherUser)->create();
@@ -164,6 +165,7 @@ test('user transaction create follows shared execution data', function (array $c
         'user' => ['id' => $user->id],
         'wallet' => ['id' => $wallet->id],
         'category' => ['id' => $category->id],
+        'own_category' => ['id' => $ownCategory->id],
         'inactive_category' => ['id' => $inactiveCategory->id],
         'other_wallet' => ['id' => $otherWallet->id],
         'other_category' => ['id' => $otherCategory->id],
