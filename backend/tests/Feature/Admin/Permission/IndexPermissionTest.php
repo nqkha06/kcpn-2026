@@ -45,3 +45,14 @@ test('permission list query parameters are validated', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['sort', 'direction', 'per_page']);
 });
+
+test('permission list page query parameter applies BVA boundaries', function () {
+    actingAs(adminUser(), 'sanctum')
+        ->getJson('/api/v1/admin/permissions?page=0')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['page']);
+
+    actingAs(adminUser(), 'sanctum')
+        ->getJson('/api/v1/admin/permissions?page=1')
+        ->assertOk();
+});

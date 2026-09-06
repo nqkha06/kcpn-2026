@@ -80,3 +80,23 @@ test('updating a missing role returns not found', function () {
         ->putJson('/api/v1/admin/roles/999999', ['name' => 'missing-role'])
         ->assertNotFound();
 });
+
+test('role update validates permissions must be an array with integer elements', function () {
+    $role = Role::firstOrCreate(['name' => 'role-update-invalid-perm', 'guard_name' => 'web']);
+
+    actingAs(adminUser(), 'sanctum')
+        ->putJson("/api/v1/admin/roles/{$role->id}", [
+            'name' => 'role-update-invalid-perm',
+            'permissions' => 'not-an-array',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['permissions']);
+
+    actingAs(adminUser(), 'sanctum')
+        ->putJson("/api/v1/admin/roles/{$role->id}", [
+            'name' => 'role-update-invalid-perm',
+            'permissions' => ['not-an-integer'],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['permissions.0']);
+});
