@@ -1,14 +1,7 @@
 /backend/.phpunit.cache
-/backend/bootstrap/ssr
-/backend/node_modules
-/backend/public/build
-/backend/public/hot
 /backend/public/storage
 /backend/storage/*.key
 /backend/storage/pail
-/backend/resources/js/actions
-/backend/resources/js/routes
-/backend/resources/js/wayfinder
 /backend/vendor
 .DS_Store
 .env

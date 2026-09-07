@@ -71,7 +71,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::get('budgets', [UserBudgetController::class, 'index'])->name('budgets.index');
             Route::post('budgets', [UserBudgetController::class, 'store'])->name('budgets.store');
 
-            Route::middleware('role:user')->prefix('settings')->name('settings.')->group(function (): void {
+            Route::prefix('settings')->name('settings.')->group(function (): void {
                 Route::get('/', [UserSettingsController::class, 'show'])->name('show');
                 Route::patch('profile', [UserSettingsController::class, 'updateProfile'])
                     ->name('profile.update');

@@ -43,6 +43,4 @@ Frontend cần lấy CSRF cookie trước các request thay đổi trạng thái
 php artisan test --compact
 ```
 
-## Trạng thái migration
-
-Các API authentication, user finance, public site và admin đã được chuẩn hóa. Mã React/Inertia cũ trong `resources/js` đang được giữ tạm để đối chiếu các trang chưa chuyển và không được frontend Next.js sử dụng.
+Backend chỉ đăng ký REST API và health endpoint. Giao diện được triển khai độc lập trong thư mục `frontend/`.

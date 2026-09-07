@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -9,7 +10,7 @@ use function Pest\Laravel\patchJson;
 
 test('a user can update their profile', function () {
     $user = User::factory()->create();
-    $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
+    $user->assignRole(Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
 
     $response = actingAs($user, 'sanctum')->patchJson('/api/v1/user/settings/profile', [
         'name' => 'Jane Smith',
@@ -25,9 +26,23 @@ test('a user can update their profile', function () {
     ]);
 });
 
+test('an admin can update their personal profile', function () {
+    $admin = adminUser();
+
+    actingAs($admin)
+        ->patchJson('/api/v1/user/settings/profile', [
+            'name' => 'Updated Administrator',
+            'email' => $admin->email,
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.name', 'Updated Administrator');
+
+    expect($admin->fresh()->name)->toBe('Updated Administrator');
+});
+
 test('profile update validates the name', function () {
     $user = User::factory()->create();
-    $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
+    $user->assignRole(Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
 
     $response = actingAs($user, 'sanctum')->patchJson('/api/v1/user/settings/profile', [
         'name' => '',

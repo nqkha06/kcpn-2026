@@ -65,14 +65,7 @@ class AppServiceProvider extends ServiceProvider
     protected function configureFrontendUrls(): void
     {
         ResetPassword::createUrlUsing(function (User $user, string $token): string {
-            $frontendUrl = config('app.frontend_url');
-
-            if (! is_string($frontendUrl) || $frontendUrl === '') {
-                return route('password.reset', [
-                    'token' => $token,
-                    'email' => $user->getEmailForPasswordReset(),
-                ]);
-            }
+            $frontendUrl = (string) (config('app.frontend_url') ?: config('app.url'));
 
             return sprintf(
                 '%s/reset-password?token=%s&email=%s',
