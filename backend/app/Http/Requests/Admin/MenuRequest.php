@@ -32,7 +32,7 @@ class MenuRequest extends FormRequest
 
         return [
             'title' => ['required', 'string', 'max:120'],
-            'url' => ['nullable', 'string', 'max:255'],
+            'url' => ['nullable', 'string', 'max:255', 'regex:~^(https?://|/|#)~i'],
             'canonical' => ['required', 'string', 'max:80', 'regex:/^[a-z0-9]+(\.[a-z0-9_-]+)+$/'],
             'parent_id' => [
                 'nullable',

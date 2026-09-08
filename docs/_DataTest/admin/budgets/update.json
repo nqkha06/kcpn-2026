@@ -495,5 +495,89 @@
         "where": {}
       }
     }
+  },
+  {
+  "case_id": "ADM-BDG-UPDATE-BVA-013",
+  "description": "note at max boundary (255 chars) is accepted on update",
+  "actor": "admin",
+  "preconditions": ["customer", "global_category"],
+  "request": {
+    "method": "PATCH",
+    "endpoint": "/api/v1/admin/budgets/{budget}",
+    "headers": { "Accept": "application/json" },
+    "path": { "budget": "@budget.id" },
+    "query": {},
+    "body": {
+      "user_id": "@customer.id",
+      "category_id": "@category.id",
+      "amount_limit": 4000,
+      "period": "monthly",
+      "status": "active",
+      "note": { "generator": "repeat", "character": "a", "length": 255 }
+    }
+  },
+  "expected": {
+    "status": 200,
+    "json_paths": {},
+    "json_absent": [],
+    "validation_errors": [],
+    "database_change": { "operation": "update", "table": "budgets", "where": {} }
   }
+},
+{
+  "case_id": "ADM-BDG-UPDATE-RBVA-014",
+  "description": "note over max boundary (256 chars) is rejected on update",
+  "actor": "admin",
+  "preconditions": ["customer", "global_category"],
+  "request": {
+    "method": "PATCH",
+    "endpoint": "/api/v1/admin/budgets/{budget}",
+    "headers": { "Accept": "application/json" },
+    "path": { "budget": "@budget.id" },
+    "query": {},
+    "body": {
+      "user_id": "@customer.id",
+      "category_id": "@category.id",
+      "amount_limit": 4000,
+      "period": "monthly",
+      "status": "active",
+      "note": { "generator": "repeat", "character": "a", "length": 256 }
+    }
+  },
+  "expected": {
+    "status": 422,
+    "json_paths": {},
+    "json_absent": [],
+    "validation_errors": ["note"],
+    "database_change": { "operation": "none", "table": null, "where": {} }
+  }
+},
+{
+  "case_id": "ADM-BDG-UPDATE-EP-015",
+  "description": "non-numeric amount_limit is rejected on update",
+  "actor": "admin",
+  "preconditions": ["customer", "global_category"],
+  "request": {
+    "method": "PATCH",
+    "endpoint": "/api/v1/admin/budgets/{budget}",
+    "headers": { "Accept": "application/json" },
+    "path": { "budget": "@budget.id" },
+    "query": {},
+    "body": {
+      "user_id": "@customer.id",
+      "category_id": "@category.id",
+      "amount_limit": "not-a-number",
+      "period": "monthly",
+      "status": "active",
+      "note": "Invalid"
+    }
+  },
+  "expected": {
+    "status": 422,
+    "json_paths": {},
+    "json_absent": [],
+    "validation_errors": ["amount_limit"],
+    "database_change": { "operation": "none", "table": null, "where": {} }
+  }
+}
 ]

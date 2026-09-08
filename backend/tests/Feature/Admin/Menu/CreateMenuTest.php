@@ -177,7 +177,7 @@ test('menu creation rejects executable javascript urls', function () {
         ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('url');
-})->todo('MenuRequest accepts executable URL schemes that may be rendered as public links');
+});
 
 // --- Boundary Value Analysis: title (rule: required, string, max:120) ---
 dataset('title boundaries', [
@@ -215,8 +215,8 @@ test('menu creation rejects an empty title', function () {
 
 // --- Boundary Value Analysis: url (rule: nullable, string, max:255) ---
 dataset('url boundaries', [
-    'max boundary (255)' => [str_repeat('a', 255), true],
-    'just above max (256)' => [str_repeat('a', 256), false],
+    'max boundary (255)' => ['/'.str_repeat('a', 254), true],
+    'just above max (256)' => ['/'.str_repeat('a', 255), false],
 ]);
 
 test('menu creation enforces url length boundaries', function (string $url, bool $shouldPass) {

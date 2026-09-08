@@ -663,5 +663,117 @@
         "where": {}
       }
     }
+  },
+  {
+  "case_id": "ADM-BDG-CREATE-EP-017",
+  "description": "category owned by the target user (not global) is accepted",
+  "actor": "admin",
+  "preconditions": ["customer", "global_category"],
+  "request": {
+    "method": "POST",
+    "endpoint": "/api/v1/admin/budgets",
+    "headers": { "Accept": "application/json" },
+    "path": {},
+    "query": {},
+    "body": {
+      "user_id": "@customer.id",
+      "category_id": "@duplicate_category.id",
+      "amount_limit": 500,
+      "period": "monthly",
+      "status": "active",
+      "note": "Own category budget"
+    }
+  },
+  "expected": {
+    "status": 201,
+    "json_paths": { "data.category.id": "@duplicate_category.id" },
+    "json_absent": [],
+    "validation_errors": [],
+    "database_change": { "operation": "insert", "table": "budgets", "where": { "category_id": "@duplicate_category.id" } }
   }
+},
+{
+  "case_id": "ADM-BDG-CREATE-EP-018",
+  "description": "inactive status is accepted as a valid class on create",
+  "actor": "admin",
+  "preconditions": ["customer", "global_category"],
+  "request": {
+    "method": "POST",
+    "endpoint": "/api/v1/admin/budgets",
+    "headers": { "Accept": "application/json" },
+    "path": {},
+    "query": {},
+    "body": {
+      "user_id": "@customer.id",
+      "category_id": "@category.id",
+      "amount_limit": 800,
+      "period": "monthly",
+      "status": "inactive",
+      "note": "Inactive at creation"
+    }
+  },
+  "expected": {
+    "status": 201,
+    "json_paths": { "data.status": "inactive" },
+    "json_absent": [],
+    "validation_errors": [],
+    "database_change": { "operation": "insert", "table": "budgets", "where": { "status": "inactive" } }
+  }
+},
+{
+  "case_id": "ADM-BDG-CREATE-BVA-019",
+  "description": "note at max boundary (255 chars) is accepted",
+  "actor": "admin",
+  "preconditions": ["customer", "global_category"],
+  "request": {
+    "method": "POST",
+    "endpoint": "/api/v1/admin/budgets",
+    "headers": { "Accept": "application/json" },
+    "path": {},
+    "query": {},
+    "body": {
+      "user_id": "@customer.id",
+      "category_id": "@category.id",
+      "amount_limit": 800,
+      "period": "monthly",
+      "status": "active",
+      "note": { "generator": "repeat", "character": "a", "length": 255 }
+    }
+  },
+  "expected": {
+    "status": 201,
+    "json_paths": {},
+    "json_absent": [],
+    "validation_errors": [],
+    "database_change": { "operation": "insert", "table": "budgets", "where": {} }
+  }
+},
+{
+  "case_id": "ADM-BDG-CREATE-RBVA-020",
+  "description": "note over max boundary (256 chars) is rejected",
+  "actor": "admin",
+  "preconditions": ["customer", "global_category"],
+  "request": {
+    "method": "POST",
+    "endpoint": "/api/v1/admin/budgets",
+    "headers": { "Accept": "application/json" },
+    "path": {},
+    "query": {},
+    "body": {
+      "user_id": "@customer.id",
+      "category_id": "@category.id",
+      "amount_limit": 800,
+      "period": "monthly",
+      "status": "active",
+      "note": { "generator": "repeat", "character": "a", "length": 256 }
+    }
+  },
+  "expected": {
+    "status": 422,
+    "json_paths": {},
+    "json_absent": [],
+    "validation_errors": ["note"],
+    "database_change": { "operation": "none", "table": null, "where": {} }
+  }
+}
 ]

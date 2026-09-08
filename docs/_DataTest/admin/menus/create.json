@@ -1380,5 +1380,13 @@
     },
     "blocked": true,
     "blocked_reason": "Chưa xác định: implementation hiện tại chỉ kiểm tra string|max:255 và chưa có quy tắc an toàn URL."
-  }
+  },
+  {
+  "case_id": "ADM-MENU-CREATE-EP-035",
+  "description": "target=_blank is accepted as the second valid class",
+  "actor": "admin",
+  "preconditions": [],
+  "request": { "method": "POST", "endpoint": "/api/v1/admin/menus", "headers": { "Accept": "application/json" }, "path": {}, "query": {}, "body": { "title": "External Link", "url": "https://example.com", "canonical": "home.header", "parent_id": null, "sort_order": 10, "target": "_blank", "status": "active" } },
+  "expected": { "status": 201, "json_paths": { "data.target": "_blank" }, "json_absent": [], "validation_errors": [], "database_change": { "operation": "insert", "table": "menus", "where": { "target": "_blank" } } }
+}
 ]

@@ -22,3 +22,6 @@ yarn-error.log
 /ui-ux-pro-max-skill
 /backend/.junie
 /scripts/node_modules
+
+backend/coverage-report/
+backend/coverage-line-detail.php

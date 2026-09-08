@@ -552,5 +552,21 @@
         "where": {}
       }
     }
-  }
+  },
+  {
+  "case_id": "ADM-BDG-INDEX-EP-016",
+  "description": "direction=desc is accepted as the second valid class",
+  "actor": "admin",
+  "preconditions": ["list_fixtures"],
+  "request": { "method": "GET", "endpoint": "/api/v1/admin/budgets", "headers": { "Accept": "application/json" }, "path": {}, "body": {}, "query": { "sort": "amount_limit", "direction": "desc" } },
+  "expected": { "status": 200, "json_paths": {}, "json_absent": [], "validation_errors": [], "database_change": { "operation": "none", "table": null, "where": {} } }
+},
+{
+  "case_id": "ADM-BDG-INDEX-RBVA-017",
+  "description": "search over max boundary (256 chars) is rejected",
+  "actor": "admin",
+  "preconditions": ["list_fixtures"],
+  "request": { "method": "GET", "endpoint": "/api/v1/admin/budgets", "headers": { "Accept": "application/json" }, "path": {}, "body": {}, "query": { "search": { "generator": "repeat", "character": "a", "length": 256 } } },
+  "expected": { "status": 422, "json_paths": {}, "json_absent": [], "validation_errors": ["search"], "database_change": { "operation": "none", "table": null, "where": {} } }
+}
 ]

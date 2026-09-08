@@ -585,5 +585,29 @@
     },
     "blocked": true,
     "blocked_reason": "Bug: route role:user|admin and BudgetPolicy currently allow admin; observed request reaches validation (422) instead of the required role rejection (403). With a valid global category, successful creation is inferred from the route and policy."
-  }
+  },
+  {
+  "case_id": "USR-BDG-CREATE-BVA-016",
+  "description": "note at max boundary (255 chars) is accepted",
+  "actor": "user",
+  "preconditions": [],
+  "request": { "method": "POST", "endpoint": "/api/v1/user/budgets", "headers": { "Accept": "application/json" }, "path": {}, "query": {}, "body": { "category_id": "@category.id", "amount_limit": 500, "period": "monthly", "note": { "generator": "repeat", "character": "a", "length": 255 } } },
+  "expected": { "status": 201, "json_paths": {}, "json_absent": [], "validation_errors": [], "database_change": { "operation": "insert", "table": "budgets", "where": {} } }
+},
+{
+  "case_id": "USR-BDG-CREATE-RBVA-017",
+  "description": "note over max boundary (256 chars) is rejected",
+  "actor": "user",
+  "preconditions": [],
+  "request": { "method": "POST", "endpoint": "/api/v1/user/budgets", "headers": { "Accept": "application/json" }, "path": {}, "query": {}, "body": { "category_id": "@category.id", "amount_limit": 500, "period": "monthly", "note": { "generator": "repeat", "character": "a", "length": 256 } } },
+  "expected": { "status": 422, "json_paths": {}, "json_absent": [], "validation_errors": ["note"], "database_change": { "operation": "none", "table": null, "where": {} } }
+},
+{
+  "case_id": "USR-BDG-CREATE-EP-018",
+  "description": "non-numeric amount_limit is rejected",
+  "actor": "user",
+  "preconditions": [],
+  "request": { "method": "POST", "endpoint": "/api/v1/user/budgets", "headers": { "Accept": "application/json" }, "path": {}, "query": {}, "body": { "category_id": "@category.id", "amount_limit": "abc", "period": "monthly", "note": "Invalid" } },
+  "expected": { "status": 422, "json_paths": {}, "json_absent": [], "validation_errors": ["amount_limit"], "database_change": { "operation": "none", "table": null, "where": {} } }
+}
 ]
