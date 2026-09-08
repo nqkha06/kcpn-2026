@@ -26,3 +26,20 @@ test('logout follows the shared test data contract', function (array $case) {
         $this->getJson('/api/v1/auth/me')->assertUnauthorized();
     }
 })->with(TestData::load('auth/logout.json'));
+
+test('stateful logout invalidates session data and regenerates its CSRF token', function () {
+    $user = regularUser();
+    $session = app('session')->driver();
+    $session->start();
+    $session->put('logout_marker', true);
+    $token = $session->token();
+
+    $this->actingAs($user)
+        ->withSession(['logout_marker' => true])
+        ->withHeader('Referer', 'http://localhost')
+        ->postJson('/api/v1/auth/logout')
+        ->assertOk();
+
+    expect($session->get('logout_marker'))->toBeNull()
+        ->and($session->token())->not->toBe($token);
+});

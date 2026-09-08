@@ -71,11 +71,12 @@ test('an admin can filter users by email', function () {
 
 test('an admin can filter users by specific created date', function () {
     $admin = adminUser();
-    $target = User::factory()->create(['created_at' => '2026-08-10 14:00:00']);
-    User::factory()->create(['created_at' => '2026-08-11 14:00:00']);
+    User::query()->whereKey($admin->id)->update(['created_at' => '2026-09-07 14:00:00']);
+    $target = User::factory()->create(['created_at' => '2026-09-08 14:00:00']);
+    User::factory()->create(['created_at' => '2026-09-09 14:00:00']);
 
     actingAs($admin)
-        ->getJson('/api/v1/admin/users?created_date=2026-08-10')
+        ->getJson('/api/v1/admin/users?created_date=2026-09-08')
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
         ->assertJsonPath('data.0.id', $target->id);

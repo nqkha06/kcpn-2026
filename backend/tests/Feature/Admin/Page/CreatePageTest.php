@@ -17,13 +17,13 @@ test('an admin can create a page', function () {
         ->postJson('/api/v1/admin/pages', [
             'title' => 'API Page',
             'content' => '<p>Created through API tests</p>',
-            'tags' => 'api, test, api',
+            'tags' => 'alpha, beta, alpha',
             'status' => 'published',
         ])
         ->assertCreated()
         ->assertJsonPath('data.slug', 'api-page')
         ->assertJsonPath('data.author.id', $admin->id)
-        ->assertJsonPath('data.tags', ['api', 'test']);
+        ->assertJsonPath('data.tags', ['alpha', 'beta']);
 
     assertDatabaseHas('pages', ['title' => 'API Page', 'slug' => 'api-page']);
 });

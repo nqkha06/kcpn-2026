@@ -74,7 +74,7 @@ test('admin can search budgets by id', function () {
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
         ->assertJsonPath('data.0.id', $budget->id);
-})->todo('AdminBudgetService calls the undefined Eloquent Builder method orWhereKey');
+});
 
 test('admin can filter budgets by period status user and category', function () {
     $admin = adminUser();
@@ -161,4 +161,52 @@ test('budget index query parameters are validated', function () {
         ->getJson('/api/v1/admin/budgets?period=weekly&status=archived&user_id=999999&category_id=999999&sort=invalid&direction=up&per_page=200')
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['period', 'status', 'user_id', 'category_id', 'sort', 'direction', 'per_page']);
+});
+
+test('admin budget search returns an empty page when nothing matches', function () {
+    Budget::factory()->create(['note' => 'Known budget']);
+
+    actingAs(adminUser(), 'web')
+        ->getJson('/api/v1/admin/budgets?search=no-match')
+        ->assertOk()
+        ->assertJsonCount(0, 'data')
+        ->assertJsonPath('meta.total', 0);
+});
+
+test('admin budget index calculates monthly yearly and zero spent amounts without filters', function () {
+    $customer = User::factory()->create();
+    $monthlyCategory = Category::factory()->create();
+    $yearlyCategory = Category::factory()->create();
+    $unusedCategory = Category::factory()->create();
+
+    $monthly = Budget::factory()->for($customer)->for($monthlyCategory)->monthly()->active()->create();
+    $yearly = Budget::factory()->for($customer)->for($yearlyCategory)->active()->create(['period' => 'yearly']);
+    $withoutTransactions = Budget::factory()->for($customer)->for($unusedCategory)->monthly()->active()->create();
+
+    ExpenseTransaction::factory()->forUser($customer)->for($monthlyCategory)->expense()->posted()->create([
+        'amount' => 100,
+        'transacted_at' => now()->toDateString(),
+    ]);
+    ExpenseTransaction::factory()->forUser($customer)->for($monthlyCategory)->expense()->pending()->create([
+        'amount' => 500,
+        'transacted_at' => now()->toDateString(),
+    ]);
+    ExpenseTransaction::factory()->forUser($customer)->for($yearlyCategory)->expense()->posted()->create([
+        'amount' => 300,
+        'transacted_at' => now()->startOfYear()->addDay()->toDateString(),
+    ]);
+    ExpenseTransaction::factory()->forUser($customer)->for($yearlyCategory)->expense()->posted()->create([
+        'amount' => 900,
+        'transacted_at' => now()->subYear()->toDateString(),
+    ]);
+
+    $response = actingAs(adminUser(), 'web')
+        ->getJson('/api/v1/admin/budgets')
+        ->assertOk();
+
+    $budgets = collect($response->json('data'))->keyBy('id');
+
+    expect($budgets[$monthly->id]['spent'])->toEqual(100)
+        ->and($budgets[$yearly->id]['spent'])->toEqual(300)
+        ->and($budgets[$withoutTransactions->id]['spent'])->toEqual(0);
 });

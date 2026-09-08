@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use Tests\Support\TestData;
 use Tests\Support\TestResponseAssertions;
 
@@ -25,3 +26,28 @@ test('appearance retrieval follows the shared test data contract', function (arr
         expect($defaultLanguage['code'])->toBe(strtolower((string) config('app.locale')));
     }
 })->with(TestData::load('admin/appearance/show.json'));
+
+test('appearance retrieval treats malformed stored general json as empty', function () {
+    Setting::query()->create([
+        'key' => 'appearance.general',
+        'value' => '{invalid-json',
+    ]);
+
+    actingAs(adminUser())
+        ->getJson('/api/v1/admin/appearance')
+        ->assertOk()
+        ->assertJsonPath('data.general', []);
+});
+
+test('appearance retrieval preserves remote asset URLs', function () {
+    Setting::query()->create([
+        'key' => 'appearance.logo_light',
+        'value' => 'https://cdn.example.test/logo.svg',
+    ]);
+
+    actingAs(adminUser())
+        ->getJson('/api/v1/admin/appearance')
+        ->assertOk()
+        ->assertJsonPath('data.logos.logo_light.path', 'https://cdn.example.test/logo.svg')
+        ->assertJsonPath('data.logos.logo_light.url', 'https://cdn.example.test/logo.svg');
+});

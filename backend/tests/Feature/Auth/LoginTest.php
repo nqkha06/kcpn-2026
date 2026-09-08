@@ -75,3 +75,23 @@ test('login is rate limited after repeated failed attempts', function () {
         ->assertStatus(429)
         ->assertJsonValidationErrors('email');
 });
+
+test('login works when Fortify username canonicalization is disabled', function () {
+    $user = User::factory()->create([
+        'email' => 'lowercase@example.com',
+        'password' => 'password',
+    ]);
+    $original = config('fortify.lowercase_usernames');
+    config()->set('fortify.lowercase_usernames', false);
+
+    try {
+        $this->postJson('/api/v1/auth/login', [
+            'email' => 'lowercase@example.com',
+            'password' => 'password',
+        ])->assertOk();
+
+        assertAuthenticatedAs($user);
+    } finally {
+        config()->set('fortify.lowercase_usernames', $original);
+    }
+});

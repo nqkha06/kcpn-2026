@@ -149,3 +149,15 @@ test('budgets ordered by period then newest id', function () {
         ->assertJsonPath('data.0.id', $monthly->id)
         ->assertJsonPath('data.1.id', $yearly->id);
 });
+
+test('budget list is empty when the user has no active budgets', function () {
+    $user = regularUser();
+    $category = Category::factory()->create();
+
+    Budget::factory()->for($user)->for($category)->create(['status' => 'inactive']);
+
+    actingAs($user, 'web')
+        ->getJson('/api/v1/user/budgets')
+        ->assertOk()
+        ->assertJsonCount(0, 'data');
+});

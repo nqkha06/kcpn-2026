@@ -76,6 +76,28 @@ test('admin can create a top level menu and it is persisted', function () {
     ]);
 });
 
+test('menu input normalization converts an empty parent and trims canonical', function () {
+    $response = actingAs(adminUser(), 'web')
+        ->postJson('/api/v1/admin/menus', [
+            'title' => 'Normalized menu',
+            'canonical' => ' home.header ',
+            'parent_id' => '',
+            'target' => '_self',
+            'status' => 'active',
+        ])
+        ->assertCreated()
+        ->assertJsonPath('data.parent_id', null)
+        ->assertJsonPath('data.canonical', 'home.header')
+        ->assertJsonPath('data.sort_order', 0);
+
+    assertDatabaseHas('menus', [
+        'id' => $response->json('data.id'),
+        'parent_id' => null,
+        'canonical' => 'home.header',
+        'sort_order' => 0,
+    ]);
+});
+
 test('admin creating a child menu inherits the parent canonical', function () {
     $admin = adminUser();
 
