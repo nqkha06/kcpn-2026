@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Api\V1\Admin;
 
-use App\Enums\BaseStatusEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,9 +26,7 @@ class PageResource extends JsonResource
             'meta_description' => $this->meta_description,
             'meta_keywords' => $this->meta_keywords,
             'tags' => is_array($this->tags) ? $this->tags : [],
-            'status' => $this->status instanceof BaseStatusEnum
-                ? $this->status->value
-                : (string) $this->status,
+            'status' => $this->status->value,
             'category' => $this->whenLoaded('category', fn (): array => [
                 'id' => $this->category->id,
                 'name' => $this->category->name,

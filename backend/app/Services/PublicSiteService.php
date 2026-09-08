@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Page;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Laravel\Fortify\Features;
 
 final class PublicSiteService
@@ -150,7 +151,7 @@ final class PublicSiteService
             return null;
         }
 
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+        if (Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
 

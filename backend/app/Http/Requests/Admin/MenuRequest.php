@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\Menu;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,7 +24,7 @@ class MenuRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -60,12 +61,9 @@ class MenuRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $parentId = $this->input('parent_id');
-
         $this->merge([
-            'parent_id' => $parentId === '' ? null : $parentId,
-            'sort_order' => (int) $this->input('sort_order', 0),
-            'canonical' => trim((string) $this->input('canonical', '')),
+            'sort_order' => $this->integer('sort_order'),
+            'canonical' => $this->string('canonical')->trim()->toString(),
         ]);
     }
 }
