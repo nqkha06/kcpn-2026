@@ -100,6 +100,21 @@ test('an explicitly duplicated page slug is rejected', function () {
         ->assertJsonValidationErrors('slug');
 });
 
+test('page creation generates a random fallback slug when title produces an empty slug', function () {
+    $response = actingAs(adminUser())
+        ->postJson('/api/v1/admin/pages', [
+            'title' => '???',
+            'status' => 'draft',
+        ])
+        ->assertCreated();
+
+    $slug = $response->json('data.slug');
+    expect($slug)->toStartWith('page-')
+        ->and(strlen($slug))->toBe(13);
+
+    assertDatabaseHas('pages', ['title' => '???', 'slug' => $slug]);
+});
+
 test('admin page create follows shared execution data', function (array $case) {
     if (isset($case['blocked'])) {
         $this->markTestSkipped($case['blocked']['reason']);
