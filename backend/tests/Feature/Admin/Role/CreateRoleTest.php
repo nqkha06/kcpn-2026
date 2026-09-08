@@ -62,3 +62,21 @@ test('role creation rejects a duplicate web guard name', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors('name');
 });
+
+test('role creation validates permissions must be an array with integer elements', function () {
+    actingAs(adminUser(), 'sanctum')
+        ->postJson('/api/v1/admin/roles', [
+            'name' => 'new-role-invalid-perm',
+            'permissions' => 'not-an-array',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['permissions']);
+
+    actingAs(adminUser(), 'sanctum')
+        ->postJson('/api/v1/admin/roles', [
+            'name' => 'new-role-invalid-perm-element',
+            'permissions' => ['not-an-integer'],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['permissions.0']);
+});

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Models\ExpenseTransaction;
 use App\Models\UserWallet;
 use Tests\Support\TestData;
 use Tests\Support\TestResponseAssertions;
@@ -36,3 +37,22 @@ test('admin transaction options follow the shared test data contract', function 
             ->assertJsonFragment(['id' => $category?->id, 'name' => $category?->name]);
     }
 })->with(TestData::load('admin/transactions/options.json'));
+
+test('an admin can view a transaction with its relations', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create(['name' => 'Cash']);
+    $category = Category::factory()->create(['name' => 'Groceries']);
+    $transaction = ExpenseTransaction::factory()->forUser($user)->for($category)->expense()->posted()->create([
+        'wallet_id' => $wallet->id,
+        'note' => 'Weekly groceries',
+    ]);
+
+    actingAs(adminUser())
+        ->getJson("/api/v1/admin/transactions/{$transaction->id}")
+        ->assertOk()
+        ->assertJsonPath('data.id', $transaction->id)
+        ->assertJsonPath('data.user.id', $user->id)
+        ->assertJsonPath('data.wallet.id', $wallet->id)
+        ->assertJsonPath('data.category.id', $category->id)
+        ->assertJsonPath('data.note', 'Weekly groceries');
+});

@@ -22,12 +22,17 @@ test('a guest cannot update preferences', function () {
     ])->assertUnauthorized();
 });
 
-test('an admin cannot update preferences on this endpoint', function () {
-    actingAs(adminUser())
+test('an admin can update their personal preferences', function () {
+    $admin = adminUser();
+
+    actingAs($admin)
         ->patchJson('/api/v1/user/settings/preferences', [
             'currency' => 'USD',
         ])
-        ->assertForbidden();
+        ->assertOk()
+        ->assertJsonPath('data.preferences.currency', 'USD');
+
+    expect($admin->fresh()->getMeta('currency'))->toBe('USD');
 });
 
 test('preference update validates currency is required', function () {

@@ -37,7 +37,6 @@ cashback/
 ├── docs/
 │   ├── images/              Hình ảnh dùng trong tài liệu repository
 │   └── srs.docx             Software Requirements Specification
-├── MIGRATION.md             Báo cáo migration Inertia → REST API + Next.js
 └── README.md
 ```
 

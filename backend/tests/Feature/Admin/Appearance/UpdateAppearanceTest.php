@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use App\Services\Admin\AdminAppearanceService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Tests\Support\TestData;
@@ -77,3 +78,21 @@ test('appearance update follows shared authorization and boundary data', functio
         }
     }
 })->with(TestData::load('admin/appearance/update.json'));
+
+test('appearance upload uses a random filename when the original basename has no slug characters', function () {
+    $result = app(AdminAppearanceService::class)->update([], [
+        'logo_light' => UploadedFile::fake()->image('---.png'),
+    ]);
+    $storedPath = $result['logos']['logo_light']['path'];
+
+    try {
+        expect($storedPath)
+            ->toBeString()
+            ->toMatch('/^settings\/[A-Za-z0-9]{8}\.png$/');
+        expect(File::exists(public_path($storedPath)))->toBeTrue();
+    } finally {
+        if (is_string($storedPath)) {
+            File::delete(public_path($storedPath));
+        }
+    }
+});

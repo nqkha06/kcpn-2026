@@ -68,6 +68,20 @@ test('a page can keep its own slug when updated', function () {
         ->assertJsonPath('data.slug', 'page');
 });
 
+test('page update keeps existing slug when new title produces an empty slug and slug is omitted', function () {
+    $page = Page::query()->create(['title' => 'Original Page', 'slug' => 'original-slug', 'status' => 'draft']);
+
+    actingAs(adminUser())
+        ->patchJson("/api/v1/admin/pages/{$page->id}", [
+            'title' => '???',
+            'status' => 'published',
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.slug', 'original-slug');
+
+    assertDatabaseHas('pages', ['id' => $page->id, 'title' => '???', 'slug' => 'original-slug']);
+});
+
 test('page update rejects another pages slug', function () {
     Page::query()->create(['title' => 'Existing', 'slug' => 'existing', 'status' => 'draft']);
     $page = Page::query()->create(['title' => 'Page', 'slug' => 'page', 'status' => 'draft']);

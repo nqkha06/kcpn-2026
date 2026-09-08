@@ -70,3 +70,15 @@ test('deleting a missing wallet returns not found', function () {
         ->deleteJson('/api/v1/user/wallets/999999')
         ->assertNotFound();
 });
+
+test('deleting the only default wallet does not attempt to promote another wallet', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->defaultWallet()->create();
+
+    actingAs($user)
+        ->deleteJson("/api/v1/user/wallets/{$wallet->id}")
+        ->assertOk();
+
+    expect(UserWallet::withTrashed()->find($wallet->id)?->trashed())->toBeTrue()
+        ->and($user->wallets()->exists())->toBeFalse();
+});

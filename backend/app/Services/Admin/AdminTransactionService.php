@@ -32,7 +32,7 @@ final class AdminTransactionService
                         ->where('name', 'like', '%'.$search.'%'));
 
                 if (ctype_digit($search)) {
-                    $builder->orWhereKey((int) $search);
+                    $builder->orWhere($builder->getModel()->getQualifiedKeyName(), (int) $search);
                 }
             });
         }

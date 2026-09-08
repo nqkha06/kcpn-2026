@@ -55,7 +55,32 @@ test('an admin can search users by id', function () {
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
         ->assertJsonPath('data.0.id', $user->id);
-})->todo('AdminUserService calls the undefined Eloquent Builder method orWhereKey');
+});
+
+test('an admin can filter users by email', function () {
+    $admin = adminUser();
+    $target = User::factory()->create(['email' => 'specific_filter@example.com']);
+    User::factory()->create(['email' => 'other_user@example.com']);
+
+    actingAs($admin)
+        ->getJson('/api/v1/admin/users?email=specific_filter')
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.id', $target->id);
+});
+
+test('an admin can filter users by specific created date', function () {
+    $admin = adminUser();
+    User::query()->whereKey($admin->id)->update(['created_at' => '2026-09-07 14:00:00']);
+    $target = User::factory()->create(['created_at' => '2026-09-08 14:00:00']);
+    User::factory()->create(['created_at' => '2026-09-09 14:00:00']);
+
+    actingAs($admin)
+        ->getJson('/api/v1/admin/users?created_date=2026-09-08')
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.id', $target->id);
+});
 
 test('an admin can filter users by role and creation date', function () {
     $admin = adminUser();

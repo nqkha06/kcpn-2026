@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -11,7 +12,7 @@ test('settings return the current users profile and preferences', function () {
         'email' => 'john@example.com',
     ]);
 
-    $user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
+    $user->assignRole(Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']));
 
     $user->setMeta('currency', 'USD');
 
@@ -45,10 +46,11 @@ test('settings use VND when the user has no currency preference', function () {
         ->assertJsonPath('data.preferences.currency', 'VND');
 });
 
-test('an admin cannot access user only settings', function () {
+test('an admin can access their personal settings', function () {
     actingAs(adminUser())
         ->getJson('/api/v1/user/settings')
-        ->assertForbidden();
+        ->assertOk()
+        ->assertJsonStructure(['data' => ['profile', 'preferences', 'currency_options']]);
 });
 
 test('settings response does not expose sensitive user fields', function () {

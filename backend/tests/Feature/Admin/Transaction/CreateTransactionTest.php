@@ -3,6 +3,7 @@
 use App\Models\Category;
 use App\Models\ExpenseTransaction;
 use App\Models\UserWallet;
+use App\Services\Admin\AdminTransactionService;
 use Tests\Support\TestData;
 use Tests\Support\TestResponseAssertions;
 
@@ -78,6 +79,22 @@ test('admin transaction creation validates required fields', function () {
             'transacted_at',
             'status',
         ]);
+});
+
+test('admin transaction validation stops wallet ownership lookup for an invalid user id', function () {
+    $wallet = UserWallet::factory()->create();
+
+    actingAs(adminUser())
+        ->postJson('/api/v1/admin/transactions', [
+            'user_id' => 0,
+            'wallet_id' => $wallet->id,
+            'type' => 'expense',
+            'amount' => 100,
+            'transacted_at' => '2026-08-01',
+            'status' => 'posted',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('user_id');
 });
 
 test('admin transaction creation rejects invalid values', function () {
@@ -160,6 +177,23 @@ test('admin transaction creation normalizes optional fields', function () {
         'category_id' => null,
         'note' => null,
     ]);
+});
+
+test('admin transaction service accepts comma separated labels from direct method input', function () {
+    $user = regularUser();
+    $wallet = UserWallet::factory()->for($user)->create();
+
+    $transaction = app(AdminTransactionService::class)->create([
+        'user_id' => $user->id,
+        'wallet_id' => $wallet->id,
+        'type' => 'expense',
+        'amount' => 100,
+        'transacted_at' => '2026-08-01',
+        'status' => 'posted',
+        'labels' => ' work, recurring, work ',
+    ]);
+
+    expect($transaction->labels)->toBe(['work', 'recurring']);
 });
 
 test('admin transaction create follows shared execution data', function (array $case) {

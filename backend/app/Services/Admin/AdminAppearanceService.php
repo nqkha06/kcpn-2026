@@ -157,7 +157,7 @@ final class AdminAppearanceService
             return null;
         }
 
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+        if (Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
 

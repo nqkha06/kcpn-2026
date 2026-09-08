@@ -46,3 +46,14 @@ test('role list query parameters are validated', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['sort', 'direction', 'per_page']);
 });
+
+test('role list page query parameter applies BVA boundaries', function () {
+    actingAs(adminUser(), 'sanctum')
+        ->getJson('/api/v1/admin/roles?page=0')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['page']);
+
+    actingAs(adminUser(), 'sanctum')
+        ->getJson('/api/v1/admin/roles?page=1')
+        ->assertOk();
+});

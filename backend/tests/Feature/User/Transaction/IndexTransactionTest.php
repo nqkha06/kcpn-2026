@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Category;
 use App\Models\ExpenseTransaction;
+use App\Models\UserWallet;
 use Tests\Support\TestData;
 use Tests\Support\TestResponseAssertions;
 
@@ -26,11 +28,11 @@ test('a guest cannot list transactions', function () {
 
 test('a user can search transactions by note', function () {
     $user = regularUser();
-    $matching = ExpenseTransaction::factory()->forUser($user)->create(['note' => 'Office lunch']);
+    $matching = ExpenseTransaction::factory()->forUser($user)->create(['note' => 'Morning coffee']);
     ExpenseTransaction::factory()->forUser($user)->create(['note' => 'Bus ticket']);
 
     actingAs($user)
-        ->getJson('/api/v1/user/transactions?search=lunch')
+        ->getJson('/api/v1/user/transactions?search=coffee')
         ->assertOk()
         ->assertJsonPath('meta.total', 1)
         ->assertJsonPath('data.0.id', $matching->id);
@@ -38,8 +40,8 @@ test('a user can search transactions by note', function () {
 
 test('a user can filter transactions by type status wallet and category', function () {
     $user = regularUser();
-    $wallet = \App\Models\UserWallet::factory()->for($user)->create();
-    $category = \App\Models\Category::factory()->create();
+    $wallet = UserWallet::factory()->for($user)->create();
+    $category = Category::factory()->create();
     $matching = ExpenseTransaction::factory()->forUser($user)->expense()->posted()->create([
         'wallet_id' => $wallet->id,
         'category_id' => $category->id,
@@ -111,7 +113,7 @@ test('transaction list rejects an end date before the start date', function () {
 });
 
 test('a user cannot filter transactions by another users wallet', function () {
-    $wallet = \App\Models\UserWallet::factory()->for(regularUser())->create();
+    $wallet = UserWallet::factory()->for(regularUser())->create();
 
     actingAs(regularUser())
         ->getJson('/api/v1/user/transactions?wallet_id='.$wallet->id)

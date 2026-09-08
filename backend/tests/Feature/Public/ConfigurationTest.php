@@ -2,6 +2,8 @@
 
 use App\Models\Menu;
 use App\Models\Setting;
+use App\Services\PublicSiteService;
+use Illuminate\Support\Facades\Schema;
 use Tests\Support\TestData;
 use Tests\Support\TestResponseAssertions;
 
@@ -60,3 +62,35 @@ test('public configuration follows the shared test data contract', function (arr
             ->assertJsonMissing(['title' => 'Hidden With Parent']);
     }
 })->with(TestData::load('public/configuration.json'));
+
+test('public configuration resolves empty remote and local appearance paths', function () {
+    foreach ([
+        'appearance.logo_light' => '',
+        'appearance.logo_dark' => 'http://cdn.example.test/dark.svg',
+        'appearance.favicon' => 'https://cdn.example.test/favicon.ico',
+        'appearance.social_image' => 'images/social.png',
+    ] as $key => $value) {
+        Setting::query()->create(compact('key', 'value'));
+    }
+
+    $this->getJson('/api/v1/public/configuration')
+        ->assertOk()
+        ->assertJsonPath('data.appearance.logo_light', null)
+        ->assertJsonPath('data.appearance.logo_dark', 'http://cdn.example.test/dark.svg')
+        ->assertJsonPath('data.appearance.favicon', 'https://cdn.example.test/favicon.ico')
+        ->assertJsonPath('data.appearance.social_image', asset('images/social.png'));
+});
+
+test('public configuration returns defaults before settings and menu tables exist', function () {
+    Schema::shouldReceive('hasTable')->once()->with('settings')->andReturnFalse();
+    Schema::shouldReceive('hasTable')->once()->with('menus')->andReturnFalse();
+
+    $configuration = app(PublicSiteService::class)->configuration('en');
+
+    expect($configuration['appearance']['logo_light'])->toBeNull()
+        ->and($configuration['menus'])->toBe([
+            'home.header' => [],
+            'home.footer' => [],
+            'user.header' => [],
+        ]);
+});

@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\Models\UserWallet;
 use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -40,26 +41,18 @@ class StoreExpenseTransactionRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        $userId = $this->user()?->id;
+        $userId = $this->user()->id;
 
         return [
             'wallet_id' => [
                 'required',
                 'integer',
                 'exists:user_wallets,id',
-                function (string $attribute, mixed $value, Closure $fail): void {
-                    $userId = $this->user()?->id;
-
-                    if ($userId === null) {
-                        $fail('You must be logged in to create a transaction.');
-
-                        return;
-                    }
-
+                function (string $attribute, mixed $value, Closure $fail) use ($userId): void {
                     $walletBelongsToUser = UserWallet::query()
                         ->whereKey((int) $value)
                         ->where('user_id', $userId)

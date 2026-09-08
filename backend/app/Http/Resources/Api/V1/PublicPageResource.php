@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class PublicPageResource extends JsonResource
 {
@@ -33,7 +34,7 @@ class PublicPageResource extends JsonResource
             return null;
         }
 
-        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+        if (Str::startsWith($this->image, ['http://', 'https://'])) {
             return $this->image;
         }
 

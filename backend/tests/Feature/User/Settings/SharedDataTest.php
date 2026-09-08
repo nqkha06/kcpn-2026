@@ -18,12 +18,14 @@ function executeUserSettingsDataCase(object $testCase, array $case): void
     $existingUser = User::factory()->create(['email' => 'shared-existing-profile@example.test']);
     $verifiedAt = $user->email_verified_at;
 
+    $authenticatedUser = $case['actor'] === 'admin' ? adminUser() : $user;
+
     if (in_array('currency_already_usd', $case['preconditions'], true)) {
-        $user->setMeta('currency', 'USD');
+        $authenticatedUser->setMeta('currency', 'USD');
     }
 
     $case = TestData::resolveAliases($case, [
-        'user' => ['id' => $user->id, 'email' => $user->email],
+        'user' => ['id' => $authenticatedUser->id, 'email' => $authenticatedUser->email],
         'existing_user' => ['email' => $existingUser->email],
         'email_254' => ['value' => sharedBoundaryEmail(254)],
         'email_255' => ['value' => sharedBoundaryEmail(255)],
@@ -31,9 +33,9 @@ function executeUserSettingsDataCase(object $testCase, array $case): void
     ]);
 
     if ($case['actor'] === 'user') {
-        $testCase->actingAs($user);
+        $testCase->actingAs($authenticatedUser);
     } elseif ($case['actor'] === 'admin') {
-        $testCase->actingAs(adminUser());
+        $testCase->actingAs($authenticatedUser);
     }
 
     $response = $testCase->json(
@@ -45,17 +47,17 @@ function executeUserSettingsDataCase(object $testCase, array $case): void
     TestResponseAssertions::assertForCase($response, $case);
 
     if ($case['expected']['database_change']['operation'] === 'update') {
-        $user->refresh();
+        $authenticatedUser->refresh();
 
         if (str_ends_with($case['request']['endpoint'], '/profile')) {
-            expect($user->name)->toBe($case['request']['body']['name'])
-                ->and($user->email)->toBe($case['request']['body']['email']);
+            expect($authenticatedUser->name)->toBe($case['request']['body']['name'])
+                ->and($authenticatedUser->email)->toBe($case['request']['body']['email']);
 
             if ($case['case_id'] === 'USR-SET-PROFILE-UPDATE-BUS-014') {
-                expect($user->email_verified_at?->equalTo($verifiedAt))->toBeTrue();
+                expect($authenticatedUser->email_verified_at?->equalTo($verifiedAt))->toBeTrue();
             }
         } else {
-            expect($user->getMeta('currency'))->toBe($case['request']['body']['currency']);
+            expect($authenticatedUser->getMeta('currency'))->toBe($case['request']['body']['currency']);
         }
     }
 }

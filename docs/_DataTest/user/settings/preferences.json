@@ -297,7 +297,7 @@
   },
   {
     "case_id": "USR-SET-PREF-UPDATE-RBAC-010",
-    "description": "admin role is forbidden by user route",
+    "description": "admin can update personal preferences",
     "actor": "admin",
     "preconditions": [],
     "request": {
@@ -313,16 +313,19 @@
       }
     },
     "expected": {
-      "status": 403,
+      "status": 200,
       "json_paths": {
-        "message": "Forbidden"
+        "data.preferences.currency": "VND"
       },
       "json_absent": [],
       "validation_errors": [],
       "database_change": {
-        "operation": "none",
-        "table": null,
-        "where": {}
+        "operation": "update",
+        "table": "user_meta",
+        "where": {
+          "user_id": "@user.id",
+          "currency": "VND"
+        }
       }
     }
   }

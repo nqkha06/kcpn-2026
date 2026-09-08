@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 final class ApiResponse
 {
+    /** @codeCoverageIgnore */
     private function __construct() {}
 
     public static function success(

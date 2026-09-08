@@ -57,3 +57,22 @@ test('registration follows the shared boundary and partition data', function (ar
         Event::assertNotDispatched(Registered::class);
     }
 })->with(TestData::load('auth/register.json'));
+
+test('stateful registration regenerates the frontend session', function () {
+    Event::fake([Registered::class]);
+    $session = app('session')->driver();
+    $session->start();
+    $sessionId = $session->getId();
+
+    $this->withSession(['registration_marker' => true])
+        ->withHeader('Referer', 'http://localhost')
+        ->postJson('/api/v1/auth/register', [
+            'name' => 'Stateful User',
+            'email' => 'stateful@example.com',
+            'password' => 'Password1!',
+            'password_confirmation' => 'Password1!',
+        ])
+        ->assertCreated();
+
+    expect($session->getId())->not->toBe($sessionId);
+});

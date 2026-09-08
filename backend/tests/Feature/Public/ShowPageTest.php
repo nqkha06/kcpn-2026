@@ -60,3 +60,34 @@ test('public page show follows the shared test data contract', function (array $
         $response->assertHeader('Cache-Control', 'max-age=60, public');
     }
 })->with(TestData::load('public/pages-show.json'));
+
+test('public page resource resolves every supported image path form', function () {
+    $images = [
+        'empty-image' => '',
+        'http-image' => 'http://cdn.example.test/page.jpg',
+        'https-image' => 'https://cdn.example.test/page.jpg',
+        'local-image' => 'images/page.jpg',
+    ];
+
+    foreach ($images as $slug => $image) {
+        Page::query()->create([
+            'title' => $slug,
+            'slug' => $slug,
+            'status' => 'published',
+            'image' => $image,
+        ]);
+    }
+
+    $this->getJson('/api/v1/public/pages/empty-image')
+        ->assertOk()
+        ->assertJsonPath('data.image', null);
+    $this->getJson('/api/v1/public/pages/http-image')
+        ->assertOk()
+        ->assertJsonPath('data.image', 'http://cdn.example.test/page.jpg');
+    $this->getJson('/api/v1/public/pages/https-image')
+        ->assertOk()
+        ->assertJsonPath('data.image', 'https://cdn.example.test/page.jpg');
+    $this->getJson('/api/v1/public/pages/local-image')
+        ->assertOk()
+        ->assertJsonPath('data.image', asset('images/page.jpg'));
+});
